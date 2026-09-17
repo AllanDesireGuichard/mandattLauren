@@ -72,6 +72,22 @@ alternatifs               4 %                                      + 5 % souv. c
 | `docs/02_ips.md` | Investment Policy Statement, v1.3, avec journal de révision |
 | `docs/04_conventions_deck.md` | Convention de présentation reprise du pitch TCP Kenz |
 
+### Application
+
+```
+main.py            8 onglets : Faisabilité · Univers · Allocation · Risque
+                   Benchmark · Fiscalité · Transmission · Concepts
+tabs/              un module par onglet
+core/viz.py        palette validée (scripts/validate_palette.js du référentiel
+                   dataviz), 11 classes repliées en 4 familles lisibles
+```
+
+Deux onglets recalculent en direct sur formules fermées : **Faisabilité**
+(curseurs inflation / frais / enveloppe) et **Transmission** (âge, horizon,
+part en assurance-vie, part donnée en nue-propriété). Les autres lisent les
+résultats de `data/*.csv` — l'optimisation prend dix minutes, la relancer à
+chaque interaction rendrait l'outil inutilisable.
+
 ### Code
 
 | Module | Rôle |
@@ -145,4 +161,5 @@ pip install -r requirements.txt
 
 PYTHONPATH=. python3 core/ips.py              # contrôles de cohérence
 PYTHONPATH=. python3 scripts/optimize_saa.py  # optimisation (~10 min)
+PYTHONPATH=. streamlit run main.py            # l'application
 ```
