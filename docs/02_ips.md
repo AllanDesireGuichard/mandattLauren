@@ -1,5 +1,5 @@
 # Investment Policy Statement — Famille Lauren
-**Version 1.5 — 17 septembre 2026**
+**Version 1.6 — 17 septembre 2026**
 
 > Révisée après passe de validation empirique. Les corrections de la v1.0
 > sont signalées en encadré à chaque endroit concerné.
@@ -607,6 +607,72 @@ Rebalancement                    bandes ± 3 pts
 ```
 
 ---
+
+## 10 bis. Backtest de la stratégie
+
+*`scripts/backtest.py` — 21,8 ans, indices larges, net de 0,85 % de frais et
+de fiscalité annuels.*
+
+| | CAGR | Volatilité | Sharpe | Max DD | Calmar |
+|---|---|---|---|---|---|
+| **Stratégie Lauren** | 5,75 % | 9,6 % | 0,37 | **26,3 %** | **0,22** |
+| 60/40 classique (EUR) | 6,35 % | 10,9 % | 0,38 | 32,5 % | 0,20 |
+
+La stratégie rend **0,60 % de moins** que le 60/40 en absolu, avec **6 points
+de drawdown en moins**. Le Sharpe est identique ; le Calmar — rendement par
+unité de perte maximale — est légèrement meilleur. C'est la bonne mesure ici :
+la contrainte du client est une **perte**, pas une volatilité.
+
+> **Réserve à énoncer, sinon un jury la soulèvera.** Ce backtest couvre
+> 2004-2026, c'est-à-dire la fin d'un marché obligataire haussier de quarante
+> ans. Le 60/40 y est flatté par des taux qui n'ont cessé de baisser. Nos
+> propres hypothèses (§3) disent que ce moteur est éteint : à 4 % d'inflation,
+> le souverain rapporte **moins que le monétaire**. Le passé surestime donc le
+> 60/40, et c'est précisément l'argument du §7 de l'argumentaire.
+
+### Atteinte de l'objectif — fenêtres glissantes de 10 ans
+
+```
+centile  5          3,99 %          P(net > 2 %)   100,0 %
+centile 50          5,08 %          P(net > 4 %)    94,6 %
+centile 95          6,45 %
+pire fenêtre        3,43 %
+```
+
+> **Réserve statistique.** Les 3 170 fenêtres se recouvrent massivement :
+> 21,8 ans ne contiennent qu'environ **deux périodes de dix ans réellement
+> indépendantes**. Le « 94,6 % » décrit ce qui s'est produit sur un unique
+> chemin historique, pas une probabilité. À présenter comme tel.
+
+## 10 ter. Coût du filtre ESG — mesure non concluante
+
+Cinq supports censés suivre des indices monde très proches donnent :
+
+| Support | Écart annuel vs MSCI World | Écart de suivi |
+|---|---|---|
+| SAWD.L — MSCI World Screened | +1,03 % | 4,7 % |
+| SUSW.L — MSCI World ESG Screened | +0,55 % | 8,7 % |
+| SUWS.L — MSCI World SRI | −0,33 % | 5,6 % |
+| XZW0.DE — MSCI World ESG | −2,16 % | 7,7 % |
+
+**Une dispersion de −2,2 % à +1,0 % entre des produits aussi proches n'est pas
+un signal, c'est du bruit de mesure.** Trois causes identifiées :
+
+1. **Devises.** Les lignes londoniennes cotent en dollars, les allemandes en
+   euros. Sans conversion, l'écart de suivi ressortait à **19 %**.
+2. **Cotations non synchrones.** Londres ferme à 16h30, New York à 22h00 CET.
+   Même en mensuel, les cours de fin de mois ne reflètent pas la même fenêtre.
+3. **Ajustement des dividendes** — rien ne garantit un traitement homogène
+   entre un fonds capitalisant européen et un distribuant américain.
+
+> **À faire avant le pitch :** prendre les rendements **officiels des indices**
+> sur les fiches MSCI — même devise, même méthode, même date. Le coût du
+> filtre ESG se tranche sur données d'indices, pas sur des prix d'ETF cotés sur
+> trois places différentes.
+>
+> **Ne présenter aucun chiffre de coût ESG tant que cette vérification n'est
+> pas faite.** C'est une donnée publique que n'importe qui peut recouper : une
+> erreur y serait relevée immédiatement.
 
 ## 11. Journal de révision
 
