@@ -16,7 +16,7 @@ st.set_page_config(page_title="Mandat Lauren", page_icon="📐",
                    layout="wide", initial_sidebar_state="expanded")
 
 from tabs import (allocation, benchmark, concepts, fiscalite,  # noqa: E402
-                  ips_tab, risque, transmission, univers)
+                  ips_tab, process, risque, transmission, univers)
 
 st.markdown("""
 <style>
@@ -42,6 +42,7 @@ TABS = [
     ("Fiscalité", fiscalite.render),
     ("Transmission", transmission.render),
     ("Concepts", concepts.render),
+    ("Process", process.render),
 ]
 
 for tab, (_, fn) in zip(st.tabs([t for t, _ in TABS]), TABS):

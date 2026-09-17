@@ -33,8 +33,8 @@ sur les États-Unis.
 | 5 — Benchmark hybride | ⬜ |
 | 6 — Backtest | ⬜ |
 | 7 — Modules fiscalité / transmission | ⬜ |
-| 8 — App Streamlit (8 onglets) | ⬜ |
-| 9 — Export PowerPoint | ⬜ |
+| 8 — App Streamlit (9 onglets) | ✅ |
+| 9 — Export PowerPoint | ✅ 44 slides |
 
 ## Les chiffres actuels
 
@@ -162,4 +162,6 @@ pip install -r requirements.txt
 PYTHONPATH=. python3 core/ips.py              # contrôles de cohérence
 PYTHONPATH=. python3 scripts/optimize_saa.py  # optimisation (~10 min)
 PYTHONPATH=. streamlit run main.py            # l'application
+PYTHONPATH=. python3 scripts/deck_charts.py   # graphiques du deck
+PYTHONPATH=. python3 scripts/build_deck.py    # -> outputs/Mandat_Lauren_pitch.pptx
 ```
