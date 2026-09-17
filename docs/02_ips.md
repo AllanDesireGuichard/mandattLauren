@@ -1,5 +1,5 @@
 # Investment Policy Statement — Famille Lauren
-**Version 1.6 — 17 septembre 2026**
+**Version 1.7 — 17 septembre 2026**
 
 > Révisée après passe de validation empirique. Les corrections de la v1.0
 > sont signalées en encadré à chaque endroit concerné.
@@ -458,27 +458,103 @@ risque. En 2008 et en 2022, elles baissent avec le reste.
   (retenue à la source ramenée de 30 % à 15 % par convention fiscale : ~22 bps/an)
 - Éviter les structures à étages générant une retenue à la source non récupérable
 
-### 7.4 Calendrier de transmission indicatif
+### 7.4 Projection du patrimoine net transmis
 
-| Échéance | Opération | Objet |
+*`core/succession.py` + `scripts/transmission.py`. Assiette 90 M€ (hors poche
+de liquidité), horizon 25 ans, 2 enfants.*
+
+| Stratégie | Brut | Impôt | **Net aux enfants** | Taux effectif |
+|---|---|---|---|---|
+| **A** — aucune structuration | 290 M€ | 130 M€ | **160 M€** | 44,8 % |
+| **B** — recommandée | 264 M€ | 62 M€ | **210 M€** | 22,7 % |
+| **C** — maximale | 251 M€ | 38 M€ | **225 M€** | 14,4 % |
+
+*B : 30 % en assurance-vie luxembourgeoise, 40 % en nue-propriété donnée,
+30 % en compte-titres. C : 30 / 60 / 10.*
+
+> **La stratégie B transmet 50 M€ de plus que l'absence de structuration —
+> soit +31 % pour les enfants.** Et le patrimoine brut est plus FAIBLE
+> (264 contre 290 M€), parce que les droits de donation sont payés dès le
+> départ. C'est la démonstration que le brut est le mauvais indicateur.
+
+### La hiérarchie des leviers — la slide qui ordonne tout le pitch
+
+Ce que chaque décision rapporte aux enfants sur 25 ans :
+
+```
+Allocation de départ                       162 M€
+Gain de toute l'optimisation d'allocation   +5,5 M€
+Coût du dé-risquage après stress tests      −7,4 M€
+Gain de la STRUCTURATION                     +50 M€
+Gain de la structuration maximale            +65 M€
+```
+
+> **La structuration pèse neuf fois le gain de toute l'optimisation
+> d'allocation.** C'est l'ordre de grandeur à faire passer : on a passé
+> l'essentiel du temps sur le portefeuille, et l'essentiel de la valeur est
+> ailleurs.
+
+### Pourquoi ne pas retenir la stratégie C
+
+Elle transmet 15 M€ de plus, mais donne la nue-propriété de 60 % du
+patrimoine dès aujourd'hui. M. Lauren conserve les revenus, pas le contrôle :
+il ne peut plus arbitrer librement ce capital. À 60 ans, avec deux enfants
+dont on ne connaît pas encore la maturité patrimoniale, c'est une décision
+irréversible que le gain fiscal seul ne justifie pas. **À poser comme
+question au client, pas à trancher à sa place.**
+
+### Le calendrier — ce que coûte un anniversaire
+
+```
+Donation en nue-propriété de 36 M€
+  avant 61 ans  (nue-propriété à 50 %)     7,4 M€ de droits
+  après  61 ans (nue-propriété à 60 %)     9,1 M€ de droits
+  ÉCART                                    1,6 M€
+```
+
+Sur la totalité du patrimoine, l'écart atteindrait 4,5 M€. **C'est la raison
+pour laquelle ce dossier a une date limite, et que cette date est le prochain
+anniversaire du client.**
+
+### 7.5 Friction fiscale annuelle — dérivée, plus postulée
+
+*`core/tax.py` reconstruit chaque chiffre à partir des rendements courants par
+classe, de la rotation induite par le rebalancement par bandes, et du taux
+applicable.*
+
+| Régime | Friction | Rendement brut requis |
 |---|---|---|
-| **T0 — avant le 61e anniversaire** | Donation-partage en nue-propriété | Barème art. 669 CGI à **50 %** au lieu de 60 % après 61 ans |
-| T0 | Versements en assurance-vie | Régime art. 990 I — fenêtre ouverte jusqu'à 70 ans |
-| T0 | Abattements 100 k€ × 2 parents × 2 enfants | Démarrage du compteur de 15 ans |
-| T + 15 ans | Renouvellement des abattements | Second cycle |
-| Revue annuelle | Ajustement | Selon valorisation et situation familiale |
+| Assurance-vie luxembourgeoise | **0,25 %** | 4,80 % |
+| Compte-titres, supports capitalisants | **0,63 %** | 5,18 % |
+| Compte-titres, supports distribuants | **1,23 %** | 5,78 % |
 
-> **Point de calendrier critique.** Le passage de la tranche d'âge à 61 ans
-> fait passer la valeur taxable de la nue-propriété de 50 % à 60 %. Toute
-> donation démembrée doit être réalisée **avant le prochain anniversaire**.
+> **Troisième et dernière révision de ce chiffre.** La v1.0 annonçait un écart
+> de 85 pb entre structure optimisée et compte-titres — c'était un homme de
+> paille. La v1.2 l'a corrigé à 15 pb — c'était trop bas, j'y sous-estimais la
+> friction de rebalancement. Le calcul dérivé donne **38 pb par an**.
+>
+> La conclusion de la v1.2 tient néanmoins : l'argument fiscal se défend sur
+> la **transmission** (50 M€), pas sur la friction annuelle (38 pb).
+>
+> En revanche, l'écart entre un compte-titres bien géré et un compte-titres
+> négligent est de **60 pb par an**, et il est gratuit à corriger. Cet
+> argument-là est solide.
 
-> **Réserve.** L'ensemble du volet fiscal et successoral doit être validé par
-> un notaire et un avocat fiscaliste avant mise en œuvre. Le présent document
-> définit la stratégie patrimoniale ; il ne se substitue pas à un conseil
-> juridique. Le régime matrimonial et les droits du conjoint survivant
-> nécessitent un traitement dédié non couvert ici.
+### 7.6 Localisation des actifs
 
----
+Appliqué brut, le calcul conclut « tout en assurance-vie » : ses 0,25 % de
+frais battent les 0,63 % du compte-titres sur chaque classe. **C'est le même
+type de sortie dégénérée que l'optimiseur d'allocation** — correcte au regard
+des données, fausse au regard du mandat. Quatre éléments qu'il ne voit pas :
+
+| Contrainte | Ce qu'elle impose |
+|---|---|
+| **Purge des plus-values au décès** | Les plus-values latentes d'un compte-titres ne sont **jamais** imposées au décès. Pour la part détenue jusqu'au bout, la friction réelle est inférieure à 0,63 %. |
+| **Liquidité de la poche A** | Un rachat en assurance-vie prend des jours. Les 10 M€ restent au compte-titres. |
+| **Concentration sur un assureur** | Le super-privilège luxembourgeois atténue le risque de contrepartie, il ne l'annule pas. Répartir sur deux compagnies. |
+| **Flexibilité** | Le compte-titres permet de nantir, de donner des titres en direct, de piloter la fiscalité des cessions. |
+
+**Répartition retenue : 65 % assurance-vie, 35 % compte-titres.**
 
 ## 8. Benchmark hybride
 

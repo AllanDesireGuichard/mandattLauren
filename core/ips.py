@@ -29,9 +29,15 @@ INSTRUMENT_TER = 0.0015           # TER moyen pondere, gestion indicielle
 # optimisee a un CTO garni de fonds DISTRIBUANTS -- un homme de paille, que
 # personne de competent ne mettrait en place. La vraie comparaison est
 # ci-dessous, et l'ecart annuel est bien plus mince qu'annonce.
-TAX_DRAG_STRUCTURED = 0.0030      # AV LUX + ETF capitalisants + domicile irlandais
-TAX_DRAG_CTO_COMPETENT = 0.0045   # CTO bien gere, ETF capitalisants
-TAX_DRAG_CTO_NAIF = 0.0090        # CTO, supports distribuants
+# DERIVES, plus postules -- cf. core/tax.py, qui reconstruit chaque chiffre a
+# partir des rendements courants par classe, de la rotation induite par le
+# rebalancement par bandes, et du taux d'imposition applicable.
+# Les valeurs precedentes (0,30 / 0,45 / 0,90 %) etaient des estimations a
+# vue de nez. Le calcul dit que la friction du compte-titres est plus lourde
+# que je ne l'avais ecrite.
+TAX_DRAG_STRUCTURED = 0.0025      # assurance-vie LUX : frais de contrat
+TAX_DRAG_CTO_COMPETENT = 0.0063   # CTO, ETF capitalisants : plus-values de rebalancement
+TAX_DRAG_CTO_NAIF = 0.0123        # CTO, supports distribuants : + PFU sur dividendes
 TAX_DRAG_UNSTRUCTURED = TAX_DRAG_CTO_COMPETENT
 
 TOTAL_FEES = MANDATE_FEE + INSTRUMENT_TER
