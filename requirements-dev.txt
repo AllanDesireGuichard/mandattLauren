@@ -1,0 +1,8 @@
+# Chaîne d'analyse : à installer en local seulement.
+-r requirements.txt
+scipy
+yfinance
+pyarrow
+matplotlib
+python-pptx>=0.6.23
+openpyxl>=3.1

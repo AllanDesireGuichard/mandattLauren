@@ -21,6 +21,13 @@ ROOT = Path(__file__).resolve().parent.parent
 CH = ROOT / "outputs" / "charts"
 OUT = ROOT / "outputs" / "Mandat_Lauren_pitch.pptx"
 
+# URL publique de l'application. Renseigner apres deploiement : le deck
+# fabrique alors un lien cliquable sur la couverture et une slide dediee.
+# Peut aussi etre passee en argument :  python3 scripts/build_deck.py <url>
+APP_URL = ""
+if len(sys.argv) > 1:
+    APP_URL = sys.argv[1].strip()
+
 SLATE = RGBColor(0x1B, 0x2A, 0x3A)
 SLATE_2 = RGBColor(0x2F, 0x48, 0x58)
 ACCENT = RGBColor(0x2A, 0x78, 0xD6)
@@ -109,6 +116,18 @@ def cover():
     _txt(tf3, "et transmettre.", 19, GOLD, bold=True)
     b4 = _box(sl, 1.1, 6.6, 11, 0.4); tf4 = b4.text_frame
     _txt(tf4, "Septembre 2026", 11, RGBColor(0x8A, 0x99, 0xA6), first=True)
+    if APP_URL:
+        from pptx.enum.shapes import MSO_SHAPE
+        btn = sl.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.55),
+                                  Inches(6.42), Inches(2.75), Inches(0.52))
+        btn.fill.solid(); btn.fill.fore_color.rgb = GOLD
+        btn.line.fill.background(); btn.shadow.inherit = False
+        tfb = btn.text_frame; tfb.word_wrap = False
+        pb = tfb.paragraphs[0]; pb.alignment = PP_ALIGN.CENTER
+        rb = pb.add_run(); rb.text = "Ouvrir l'outil interactif"
+        rb.font.size, rb.font.bold = Pt(12), True
+        rb.font.color.rgb = SLATE; rb.font.name = FONT
+        rb.hyperlink.address = APP_URL
 
 
 def section(name: str, num: str, points: list[str]):
@@ -860,6 +879,38 @@ bullets(sl, [
 callout(sl, "La plupart de nos concurrents vous parleront d'abord de fonds. "
             "Nous vous avons parlé d'abord de votre contrainte et de vos "
             "enfants.", y=6.65)
+
+if APP_URL:
+    sl = slide("L'outil est à votre disposition",
+               "Tous les chiffres de cette présentation sont recalculables en "
+               "direct.")
+    table(sl, ["Onglet", "Ce que vous pouvez y faire"], [
+        ["*Faisabilité", "*Faire varier l'inflation, nos frais, l'enveloppe "
+         "fiscale — et voir immédiatement si votre objectif reste atteint"],
+        ["*Transmission", "*Faire varier votre âge, l'horizon, la part donnée "
+         "en nue-propriété — et voir ce qui arrive à vos enfants"],
+        ["Allocation", "Le portefeuille, et ce que l'optimiseur proposait avant "
+         "nos contraintes"],
+        ["Risque", "Les crises qui ont eu lieu, la distribution complète des "
+         "pertes, le temps passé sous l'eau"],
+        ["Benchmark", "La composition de votre référence et ce qu'elle mesure"],
+        ["Fiscalité", "La friction annuelle par enveloppe"],
+        ["Univers", "Les supports retenus, et le contrôle qualité des données"],
+        ["Concepts", "Le raisonnement derrière chaque décision"],
+        ["Process", "D'où vient chaque chiffre : sources, traitements, "
+         "arbitrages, et les corrections que nous avons faites"],
+    ], y=2.1, widths=[2.4, 9.8], size=11.5)
+    from pptx.enum.shapes import MSO_SHAPE
+    btn = sl.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(4.4),
+                              Inches(6.05), Inches(4.5), Inches(0.62))
+    btn.fill.solid(); btn.fill.fore_color.rgb = ACCENT
+    btn.line.fill.background(); btn.shadow.inherit = False
+    tfb = btn.text_frame
+    pb = tfb.paragraphs[0]; pb.alignment = PP_ALIGN.CENTER
+    rb = pb.add_run(); rb.text = APP_URL.replace("https://", "")
+    rb.font.size, rb.font.bold = Pt(13), True
+    rb.font.color.rgb = WHITE; rb.font.name = FONT
+    rb.hyperlink.address = APP_URL
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 prs.save(str(OUT))
