@@ -57,7 +57,7 @@ RISKLESS_YIELD = 0.022
 # 60/40 classique, en EUR, pour comparaison
 NAIVE = {"equity_us": 0.36, "equity_dev_exus": 0.24, "govt_bonds": 0.40}
 
-ANNUAL_COST = ips.TOTAL_FEES + ips.TAX_DRAG_STRUCTURED     # 0,85 %
+ANNUAL_COST = ips.ANNUAL_COST                              # TER des supports
 
 
 def max_dd(v: np.ndarray) -> float:
@@ -101,7 +101,7 @@ def main() -> int:
     years = (strat.index[-1] - strat.index[0]).days / 365.25
     print(f"\nPeriode : {strat.index[0].date()} -> {strat.index[-1].date()} "
           f"({years:.1f} ans)")
-    print(f"Frais et fiscalite deduits : {ANNUAL_COST:.2%} par an\n")
+    print(f"Cout des supports deduit : {ANNUAL_COST:.2%} par an\n")
 
     print("=" * 72)
     print("1. PERFORMANCE, NETTE DE FRAIS ET D'IMPOTS")

@@ -15,3 +15,8 @@ outputs/*.log
 # irreproductibles. 7,8 Mo, une seule fois.
 # Si un rafraichissement regulier est mis en place, les exclure a ce
 # moment-la et versionner plutot un manifeste.
+
+# Secrets. Le depot est PUBLIC (condition du deploiement gratuit Streamlit) :
+# aucune cle ne doit y entrer. En local, .streamlit/secrets.toml ; en ligne,
+# le panneau Secrets du tableau de bord Streamlit Cloud.
+.streamlit/secrets.toml

@@ -29,13 +29,14 @@ SURFACE = "#fcfcfb"
 STATUS = {"good": "#008300", "warning": "#eda100", "critical": "#e34948"}
 
 # Regroupement des 11 classes de la SAA en 4 familles lisibles.
-GROUPS = {
-    "Croissance":     ["equity_developed", "equity_emerging",
-                       "infrastructure", "crypto"],
-    "Obligataire":    ["inflation_linked", "govt_bonds_eur", "credit_ig_eur"],
-    "Actifs réels":   ["gold", "alternatives"],
-    "Liquidité":      ["govt_bonds_eur_short", "cash"],
-}
+# Les familles sont definies UNE SEULE FOIS, dans core/ips.py : elles sont
+# une propriete de l'allocation, pas un choix graphique. Ici on ne fait
+# que leur attacher une couleur et un libelle accentue.
+from core.ips import FAMILIES  # noqa: E402
+
+FAMILY_LABEL = {"Croissance": "Croissance", "Obligataire": "Obligataire",
+                "Actifs reels": "Actifs réels", "Liquidite": "Liquidité"}
+GROUPS = {FAMILY_LABEL[f]: list(c) for f, c in FAMILIES.items()}
 GROUP_COLOR = dict(zip(GROUPS, CATEGORICAL))
 
 LABEL = {

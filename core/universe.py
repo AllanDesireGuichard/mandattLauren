@@ -6,7 +6,7 @@ Filtres appliques (IPS §5.2 et §5.3) :
   - indices filtres ESG sur les classes ou ils existent (cf. core/esg.py)
   - supports CAPITALISANTS hors assurance-vie (report d'imposition)
   - domiciliation IRLANDAISE privilegiee sur l'exposition actions US
-    (retenue a la source 15 % vs 30 %, cf. core/ips.py WITHHOLDING_TAX)
+    (retenue a la source 15 % vs 30 % -- cf. archive/core/tax.py)
 
 AVERTISSEMENT SUR LES DONNEES
   Les TER sont INDICATIFS et doivent etre verifies sur les documents
@@ -80,7 +80,7 @@ GAPS = {
                       "Ecart de suivi a mesurer sur la periode commune.",
         "impact_pitch": "Aucun si l'on presente bien le backtest comme portant "
                         "sur la STRATEGIE et non sur les fonds (cf. §11 de "
-                        "docs/02_ips.md).",
+                        "archive/docs/02_ips.md).",
     },
 }
 

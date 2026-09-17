@@ -136,13 +136,13 @@ def main() -> int:
     for label, infl in [("Consensus / cible BCE", INFLATION_BASE),
                         ("Hypothese client (stress)", INFLATION_CLIENT)]:
         er = portfolio_return(wd, infl)
-        hurdle = infl + ips.TOTAL_FEES + ips.TAX_DRAG_STRUCTURED
+        hurdle = ips.required_gross_return(inflation=infl)
         print(f"\n{label} -- inflation {infl:.1%}")
         print(f"  Rendement brut attendu    {er:>7.2%}")
         print(f"  Seuil requis              {hurdle:>7.2%}")
         print(f"  MARGE                     {er-hurdle:>+7.2%}"
               f"   {'ATTEINT' if er >= hurdle else 'NON ATTEINT'}")
-        real_net = er - ips.TOTAL_FEES - ips.TAX_DRAG_STRUCTURED - infl
+        real_net = er - ips.ANNUAL_COST - infl
         print(f"  Rendement reel net        {real_net:>+7.2%}")
 
     print(f"\nVolatilite du portefeuille  {pvol:>7.2%}"

@@ -1,50 +1,64 @@
 """
-Mandat Lauren -- application de pilotage.
+Mandat Lauren — chaine d'investissement en cinq etapes.
 
-Lance avec :  PYTHONPATH=. streamlit run main.py
+Lancer :  PYTHONPATH=. streamlit run main.py
 
-Principe : l'app LIT les resultats calcules (data/*.csv) plutot que de les
-recalculer. L'optimisation prend une dizaine de minutes ; la relancer a chaque
-interaction rendrait l'outil inutilisable. Les onglets qui recalculent
-(Faisabilite, Transmission) le font sur des formules fermees, instantanees.
+STRUCTURE. Cinq onglets SEQUENTIELS : la sortie de chacun est l'entree du
+suivant. C'est le reproche principal fait a la version precedente, qui
+juxtaposait neuf onglets sans ordre lisible.
+
+    1. Parametres d'entree    ce que le mandat impose
+    2. Macro top-down         ou nous sommes dans le cycle
+    3. Analyse ligne a ligne  ce qui est investissable
+    4. Allocation             combien de chaque
+    5. Backtests              ce que la contrainte donne
+
+PRINCIPE DE CALCUL. L'application LIT les resultats calcules (data/*.csv)
+plutot que de les recalculer : l'optimisation prend une dizaine de minutes.
+Ce qui se recalcule en direct le fait sur des formules fermees, donc
+instantanement.
 """
 from __future__ import annotations
 
 import streamlit as st
 
 st.set_page_config(page_title="Mandat Lauren", page_icon="📐",
-                   layout="wide", initial_sidebar_state="expanded")
+                   layout="wide", initial_sidebar_state="collapsed")
 
-from tabs import (allocation, benchmark, concepts, fiscalite,  # noqa: E402
-                  ips_tab, process, risque, transmission, univers)
+from core import version                                        # noqa: E402
+from tabs import (t1_parametres, t2_macro, t3_lignes,            # noqa: E402
+                  t4_allocation, t5_backtests)
 
 st.markdown("""
 <style>
   .block-container {padding-top: 2.2rem; max-width: 1400px;}
   h1 {font-size: 1.7rem; letter-spacing: -.01em;}
-  h2 {font-size: 1.15rem; margin-top: 1.6rem;}
-  h3 {font-size: .95rem; color: #52514e;}
-  [data-testid="stMetricValue"] {font-size: 1.45rem;}
-  .stTabs [data-baseweb="tab"] {font-size: .88rem;}
+  h3 {font-size: 1.12rem; margin-top: .2rem;}
+  h4 {font-size: .98rem; color: #14304f; margin-top: 2rem;
+      padding-bottom: .3rem; border-bottom: 1px solid #e3e6ea;}
+  [data-testid="stMetricValue"] {font-size: 1.4rem;}
+  .stTabs [data-baseweb="tab"] {font-size: .9rem;}
+  .tampon {font-size: .72rem; color: #8a8e95; text-align: right;
+           margin-top: 2.5rem; padding-top: .6rem;
+           border-top: 1px solid #eceef1;}
 </style>
 """, unsafe_allow_html=True)
 
 st.title("Mandat Lauren")
-st.caption("Gestion privée · 100 M€ · préservation contre l'inflation "
-           "sous contrainte de perte maximum de 15 %")
+st.caption("Cas de gestion · 100 M€ · préserver le pouvoir d'achat sous "
+           "contrainte de perte maximum de 15 %")
 
-TABS = [
-    ("Faisabilité", ips_tab.render),
-    ("Univers", univers.render),
-    ("Allocation", allocation.render),
-    ("Risque", risque.render),
-    ("Benchmark", benchmark.render),
-    ("Fiscalité", fiscalite.render),
-    ("Transmission", transmission.render),
-    ("Concepts", concepts.render),
-    ("Process", process.render),
+ONGLETS = [
+    ("1 · Paramètres d'entrée",   t1_parametres.render),
+    ("2 · Macro top-down",        t2_macro.render),
+    ("3 · Analyse ligne à ligne", t3_lignes.render),
+    ("4 · Allocation",            t4_allocation.render),
+    ("5 · Backtests",             t5_backtests.render),
 ]
 
-for tab, (_, fn) in zip(st.tabs([t for t, _ in TABS]), TABS):
-    with tab:
-        fn()
+for onglet, (_, rendre) in zip(st.tabs([t for t, _ in ONGLETS]), ONGLETS):
+    with onglet:
+        rendre()
+
+st.markdown(f'<div class="tampon">{version.tampon()}</div>',
+            unsafe_allow_html=True)

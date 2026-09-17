@@ -1,140 +1,115 @@
 """
-IPS — parametres du mandat Lauren.
+Parametres du mandat. Source unique de verite.
 
-Source unique de verite. Le document docs/02_ips.md est la version redigee de
-ce module ; toute modification ici doit y etre repercutee.
+PERIMETRE, revu le 2026-09-17. Ce module ne decrit plus qu'un PROCESSUS
+D'INVESTISSEMENT. Tout ce qui relevait de la fiscalite, de la transmission et
+de la structuration d'enveloppe a ete retire (code dans archive/core/).
+
+Consequence a ne pas passer sous silence : le resultat le plus puissant du
+dossier precedent disparait avec lui. La structuration valait +50 M EUR de
+patrimoine net transmis, contre +5,5 M EUR pour toute l'optimisation
+d'allocation -- un facteur neuf. Ce n'est pas une perte de qualite, c'est un
+changement d'objet : on ne construit plus un mandat de gestion privee, on
+construit et on documente une chaine d'investissement.
+
+Deuxieme consequence, mecanique : le seuil de rendement requis etait calcule
+net des frais de mandat (0,40 %) et de la friction d'enveloppe (0,25 %). Sans
+eux, il tombe de 4,80 % a 4,15 % et la marge s'elargit d'autant. Ce n'est PAS
+une amelioration du portefeuille -- c'est le meme portefeuille juge sur un
+seuil plus bas. Dit autrement : la marge affichee ici est une marge AVANT
+frais de gestion. Voir `SEUIL_REFERENCE_AVEC_FRAIS` pour le point de
+comparaison, qui reste affiche mais n'est plus un parametre.
 """
-from dataclasses import dataclass, field
+from __future__ import annotations
 
 # --------------------------------------------------------------------------
-# Client et actifs
+# 1. Le mandat. Aucune de ces valeurs n'est reglable dans l'application :
+#    ce sont des donnees du probleme, pas des variables de decision.
 # --------------------------------------------------------------------------
 
-TOTAL_ASSETS = 100_000_000.0      # EUR — hypothese : produit de cession deja converti
-LIQUIDITY_NEED = 10_000_000.0     # EUR — a decaisser sous 24 mois
-CLIENT_AGE = 60
-N_CHILDREN = 2
+TOTAL_ASSETS = 100_000_000.0      # EUR, produit de cession deja converti
+LIQUIDITY_NEED = 10_000_000.0     # EUR, a decaisser sous 24 mois
 BASE_CURRENCY = "EUR"
+HORIZON_YEARS = 10                # horizon de reference des hypotheses
 
-# --------------------------------------------------------------------------
-# Objectif de rendement  (cf. docs/02_ips.md §3)
-# --------------------------------------------------------------------------
+INFLATION_TARGET = 0.0400         # HYPOTHESE CLIENT, figee. Voir onglet 2 :
+                                  # le point d'inflation anticipe par le
+                                  # marche est mesure, pas suppose, et il est
+                                  # nettement plus bas.
 
-INFLATION_TARGET = 0.0400         # objectif de preservation du pouvoir d'achat
-MANDATE_FEE = 0.0040              # frais de mandat negocies
-INSTRUMENT_TER = 0.0015           # TER moyen pondere, gestion indicielle
+INSTRUMENT_TER = 0.0015           # TER moyen pondere des supports retenus.
+                                  # Conserve parce que c'est une propriete
+                                  # MESURABLE des instruments (onglet 3), pas
+                                  # un parametre commercial.
 
-# Friction fiscale ANNUELLE. Chiffres revus a la baisse apres reexamen :
-# l'ancienne comparaison (0,35 % contre 1,20 %) opposait une structure
-# optimisee a un CTO garni de fonds DISTRIBUANTS -- un homme de paille, que
-# personne de competent ne mettrait en place. La vraie comparaison est
-# ci-dessous, et l'ecart annuel est bien plus mince qu'annonce.
-# DERIVES, plus postules -- cf. core/tax.py, qui reconstruit chaque chiffre a
-# partir des rendements courants par classe, de la rotation induite par le
-# rebalancement par bandes, et du taux d'imposition applicable.
-# Les valeurs precedentes (0,30 / 0,45 / 0,90 %) etaient des estimations a
-# vue de nez. Le calcul dit que la friction du compte-titres est plus lourde
-# que je ne l'avais ecrite.
-TAX_DRAG_STRUCTURED = 0.0025      # assurance-vie LUX : frais de contrat
-TAX_DRAG_CTO_COMPETENT = 0.0063   # CTO, ETF capitalisants : plus-values de rebalancement
-TAX_DRAG_CTO_NAIF = 0.0123        # CTO, supports distribuants : + PFU sur dividendes
-TAX_DRAG_UNSTRUCTURED = TAX_DRAG_CTO_COMPETENT
+ANNUAL_COST = INSTRUMENT_TER      # seul cout porte par le processus
 
-TOTAL_FEES = MANDATE_FEE + INSTRUMENT_TER
+# Point de comparaison, affiche et jamais reglable : ce que deviendrait le
+# seuil avec des frais de gestion de marche sur un encours de cette taille.
+FRAIS_GESTION_REFERENCE = 0.0040
+SEUIL_REFERENCE_AVEC_FRAIS = INFLATION_TARGET + ANNUAL_COST + FRAIS_GESTION_REFERENCE
 
 
-def required_gross_return(drag: float = TAX_DRAG_STRUCTURED,
-                          inflation: float | None = None) -> float:
-    """Rendement brut annuel requis pour preserver le pouvoir d'achat."""
+def required_gross_return(inflation: float | None = None) -> float:
+    """
+    Rendement brut annuel requis pour preserver le pouvoir d'achat.
+
+    Inflation + cout des supports. Rien d'autre : ni frais de gestion, ni
+    fiscalite, par decision de perimetre.
+    """
     infl = INFLATION_TARGET if inflation is None else inflation
-    return infl + TOTAL_FEES + drag
+    return infl + ANNUAL_COST
 
 
 TARGET_GROSS_RETURN = round(required_gross_return(), 4)
 
 # --------------------------------------------------------------------------
-# Contrainte de risque  (cf. docs/02_ips.md §4)
+# 2. La contrainte de risque. C'est elle qui pilote tout le dimensionnement.
 # --------------------------------------------------------------------------
 
-MAX_DRAWDOWN = 0.15               # pic a creux, 12 mois glissants, consolide EUR
+MAX_DRAWDOWN = 0.15               # pic a creux, 12 mois glissants, en EUR
 DD_BREACH_PROBABILITY = 0.10      # tolerance de depassement
 
-# ESTIME, PAS ASSUME.  scripts/estimate_dd_ratio.py + validate_saa_risk.py,
-# 21,8 ans de donnees quotidiennes en EUR (2004-2026 : GFC, 2011, 2020, 2022).
-#
-# Valeur precedente : 1.9, posee comme "regle empirique". FAUSSE et trop
-# conservatrice -- elle sous-allouait le risque d'environ 10 points d'actions.
-#
-# Le ratio n'est PAS constant : il decroit avec le poids d'actions
-# (1,81 a 20 % d'actions -> 1,33 a 80 %) parce que la diversification
-# obligataire agit davantage sur le drawdown que sur la volatilite.
-# Pour un portefeuille multi-actifs diversifie comme le notre : 1,33-1,36.
+# MESURE, pas postule. scripts/estimate_dd_ratio.py, 21,8 ans de donnees
+# quotidiennes en EUR (2004-2026 : 2008, 2011, 2020, 2022).
+# La valeur "regle empirique" de 1,9 etait fausse et trop conservatrice : elle
+# sous-allouait le risque d'environ dix points d'actions. Le ratio n'est pas
+# constant -- 1,81 a 20 % d'actions, 1,33 a 80 % -- parce que la
+# diversification obligataire agit plus sur le drawdown que sur la volatilite.
 DD_TO_VOL_RATIO = 1.35
 
-# Budget de risque retenu : PAS derive du ratio, mais lu directement sur la
-# SAA testee (data/saa_risk.csv). Marge deliberee sous les 15 %, parce que
-# l'estimation elle-meme porte une erreur.
-TARGET_VOL = 0.099                # SAA a 47 % d'actifs de croissance
-EXPECTED_DD_P90 = 0.133           # mesure -> 1,7 pt de marge sous la contrainte
+TARGET_VOL = 0.096                # lu sur la SAA testee, pas deduit du ratio
+EXPECTED_DD_P90 = 0.138           # data/saa_risk.csv
+DD_BREACH_MEASURED = 0.091        # P(perte 12m > 15 %), tolerance 10 %
 TARGET_VOL_RISKY = TARGET_VOL / 0.90
 
-# CE QUE LE CLIENT DOIT SAVOIR, ET QUE LE P90 MASQUE.
-# Le pire drawdown observe sur la periode n'est pas 13 % mais 26 % (2008).
-# La contrainte de 15 % est tenue "moins d'une annee sur dix", pas "jamais".
-WORST_OBSERVED_DD = 0.263         # SAA au niveau de risque retenu, 2008
-DD_2022 = 0.133
+# LE CHIFFRE A NE JAMAIS OMETTRE. Le pire drawdown de la periode n'est pas
+# 13,8 % (P90) mais 26 % (2008). La contrainte de 15 % est tenue "moins d'une
+# annee sur dix", pas "jamais". Les deux chiffres vont ensemble ou pas du tout.
+WORST_OBSERVED_DD = 0.256
+DD_2022 = 0.138
+
+# Crises nommees, mesurees sur la SAA (scripts/stress_tests.py).
+# La duree compte autant que la profondeur : 2022 est moins profond que 2020
+# mais trois fois plus long a recuperer.
+CRISES = {
+    "Lehman 2008":        {"drawdown": 0.256, "recuperation_mois": 12},
+    "COVID 2020":         {"drawdown": 0.175, "recuperation_mois": 5},
+    "Taux 2022":          {"drawdown": 0.138, "recuperation_mois": 17},
+    "Dette EUR 2011":     {"drawdown": 0.068, "recuperation_mois": 3},
+}
 
 # --------------------------------------------------------------------------
-# Architecture en poches  (cf. docs/02_ips.md §6.1)
+# 3. Contraintes d'investissement
 # --------------------------------------------------------------------------
 
-@dataclass(frozen=True)
-class Bucket:
-    code: str
-    name: str
-    amount: float
-    horizon_years: tuple[int, int]
-    target_vol: float
-    wrapper: str
-    rationale: str
-
-    @property
-    def weight(self) -> float:
-        return self.amount / TOTAL_ASSETS
-
-
-BUCKETS: tuple[Bucket, ...] = (
-    Bucket(
-        "A", "Liquidite", 10_000_000, (0, 2), 0.010,
-        "Compte-titres / depots",
-        "Engagement date et certain : preservation nominale, aucune prise de risque.",
-    ),
-    Bucket(
-        "B", "Coeur patrimonial", 58_000_000, (10, 20), 0.070,
-        "Assurance-vie luxembourgeoise",
-        "Niveau de vie du client, protege de l'inflation. Risque modere.",
-    ),
-    Bucket(
-        "C", "Transmission", 30_000_000, (25, 30), 0.120,
-        "AV LUX + donation demembree",
-        "Horizon superieur a l'esperance de vie du client : le risque est "
-        "remunere par le temps et dilue par les poches A et B.",
-    ),
-    Bucket(
-        "D", "Satellite", 2_000_000, (10, 30), 0.500,
-        "Compartiment dedie",
-        "Convictions plafonnees, dont crypto. Loge dans la poche longue.",
-    ),
-)
-
-# --------------------------------------------------------------------------
-# Contraintes  (cf. docs/02_ips.md §5)
-# --------------------------------------------------------------------------
-
+# Les trois exclusions visent des EMETTEURS D'ENTREPRISE. Il n'y a rien a
+# filtrer dans un Bund ou dans un lingot : core/esg.py distingue
+# "exige" / "sans objet" / "sous condition".
 ESG_EXCLUSIONS = {
-    "tobacco":       {"production": 0.00, "distribution": 0.05},
-    "weapons":       {"controversial": 0.00, "conventional": 0.05},
-    "thermal_coal":  {"extraction": 0.05, "power_generation": 0.05},
+    "tabac":          {"production": 0.00, "distribution": 0.05},
+    "armement":       {"controverse": 0.00, "conventionnel": 0.05},
+    "charbon":        {"extraction": 0.05, "production_electrique": 0.05},
 }
 
 UCITS_ONLY = True                 # resident francais retail, contrainte PRIIPs
@@ -145,35 +120,47 @@ CONCENTRATION_LIMITS = {
     "growth_assets": 0.60,
     "crypto": 0.02,
     "single_issuer": 0.05,        # hors dette souveraine core
-    "illiquid": 0.15,             # poche C uniquement
 }
 
-MIN_DAILY_LIQUIDITY = 0.80        # poches B et C
-
-# --------------------------------------------------------------------------
-# Couverture de change  (cf. docs/02_ips.md §6.4)
-# --------------------------------------------------------------------------
+MIN_DAILY_LIQUIDITY = 0.80
 
 FX_HEDGE_RATIO = {
-    "bonds_international": 1.00,   # vol FX (8-10 %) > vol actif (4-5 %)
+    "bonds_international": 1.00,      # vol FX (8-10 %) > vol actif (4-5 %)
     "equity_developed_ex_emu": 0.40,  # USD = couverture naturelle en stress
-    "equity_emerging": 0.00,       # devise = moteur de performance
-    "gold": 0.00,                  # couvrir annulerait la reserve de valeur
+    "equity_emerging": 0.00,          # devise = moteur de performance
+    "gold": 0.00,                     # couvrir annulerait la reserve de valeur
     "alternatives": 0.50,
 }
 
 # --------------------------------------------------------------------------
-# Allocation strategique indicative  (a confirmer par optimisation)
+# 4. Poche de liquidite
 # --------------------------------------------------------------------------
+# L'architecture en quatre poches est retiree avec la transmission : trois des
+# quatre n'avaient de sens que par leur enveloppe fiscale. La poche de
+# liquidite reste, parce qu'elle repond a un fait du mandat -- 10 M EUR a
+# decaisser sous deux ans -- et non a un choix de structuration.
+#
+# Elle est une decision de POLITIQUE, jamais un arbitrage d'optimisation.
+# L'exclure du calcul : voir core/optimizer.py, ou l'inclure faisait degenerer
+# la parite de risque vers un fonds monetaire a 82 %.
 
-# SAA corrigee apres validation empirique (scripts/validate_saa_risk.py).
-# Correction 1 : le poids d'actions passe de 52 % a 47 % -- non pas par
-#   prudence, mais parce que l'ancien chiffre etait incoherent avec la
-#   volatilite cible annoncee (52 % d'actions ne font pas 7,9 % de vol,
-#   ils en font ~10,8 %).
-# Correction 2 : la poche A pesait 10 % des actifs mais la SAA n'affichait
-#   que 5 % de cash. Les 5 % manquants sont desormais explicites en
-#   souverain court, qui est bien ce que decrit l'IPS §6.2.
+LIQUIDITY_SLEEVE = ("cash", "govt_bonds_eur_short")
+LIQUIDITY_WEIGHT = LIQUIDITY_NEED / TOTAL_ASSETS      # 10 %
+
+# --------------------------------------------------------------------------
+# 5. Allocation strategique en vigueur
+# --------------------------------------------------------------------------
+# Issue de scripts/optimize_saa.py puis DE-RISQUEE apres stress tests :
+# croissance 50 % -> 45 %, par rotation vers l'obligataire et l'or, jamais
+# vers le monetaire (gonfler la poche de liquidite confondrait deux
+# decisions distinctes). Cout 19 pb de rendement, gain 1,5 pt de marge sur
+# le drawdown.
+#
+# A RECALIBRER A L'ETAPE 2. Les hypotheses de rendement sous-jacentes
+# (core/cma.py) s'ancrent sur un taux monetaire EUR mesure a 2,05 %. Le taux
+# de depot BCE est a 2,50 % et le 10 ans EUR a 3,53 % (16/09/2026). La
+# calibration doit etre reprise sur les courbes vivantes.
+
 SAA_INDICATIVE = {
     "equity_developed":      0.23,
     "equity_emerging":       0.11,
@@ -184,47 +171,43 @@ SAA_INDICATIVE = {
     "credit_ig_eur":         0.09,
     "gold":                  0.07,
     "alternatives":          0.04,
-    "govt_bonds_eur_short":  0.05,   # poche A
-    "cash":                  0.05,   # poche A
+    "govt_bonds_eur_short":  0.05,
+    "cash":                  0.05,
 }
 
-# Issue de scripts/optimize_saa.py (second passage), puis DE-RISQUEE apres les
-# stress tests de l'etape 4.
-#
-# L'allocation issue de l'optimisation (croissance 50 %) ressortait a 14,1 %
-# de drawdown P90 et 9,2 % de probabilite de depassement -- soit juste sous
-# les seuils de 15 % et 10 %. Elle satisfaisait la contrainte, sans marge.
-#
-# Or l'estimation elle-meme porte une erreur : un seul bug d'echelle avait
-# deja deplace ce chiffre de 12,0 % a 14,1 %. Construire a la limite d'une
-# mesure aussi sensible n'est pas defendable.
-#
-# De-risquage par ROTATION vers l'obligataire et l'or, PAS vers le monetaire :
-# la poche A est dimensionnee sur le besoin de liquidite de 10 M EUR, la
-# gonfler reviendrait a confondre deux decisions distinctes.
-#   croissance   50 % -> 45 %
-#   obligataire  30 % -> 34 %
-#   actifs reels 10 % -> 11 %
-# Cout : 19 pb de rendement. Gain : 1,5 pt de marge sur le drawdown.
-#
-# PARTAGE DE LA POCHE A -- decision hors optimisation.
-#   L'optimiseur place les 10 % integralement en monetaire : a rendement
-#   voisin, 0,4 % de volatilite domine 1,6 %. Economiquement juste, mais il
-#   raisonne en risque, pas en ADOSSEMENT. La poche A finance un decaissement
-#   date : on echelonne 5 % de monetaire et 5 % de souverain court sur le
-#   calendrier de depense (IPS §6.2).
-#   A soulever avec le client : si les dates de depense sont incertaines, le
-#   tout-monetaire est preferable ; si elles sont connues, l'echelonnement
-#   rapporte ~20 pb de plus.
 
-# Poche A = liquidites + souverain court. 10 % des actifs, coherent avec
-# BUCKETS et avec le diviseur de TARGET_VOL_RISKY.
-LIQUIDITY_SLEEVE = ("cash", "govt_bonds_eur_short")
+GROWTH_ASSETS = ("equity_developed", "equity_emerging", "infrastructure", "crypto")
+REAL_ASSETS = ("gold", "infrastructure", "inflation_linked")
+BOND_ASSETS = ("inflation_linked", "govt_bonds_eur", "credit_ig_eur",
+               "govt_bonds_eur_short")
 
-# Hypotheses de rendement : voir core/cma.py, qui porte le detail des blocs
-# constitutifs, la provenance de chaque entree, et surtout la COHERENCE DU
-# REGIME D'INFLATION -- le seuil et les rendements attendus sont desormais
-# evalues dans le meme regime.
+# Quatre familles, pas onze : au-dela de huit teintes aucune palette
+# categorielle ne tient, et onze categories ne se distinguent pas a l'oeil.
+# core/viz.py consomme ce dictionnaire -- une seule definition des familles.
+FAMILIES = {
+    "Croissance":   GROWTH_ASSETS,
+    "Obligataire":  ("inflation_linked", "govt_bonds_eur", "credit_ig_eur"),
+    "Actifs reels": ("gold", "alternatives"),
+    "Liquidite":    LIQUIDITY_SLEEVE,
+}
+
+# --------------------------------------------------------------------------
+# 6. Gouvernance
+# --------------------------------------------------------------------------
+
+REBALANCING_BAND = 0.03           # +/- 3 points autour de la cible
+REVIEW_TRIGGER_DD = 0.10          # 2/3 du budget de risque -> revue
+
+TACTICAL_BANDS = {
+    "growth":  (0.40, 0.45, 0.55),   # (min, cible, max)
+    "bonds":   (0.28, 0.34, 0.40),
+    "real":    (0.08, 0.11, 0.16),
+    "cash":    (0.05, 0.10, 0.15),
+}
+
+# --------------------------------------------------------------------------
+# 7. Faisabilite
+# --------------------------------------------------------------------------
 
 
 def expected_gross_return(inflation: float | None = None) -> float:
@@ -233,145 +216,85 @@ def expected_gross_return(inflation: float | None = None) -> float:
                             INFLATION_CLIENT if inflation is None else inflation)
 
 
-GROWTH_ASSETS = ("equity_developed", "equity_emerging", "infrastructure", "crypto")
-REAL_ASSETS = ("gold", "infrastructure", "inflation_linked")
-
-# --------------------------------------------------------------------------
-# Gouvernance  (cf. docs/02_ips.md §9)
-# --------------------------------------------------------------------------
-
-REBALANCING_BAND = 0.03           # +/- 3 points autour de la cible
-REVIEW_TRIGGER_DD = 0.10          # 2/3 du budget de risque -> revue exceptionnelle
-
-TACTICAL_BANDS = {
-    "growth":  (0.40, 0.50, 0.60),   # (min, cible, max)
-    "bonds":   (0.22, 0.30, 0.38),
-    "real":    (0.10, 0.15, 0.20),
-    "cash":    (0.02, 0.05, 0.15),
-}
-
-# --------------------------------------------------------------------------
-# Fiscalite et transmission  (cf. docs/02_ips.md §7)
-# --------------------------------------------------------------------------
-
-PFU_RATE = 0.30                   # flat tax : 12.8 % IR + 17.2 % PS
-CORPORATE_TAX_RATE = 0.25         # IS, si holding patrimoniale
-
-# Bareme art. 669 CGI — valeur de l'usufruit par tranche d'age du donateur.
-# Le passage 60 -> 61 ans fait chuter l'usufruit de 50 % a 40 %, donc monte
-# la nue-propriete taxable de 50 % a 60 %. Point de calendrier critique.
-USUFRUCT_SCALE = {
-    (0, 20): 0.90, (21, 30): 0.80, (31, 40): 0.70, (41, 50): 0.60,
-    (51, 60): 0.50, (61, 70): 0.40, (71, 80): 0.30, (81, 90): 0.20,
-    (91, 120): 0.10,
-}
-
-
-def bare_ownership_value(age: int) -> float:
-    """Valeur taxable de la nue-propriete donnee, selon l'age du donateur."""
-    for (lo, hi), usufruct in USUFRUCT_SCALE.items():
-        if lo <= age <= hi:
-            return 1.0 - usufruct
-    raise ValueError(f"age hors bareme : {age}")
-
-
-DONATION_ALLOWANCE = 100_000.0    # par parent, par enfant, tous les 15 ans
-DONATION_ALLOWANCE_PERIOD = 15
-
-# Assurance-vie, primes versees avant 70 ans (art. 990 I CGI)
-AV_ALLOWANCE_PER_BENEFICIARY = 152_500.0
-AV_RATE_LOW = 0.20                # jusqu'a 700 k€ au-dela de l'abattement
-AV_RATE_HIGH = 0.3125             # au-dela
-AV_THRESHOLD = 700_000.0
-AV_AGE_LIMIT = 70                 # fenetre fermant aux 70 ans du client
-
-# Bareme des droits de succession en ligne directe (art. 777 CGI)
-SUCCESSION_ALLOWANCE = 100_000.0  # par parent, par enfant
-SUCCESSION_SCALE = (
-    (8_072,     0.05), (12_109,    0.10), (15_932,    0.15),
-    (552_324,   0.20), (902_838,   0.30), (1_805_677, 0.40),
-    (float("inf"), 0.45),
-)
-
-WITHHOLDING_TAX = {               # retenue a la source sur dividendes US
-    "ireland_domiciled": 0.15,    # convention fiscale Irlande - Etats-Unis
-    "luxembourg_domiciled": 0.30,
-}
-
-# --------------------------------------------------------------------------
-
-def feasibility() -> list[tuple[str, float, str]]:
+def feasibility() -> list[tuple[str, float, float, float]]:
     """
-    Ecart entre rendement attendu et rendement requis, dans les deux regimes
-    d'inflation.
+    (libelle, rendement attendu, seuil requis, marge) par regime d'inflation.
 
-    CORRECTION MAJEURE (v1.2). La v1.1 annoncait une marge de -0,09 %. Elle
-    comparait un seuil bati sur 4 % d'inflation a des rendements attendus
-    batis implicitement sur 2 %. Une fois le regime rendu coherent
-    (cf. core/cma.py), la marge est POSITIVE dans les deux cas.
+    Les deux nombres sont evalues DANS LE MEME REGIME. C'est la correction la
+    plus importante du projet : les versions initiales comparaient un seuil
+    bati sur 4 % d'inflation a des rendements attendus batis implicitement sur
+    2 %. Un portefeuille evalue dans un monde, juge dans un autre.
     """
     from core.cma import INFLATION_BASE, INFLATION_CLIENT
 
     out = []
-    for label, infl in [("Consensus BCE (inflation 2 %)", INFLATION_BASE),
-                        ("Hypothese client (inflation 4 %)", INFLATION_CLIENT)]:
-        gap = expected_gross_return(infl) - required_gross_return(inflation=infl)
-        out.append((label, gap, "regime coherent seuil / rendements"))
-
-    exp = expected_gross_return()
-    out.append(("  frais de mandat 0,40 % -> 0,25 %",
-                exp - (INFLATION_TARGET + 0.0025 + INSTRUMENT_TER
-                       + TAX_DRAG_STRUCTURED),
-                "negociable sur 100 M EUR"))
-    out.append(("  sans structuration fiscale",
-                exp - required_gross_return(TAX_DRAG_CTO_COMPETENT),
-                "l'ecart annuel reste modeste : 15 bps"))
-    out.append(("  sans structuration du tout",
-                exp - required_gross_return(TAX_DRAG_CTO_NAIF),
-                "60 bps : c'est la que l'erreur coute"))
+    for label, infl in [("Hypothese client", INFLATION_CLIENT),
+                        ("Consensus BCE", INFLATION_BASE)]:
+        er = expected_gross_return(infl)
+        seuil = required_gross_return(inflation=infl)
+        out.append((f"{label} (inflation {infl:.0%})", er, seuil, er - seuil))
     return out
 
 
-def summary() -> dict:
-    """Parametres cles, pour affichage Streamlit et controle de coherence."""
+def summary() -> dict[str, str]:
+    er = expected_gross_return()
+    seuil = required_gross_return()
     return {
-        "Actifs":                    f"{TOTAL_ASSETS:,.0f} EUR",
-        "Besoin de liquidite":       f"{LIQUIDITY_NEED:,.0f} EUR",
-        "Inflation cible":           f"{INFLATION_TARGET:.2%}",
-        "Rendement brut requis":     f"{required_gross_return():.2%}",
-        "  sans structuration":      f"{required_gross_return(TAX_DRAG_CTO_COMPETENT):.2%}",
-        "Rendement brut attendu":    f"{expected_gross_return():.2%}",
-        "  marge":                   f"{expected_gross_return()-required_gross_return():+.2%}",
-        "  (inflation 2 %)":         f"{expected_gross_return(0.02):.2%}"
-                                     f" vs {required_gross_return(inflation=0.02):.2%}",
+        "Actifs sous mandat":        f"{TOTAL_ASSETS/1e6:,.0f} M EUR".replace(",", " "),
+        "Besoin de liquidite":       f"{LIQUIDITY_NEED/1e6:,.0f} M EUR sous 24 mois",
+        "Devise de reference":       BASE_CURRENCY,
+        "Hypothese d'inflation":     f"{INFLATION_TARGET:.2%} (figee)",
+        "Seuil de rendement requis": f"{seuil:.2%}",
+        "Rendement brut attendu":    f"{er:.2%}",
+        "Marge":                     f"{er - seuil:+.2%}",
         "Volatilite cible":          f"{TARGET_VOL:.2%}",
-        "Drawdown maximum":          f"{MAX_DRAWDOWN:.0%} (12m, P<{DD_BREACH_PROBABILITY:.0%})",
-        "  P90 mesure":              f"{EXPECTED_DD_P90:.1%}",
-        "  pire cas observe (2008)": f"{WORST_OBSERVED_DD:.1%}",
-        "Nue-propriete a 60 ans":    f"{bare_ownership_value(60):.0%}",
-        "Nue-propriete a 61 ans":    f"{bare_ownership_value(61):.0%}",
+        "Contrainte de perte":       f"{MAX_DRAWDOWN:.0%} sur 12 mois, "
+                                     f"depassement < {DD_BREACH_PROBABILITY:.0%}",
+        "Drawdown P90 mesure":       f"{EXPECTED_DD_P90:.1%}",
+        "Probabilite mesuree":       f"{DD_BREACH_MEASURED:.1%}",
+        "Pire cas observe (2008)":   f"{WORST_OBSERVED_DD:.1%}",
     }
+
+
+# --------------------------------------------------------------------------
+# Controles de coherence. Executes a l'import : un parametre incoherent doit
+# casser au chargement, pas produire un portefeuille silencieusement faux.
+# --------------------------------------------------------------------------
+
+def _controles() -> None:
+    poids = sum(SAA_INDICATIVE.values())
+    assert abs(poids - 1.0) < 1e-9, f"la SAA somme a {poids}"
+
+    croissance = sum(SAA_INDICATIVE[k] for k in GROWTH_ASSETS)
+    assert croissance <= CONCENTRATION_LIMITS["growth_assets"], \
+        f"croissance {croissance:.0%} au-dela du plafond"
+
+    sleeve = sum(SAA_INDICATIVE[k] for k in LIQUIDITY_SLEEVE)
+    assert abs(sleeve - LIQUIDITY_WEIGHT) < 1e-9, \
+        f"poche de liquidite {sleeve:.0%} vs besoin {LIQUIDITY_WEIGHT:.0%}"
+
+    couvertes = {c for fam in FAMILIES.values() for c in fam}
+    assert couvertes == set(SAA_INDICATIVE), \
+        f"classes non rattachees a une famille : {set(SAA_INDICATIVE) - couvertes}"
+
+    assert DD_BREACH_MEASURED <= DD_BREACH_PROBABILITY, \
+        "la SAA viole sa propre contrainte de depassement"
+
+
+_controles()
 
 
 if __name__ == "__main__":
     for k, v in summary().items():
         print(f"{k:<28} {v}")
     print()
-    total = sum(b.amount for b in BUCKETS)
-    assert abs(total - TOTAL_ASSETS) < 1, f"poches = {total:,.0f}"
-    w = sum(SAA_INDICATIVE.values())
-    assert abs(w - 1.0) < 1e-9, f"SAA = {w}"
-    growth = sum(SAA_INDICATIVE[k] for k in GROWTH_ASSETS)
-    assert growth <= CONCENTRATION_LIMITS["growth_assets"], f"growth = {growth}"
-    print(f"Poches          {total:,.0f} EUR  OK")
-    print(f"SAA             {w:.0%}  OK")
-    print(f"Actifs croissance {growth:.0%}  (plafond {CONCENTRATION_LIMITS['growth_assets']:.0%})  OK")
-    sleeve = sum(SAA_INDICATIVE[k] for k in LIQUIDITY_SLEEVE)
-    a = [b for b in BUCKETS if b.code == "A"][0]
-    assert abs(sleeve - a.weight) < 1e-9, f"poche A {a.weight} vs SAA {sleeve}"
-    print(f"Poche A vs SAA  {sleeve:.0%} = {a.weight:.0%}  OK")
+    print("FAISABILITE")
+    for label, er, seuil, marge in feasibility():
+        print(f"  {label:<28} attendu {er:.2%}  requis {seuil:.2%}  "
+              f"marge {marge:+.2%}")
     print()
-    print("FAISABILITE  (ecart rendement attendu - requis)")
-    for label, gap, note in feasibility():
-        print(f"  {gap:+.2%}  {label}")
-        print(f"           {note}")
+    print(f"Pour memoire, seuil avec des frais de gestion de "
+          f"{FRAIS_GESTION_REFERENCE:.2%} : {SEUIL_REFERENCE_AVEC_FRAIS:.2%} "
+          f"-> marge {expected_gross_return() - SEUIL_REFERENCE_AVEC_FRAIS:+.2%}")
+    print()
+    print("Controles de coherence : OK")
