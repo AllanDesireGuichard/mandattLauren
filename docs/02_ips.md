@@ -1,5 +1,5 @@
 # Investment Policy Statement — Famille Lauren
-**Version 1.4 — 17 septembre 2026**
+**Version 1.5 — 17 septembre 2026**
 
 > Révisée après passe de validation empirique. Les corrections de la v1.0
 > sont signalées en encadré à chaque endroit concerné.
@@ -480,22 +480,84 @@ risque. En 2008 et en 2022, elles baissent avec le reste.
 
 ---
 
-## 8. Benchmark
+## 8. Benchmark hybride
 
-Benchmark hybride composite, dérivé de l'allocation stratégique.
-**Spécification complète : document 03.**
+*Défini dans `core/benchmark.py`, série reconstituée par `scripts/build_benchmark.py`.*
 
-Critères de validité :
-1. Investissable — chaque composant réplicable par ETF
-2. Réplicable — pondérations publiques, règles de rebalancement écrites
-3. Cohérent en devise — libellé EUR, politique de couverture identique
-4. Cohérent en ESG — indices filtrés
+| Poids | Indice | Couverture | Filtre ESG |
+|---|---|---|---|
+| 23 % | MSCI World ESG Screened NTR | 40 % | exigé |
+| 15 % | Bloomberg Euro Government Inflation-Linked | 100 % | sans objet |
+| 11 % | MSCI Emerging Markets ESG Screened NTR | 0 % | exigé |
+| 10 % | iBoxx EUR Sovereigns | 100 % | sans objet |
+| 9 % | FTSE Global Core Infrastructure 50/50 ESG | 40 % | exigé |
+| 9 % | Bloomberg Euro Aggregate Corporate SRI | 100 % | exigé |
+| 7 % | LBMA Gold Price PM, en EUR | 0 % | sans objet |
+| 5 % | iBoxx EUR Sovereigns 1-3 | 100 % | sans objet |
+| 5 % | €STR capitalisé | 100 % | sans objet |
+| 4 % | Bloomberg Commodity ex-Agriculture | 40 % | sans objet |
+| 2 % | Bitcoin — cours de référence EUR | 0 % | sans objet |
 
-Double référence retenue :
-- **Relative** — le benchmark composite (mesure la valeur ajoutée de gestion)
-- **Absolue** — inflation + 0 % net (mesure l'atteinte de l'objectif client)
+**Rebalancement :** trimestriel, aux poids cibles, au cours de clôture du
+dernier jour ouvré du trimestre.
 
----
+### 8.1 Ce que le benchmark mesure — à assumer devant le client
+
+Ses poids étant ceux de l'allocation stratégique, **l'écart stratégique est nul
+par construction.** Ce n'est pas un défaut de conception, c'est le bon réglage :
+le client a validé cette allocation, elle ne doit donc pas être une source de
+sur- ou sous-performance mesurée.
+
+Ce qui reste mesuré est notre **exécution** :
+
+1. les écarts tactiques dans les bandes de ± 3 points (§9.2)
+2. l'écart de suivi des fonds face à leur indice
+3. le timing de rebalancement
+
+Écart de suivi engendré par l'usage complet du budget tactique
+(500 simulations) : **médiane 1,04 %, 90ᵉ centile 1,58 %** par an.
+
+> **À dire au client :** « Même en utilisant tout notre budget tactique, votre
+> portefeuille reste à moins de 1,6 % d'écart annuel de sa référence. C'est la
+> mesure honnête de notre marge de manœuvre — et donc de ce que vous nous
+> payez pour faire. »
+
+### 8.2 Double référence
+
+| Référence | Rôle |
+|---|---|
+| **Relative** — le composite ci-dessus | Mesure la valeur ajoutée de gestion |
+| **Absolue** — inflation constatée + 0 %, nette de frais et d'impôts | Mesure l'atteinte de l'objectif client |
+
+Un benchmark relatif ne dit pas si l'objectif est atteint : on peut battre son
+indice et s'appauvrir. La référence absolue se juge sur l'inflation
+**constatée**, jamais sur l'hypothèse de 4 % retenue pour le dimensionnement.
+
+### 8.3 Performance reconstituée — et sa limite
+
+| Série | Période | Rendement | Volatilité | Max DD |
+|---|---|---|---|---|
+| Composition complète | 6,2 ans | 7,32 % | 7,4 % | 11,1 % |
+| Hors crypto | 6,9 ans | 5,62 % | 8,2 % | 18,4 % |
+
+> **Ces deux lignes ne sont pas comparables, et il serait malhonnête de les
+> présenter côte à côte sans le dire.** Le tracker crypto (BTCE.DE) démarre en
+> juin 2020 : la série « complète » commence donc **après le krach COVID de
+> mars 2020**. Son drawdown de 11,1 % ne mesure pas moins de risque — il
+> mesure une fenêtre qui exclut la pire baisse de la période.
+>
+> La ligne de référence est donc celle **hors crypto**, sur 6,9 ans : 5,62 %
+> brut, 4,77 % net de frais et d'impôts.
+
+**Limite d'historique.** Le benchmark ne peut être reconstitué que sur 6,9 ans,
+faute de trackers plus anciens sur les composants filtrés ESG. Pour toute
+présentation portant sur une période plus longue, se référer au backtest sur
+indices larges (§11), en distinguant explicitement les deux exercices.
+
+**Composant fragile :** le tracker d'infrastructure filtré ESG (NFRA.L) n'a que
+3,1 ans. La série utilise MSCI World Utilities (XDWU.DE, 10,4 ans) comme
+substitut d'historique ; l'écart entre les deux doit être mesuré sur la période
+commune avant le pitch.
 
 ## 9. Gouvernance
 
