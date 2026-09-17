@@ -24,7 +24,7 @@ OUT = ROOT / "outputs" / "Mandat_Lauren_pitch.pptx"
 # URL publique de l'application. Renseigner apres deploiement : le deck
 # fabrique alors un lien cliquable sur la couverture et une slide dediee.
 # Peut aussi etre passee en argument :  python3 scripts/build_deck.py <url>
-APP_URL = ""
+APP_URL = "https://mandat-lauren.streamlit.app"
 if len(sys.argv) > 1:
     APP_URL = sys.argv[1].strip()
 

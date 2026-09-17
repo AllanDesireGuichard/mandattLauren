@@ -1,5 +1,8 @@
 # Mandat Lauren — gestion privée 100 M€
 
+**Application en ligne : https://mandat-lauren.streamlit.app**
+Redéployée automatiquement à chaque `git push` sur `main`.
+
 Cas de pitch private banking. Livrables : **PowerPoint** (pitch client) et
 **app Streamlit**.
 
@@ -163,5 +166,5 @@ PYTHONPATH=. python3 core/ips.py              # contrôles de cohérence
 PYTHONPATH=. python3 scripts/optimize_saa.py  # optimisation (~10 min)
 PYTHONPATH=. streamlit run main.py            # l'application
 PYTHONPATH=. python3 scripts/deck_charts.py   # graphiques du deck
-PYTHONPATH=. python3 scripts/build_deck.py    # -> outputs/Mandat_Lauren_pitch.pptx
+PYTHONPATH=. python3 scripts/build_deck.py https://mandat-lauren.streamlit.app
 ```
