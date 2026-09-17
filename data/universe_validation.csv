@@ -1,0 +1,28 @@
+ticker,ok,n,start,years,err,asset_class,role,name
+SUSW.L,True,2254,2017-10-12,8.9,,equity_developed,primary,iShares MSCI World ESG Screened UCITS
+XZW0.DE,True,2131,2018-04-24,8.4,,equity_developed,alternate,Xtrackers MSCI World ESG UCITS
+SUWS.L,True,2249,2017-10-12,8.9,,equity_developed,alternate_sri,iShares MSCI World SRI UCITS
+SUAS.L,True,2574,2016-07-11,10.2,,equity_developed,building_block,iShares MSCI USA SRI UCITS
+SUUS.L,True,2572,2016-07-11,10.2,,equity_developed,building_block,iShares MSCI USA ESG Screened UCITS
+SUSE.L,True,104,2026-04-21,0.4,,equity_developed,building_block,iShares MSCI Europe SRI UCITS
+XZWE.DE,True,1534,2020-09-09,6.0,,equity_developed,building_block,Xtrackers MSCI Europe ESG UCITS
+SPXS.L,True,4113,2010-05-25,16.3,,equity_developed,alternate,Invesco S&P 500 ESG UCITS
+SUSM.L,True,2556,2016-07-11,10.2,,equity_emerging,primary,iShares MSCI EM SRI UCITS
+EUNA.DE,True,2238,2017-11-21,8.8,,govt_bonds_eur,primary,iShares Core Euro Govt Bond UCITS
+DBXG.DE,True,4750,2008-01-02,18.7,,govt_bonds_eur,alternate,Xtrackers II Eurozone Govt Bond UCITS
+TGBT.DE,True,1961,2018-12-21,7.7,,govt_bonds_eur,alternate,VanEck iBoxx EUR Sovereign Diversified 1-10 UCITS
+STHE.L,True,3263,2013-10-16,12.9,,inflation_linked,primary,iShares EUR Inflation Linked Govt Bond UCITS
+LYXIB.PA,False,0,,0.0,no data,inflation_linked,alternate,Amundi Euro Inflation-Linked UCITS
+VECP.L,True,2666,2016-02-24,10.6,,credit_ig_eur,alternate,Vanguard EUR Corporate Bond UCITS
+TCBT.DE,True,1952,2019-01-10,7.7,,credit_ig_eur,alternate,VanEck iBoxx EUR Corporates UCITS
+CRPS.L,True,3531,2012-09-24,14.0,,credit_ig_eur,alternate,iShares Euro Corp Bond Large Cap UCITS
+SGLN.L,True,3899,2011-04-08,15.4,,gold,primary,iShares Physical Gold ETC
+PHAU.L,True,4727,2008-01-02,18.7,,gold,alternate,WisdomTree Physical Gold
+JEST.DE,True,2084,2018-07-02,8.2,,cash,primary,JPMorgan EUR Ultra-Short Income UCITS
+SEUH.PA,False,0,,0.0,no data,cash,primary,Amundi Euro Government Bond 1-3Y UCITS
+IBGS.L,True,4725,2008-01-02,18.7,,cash,alternate,iShares Core Euro Govt Bond 1-3yr UCITS
+BTCE.DE,True,1599,2020-06-08,6.3,,crypto,primary,ETC Group Physical Bitcoin ETC
+BTC.L,True,425,2025-01-13,1.7,,crypto,alternate,WisdomTree Physical Bitcoin ETC
+IWDP.L,True,4471,2009-01-02,17.7,,infrastructure,proxy_only,iShares Developed Markets Property Yield UCITS
+XDWU.DE,True,2643,2016-04-18,10.4,,infrastructure,proxy_only,Xtrackers MSCI World Utilities UCITS
+AIGC.L,True,4727,2008-01-02,18.7,,alternatives,proxy_only,WisdomTree Enhanced Commodity UCITS

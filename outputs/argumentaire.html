@@ -1,0 +1,709 @@
+<title>Argumentaire Lauren</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F5F6F7; --surface:#FFFFFF; --sunk:#ECEFF1;
+  --ink:#14181D; --ink-2:#4A535E; --ink-3:#7D8792;
+  --line:#DCE1E5; --line-2:#C3CBD2;
+  --accent:#2F4858; --accent-2:#41667C; --accent-soft:#E5EDF1;
+  --warn:#8C5A2B; --warn-soft:#F5EDE3;
+  --speak-bg:#1B2530; --speak-ink:#E8EBEE; --speak-dim:#9FB0BD; --speak-rule:#4E6C82;
+  --shadow:0 1px 2px rgba(20,24,29,.05),0 8px 24px -12px rgba(20,24,29,.16);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1319; --surface:#161B22; --sunk:#1B212A;
+    --ink:#E3E8EC; --ink-2:#A2ACB7; --ink-3:#6E7883;
+    --line:#272E38; --line-2:#39424E;
+    --accent:#8FB4C8; --accent-2:#A8C6D6; --accent-soft:#1A2530;
+    --warn:#C79A64; --warn-soft:#2A2117;
+    --speak-bg:#212C38; --speak-ink:#EAEEF1; --speak-dim:#A5B6C3; --speak-rule:#5A7C93;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1319; --surface:#161B22; --sunk:#1B212A;
+  --ink:#E3E8EC; --ink-2:#A2ACB7; --ink-3:#6E7883;
+  --line:#272E38; --line-2:#39424E;
+  --accent:#8FB4C8; --accent-2:#A8C6D6; --accent-soft:#1A2530;
+  --warn:#C79A64; --warn-soft:#2A2117;
+  --speak-bg:#212C38; --speak-ink:#EAEEF1; --speak-dim:#A5B6C3; --speak-rule:#5A7C93;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:16px; line-height:1.62; -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:2px solid var(--accent-2); outline-offset:3px; border-radius:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ---------- shell ---------- */
+.shell{display:grid; grid-template-columns:270px minmax(0,1fr); gap:0; max-width:1240px; margin:0 auto}
+@media(max-width:940px){.shell{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- rail ---------- */
+.rail{
+  position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+  padding:34px 26px 40px 30px; border-right:1px solid var(--line);
+  font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12.5px;
+}
+@media(max-width:940px){.rail{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}}
+.rail .mark{font-family:"Spectral",Georgia,serif; font-size:19px; line-height:1.25; color:var(--ink); margin-bottom:3px}
+.rail .mark em{font-style:italic; color:var(--accent)}
+.rail .sub{color:var(--ink-3); font-size:11px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:26px}
+.rail nav{display:flex; flex-direction:column; gap:1px}
+.rail .grp{color:var(--ink-3); font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; margin:20px 0 7px; padding-left:2px}
+.rail .grp:first-of-type{margin-top:0}
+.rail a{
+  display:grid; grid-template-columns:22px minmax(0,1fr); gap:9px; align-items:baseline;
+  color:var(--ink-2); text-decoration:none; padding:4px 6px 4px 2px; border-radius:3px; line-height:1.38;
+}
+.rail a:hover{color:var(--ink); background:var(--sunk)}
+.rail a .n{color:var(--ink-3); font-variant-numeric:tabular-nums}
+.rail a.on{color:var(--accent); background:var(--accent-soft)}
+.rail a.on .n{color:var(--accent)}
+
+/* ---------- main ---------- */
+main{padding:56px 52px 120px; min-width:0}
+@media(max-width:940px){main{padding:36px 22px 80px}}
+.col{max-width:68ch}
+
+/* ---------- masthead ---------- */
+.masthead{border-bottom:2px solid var(--ink); padding-bottom:26px; margin-bottom:12px}
+.eyebrow{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:14px}
+h1{font-family:"Spectral",Georgia,serif; font-weight:500; font-size:clamp(34px,5vw,50px); line-height:1.06; letter-spacing:-.015em; margin:0 0 16px; text-wrap:balance}
+.standfirst{font-family:"Spectral",Georgia,serif; font-size:19px; line-height:1.55; color:var(--ink-2); max-width:56ch; margin:0}
+
+/* ---------- params strip ---------- */
+.params{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr));
+  font-family:"IBM Plex Mono",monospace; border-bottom:1px solid var(--line);
+  margin:0 0 46px;
+}
+.params div{padding:16px 16px 16px 0; border-right:1px solid var(--line)}
+.params div:last-child{border-right:none}
+.params dt{font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); margin-bottom:5px}
+.params dd{margin:0; font-size:19px; color:var(--ink); font-variant-numeric:tabular-nums}
+.params dd small{font-size:11.5px; color:var(--ink-3); display:block; letter-spacing:.02em; margin-top:2px}
+
+/* ---------- sections ---------- */
+section{scroll-margin-top:24px; padding-top:44px}
+.part{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--accent); padding:54px 0 4px;
+  border-top:1px solid var(--line-2); margin-top:50px;
+}
+.part:first-of-type{margin-top:34px}
+h2{
+  font-family:"Spectral",Georgia,serif; font-weight:500; font-size:28px; line-height:1.2;
+  letter-spacing:-.01em; margin:0 0 6px; text-wrap:balance;
+  display:grid; grid-template-columns:auto minmax(0,1fr); gap:14px; align-items:baseline;
+}
+h2 .n{font-family:"IBM Plex Mono",monospace; font-size:14px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+h3{font-family:"IBM Plex Sans",sans-serif; font-weight:600; font-size:15px; letter-spacing:-.005em; margin:34px 0 10px; color:var(--ink)}
+p{margin:0 0 15px}
+.lede{font-size:17px; color:var(--ink-2); margin-bottom:20px}
+strong{font-weight:600}
+em{font-style:italic}
+a.ref{color:var(--accent); text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px}
+
+/* idea */
+.idea{
+  border-left:2px solid var(--accent); padding:2px 0 2px 18px; margin:0 0 24px;
+  font-size:17px; line-height:1.55; color:var(--ink);
+}
+.idea .lbl{display:block; font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--accent); margin-bottom:6px}
+
+/* speak — the prompter block */
+.speak{
+  background:var(--speak-bg); color:var(--speak-ink); border-radius:3px;
+  padding:26px 30px 28px; margin:26px 0; box-shadow:var(--shadow);
+  font-family:"Spectral",Georgia,serif; font-size:17.5px; line-height:1.62;
+}
+.speak .lbl{
+  font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--speak-dim); margin-bottom:14px;
+  padding-bottom:10px; border-bottom:1px solid var(--speak-rule); display:block;
+}
+.speak p{margin:0 0 14px; color:var(--speak-ink)}
+.speak p:last-child{margin-bottom:0}
+.speak strong{color:#fff; font-weight:600}
+:root[data-theme="dark"] .speak strong,
+:root:not([data-theme="light"]) .speak strong{color:#fff}
+.speak.hot{border-left:3px solid #C9A227}
+
+/* challenge */
+.chal{
+  border-left:2px solid var(--warn); background:var(--warn-soft);
+  padding:16px 20px; margin:22px 0; border-radius:0 3px 3px 0; font-size:15px;
+}
+.chal .lbl{
+  font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--warn); display:block; margin-bottom:7px;
+}
+.chal .q{font-style:italic; color:var(--ink-2); display:block; margin-bottom:9px}
+.chal p{margin:0 0 10px}
+.chal p:last-child{margin-bottom:0}
+
+/* data */
+table{width:100%; border-collapse:collapse; font-size:14px; margin:22px 0; font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto; margin:22px 0}
+.scroll table{margin:0; min-width:440px}
+th{
+  text-align:left; font-family:"IBM Plex Mono",monospace; font-size:10.5px;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3);
+  border-bottom:1px solid var(--line-2); padding:0 14px 8px 0; font-weight:400; vertical-align:bottom;
+}
+td{padding:9px 14px 9px 0; border-bottom:1px solid var(--line); vertical-align:top; line-height:1.45}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:500}
+.num{text-align:right; padding-right:0; white-space:nowrap}
+
+/* calc block */
+.calc{
+  font-family:"IBM Plex Mono",monospace; font-size:13.5px; line-height:1.85;
+  background:var(--sunk); border:1px solid var(--line); border-radius:3px;
+  padding:20px 22px; margin:22px 0; overflow-x:auto; white-space:pre;
+  font-variant-numeric:tabular-nums; color:var(--ink-2);
+}
+.calc b{color:var(--ink); font-weight:500}
+.calc .hi{color:var(--accent); font-weight:500}
+
+/* note */
+.note{
+  font-size:14px; color:var(--ink-2); border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line); padding:14px 0; margin:24px 0;
+}
+.note b{color:var(--ink)}
+
+/* toolbar */
+.bar{
+  position:fixed; right:22px; bottom:22px; z-index:40; display:flex; gap:8px;
+}
+.bar button{
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; letter-spacing:.06em;
+  text-transform:uppercase; background:var(--surface); color:var(--ink-2);
+  border:1px solid var(--line-2); border-radius:3px; padding:9px 14px;
+  cursor:pointer; box-shadow:var(--shadow);
+}
+.bar button:hover{color:var(--ink); border-color:var(--ink-3)}
+.bar button[aria-pressed="true"]{background:var(--accent); color:var(--surface); border-color:var(--accent)}
+:root[data-theme="dark"] .bar button[aria-pressed="true"],
+:root:not([data-theme="light"]) .bar button[aria-pressed="true"]{color:#0F1319}
+
+/* oral mode */
+body.oral .hide-oral{display:none}
+body.oral main{padding-top:30px}
+body.oral section{padding-top:22px}
+body.oral .speak{font-size:19px; padding:30px 34px 32px}
+body.oral h2{font-size:21px; margin-bottom:14px}
+body.oral .col{max-width:74ch}
+.oral-only{display:none}
+body.oral .oral-only{display:block}
+
+footer{margin-top:80px; padding-top:26px; border-top:2px solid var(--ink); font-size:14px; color:var(--ink-2)}
+footer .col{max-width:68ch}
+</style>
+
+<div class="shell">
+<aside class="rail hide-oral">
+  <div class="mark">Argumentaire <em>Lauren</em></div>
+  <div class="sub">Préparation orale</div>
+  <nav id="nav">
+    <div class="grp">Fondations</div>
+    <a href="#s1"><span class="n">01</span><span>Quatre poches, pas une</span></a>
+    <a href="#s2"><span class="n">02</span><span>L'horizon n'est pas l'âge</span></a>
+    <a href="#s3"><span class="n">03</span><span>Dynamique vs 15 %</span></a>
+    <a href="#s4"><span class="n">04</span><span>Le piège du « 4 % »</span></a>
+    <div class="grp">Méthode</div>
+    <a href="#s5"><span class="n">05</span><span>Le budget de risque</span></a>
+    <a href="#s6"><span class="n">06</span><span>Au-delà de Markowitz</span></a>
+    <a href="#s7"><span class="n">07</span><span>L'argument 2022</span></a>
+    <div class="grp">Décisions</div>
+    <a href="#s8"><span class="n">08</span><span>La poche de liquidité</span></a>
+    <a href="#s9"><span class="n">09</span><span>La couverture de change</span></a>
+    <a href="#s10"><span class="n">10</span><span>Le contenant, pas le contenu</span></a>
+    <a href="#s11"><span class="n">11</span><span>La transmission</span></a>
+    <a href="#s12"><span class="n">12</span><span>La crypto</span></a>
+    <a href="#s13"><span class="n">13</span><span>Le benchmark</span></a>
+    <a href="#s14"><span class="n">14</span><span>La gouvernance</span></a>
+  </nav>
+</aside>
+
+<main>
+<div class="col">
+
+<div class="masthead hide-oral">
+  <div class="eyebrow">Mandat de gestion privée · Note interne</div>
+  <h1>Argumentaire Lauren</h1>
+  <p class="standfirst">Quatorze décisions du portefeuille, et la manière de les défendre à l'oral. Chaque concept en trois temps : l'idée, ce qu'on dit au client, et la réponse à l'objection.</p>
+  <p class="standfirst" style="margin-top:14px;font-size:15px;color:var(--ink-3)">Version 1.2 — révisée après validation sur 21,8 ans de données et construction des hypothèses de marché. Les arguments qui se sont révélés faux sont corrigés ci-dessous, signalés à chaque endroit concerné.</p>
+</div>
+
+<dl class="params hide-oral">
+  <div><dt>Actifs</dt><dd>100 M€<small>dont 10 M€ liquides</small></dd></div>
+  <div><dt>Rendement requis</dt><dd>4,85 %<small>attendu 5,84 %</small></dd></div>
+  <div><dt>Perte maximum</dt><dd>15 %<small>P90 mesuré 13,3 %</small></dd></div>
+  <div><dt>Volatilité cible</dt><dd>9,9 %<small>47 % de croissance</small></dd></div>
+  <div><dt>Horizon</dt><dd>30 ans<small>poche longue</small></dd></div>
+</dl>
+
+<p class="note hide-oral"><b>Règle de langage.</b> Aucun jargon sans traduction immédiate. M. Lauren a vendu une entreprise technologique : il est intelligent, il n'est pas gérant d'actifs. Les termes techniques figurent ici pour vous, jamais pour le rendez-vous.</p>
+
+<p class="note hide-oral"><b>Hypothèse de travail.</b> Le patrimoine est déjà en euros. La conversion du produit de cession est hors périmètre ; la couverture de change des actifs étrangers que nous achetons reste une décision d'allocation à part entière — <a class="ref" href="#s9">§9</a>.</p>
+
+<div class="part">Partie I — Les fondations</div>
+
+<section id="s1">
+<h2><span class="n">01</span><span>Quatre poches, pas un portefeuille</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>Un patrimoine n'a pas un objectif, il en a plusieurs, avec des horizons différents. Un portefeuille unique moyenne ces objectifs et les sert tous mal.</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Monsieur Lauren, vos 100 millions ne servent pas tous la même chose. 10 millions doivent être disponibles dans deux ans : cet argent n'a pas le droit de baisser, point. À l'inverse, la part qui ira à vos enfants sera investie pendant trente ans : lui interdire de prendre du risque, ce serait lui interdire de performer.</p>
+<p>Si je mélange les deux dans un portefeuille unique, j'obtiens un compromis qui ne convient à aucun des deux : <strong>trop risqué pour vos deux ans, trop timide pour vos trente ans.</strong> Donc nous séparons. Quatre poches, quatre horizons, quatre budgets de risque.</p>
+</div>
+<div class="scroll hide-oral"><table>
+<thead><tr><th>Poche</th><th class="num">Montant</th><th>Horizon</th><th>Rôle</th></tr></thead>
+<tbody>
+<tr><td>A — Liquidité</td><td class="num">10 M€</td><td>0–2 ans</td><td>Le projet financé</td></tr>
+<tr><td>B — Cœur patrimonial</td><td class="num">58 M€</td><td>10–20 ans</td><td>Le niveau de vie, protégé de l'inflation</td></tr>
+<tr><td>C — Transmission</td><td class="num">30 M€</td><td>25–30 ans</td><td>Ce qui ira aux enfants</td></tr>
+<tr><td>D — Satellite</td><td class="num">2 M€</td><td>10 ans +</td><td>Convictions, dont crypto</td></tr>
+</tbody></table></div>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« C'est de la complexité pour faire joli. »</span>
+<p>Non — c'est ce qui rend l'objectif atteignable. La contrainte de 15 % s'applique au total. La poche C peut donc porter beaucoup plus de risque qu'elle n'en porterait seule, parce qu'elle est diluée par les poches A et B. C'est précisément cette respiration qui nous permet d'aller chercher le rendement dont vous avez besoin. Sans découpage, nous n'y arrivons pas.</p></div>
+<p class="note hide-oral"><b>Pour vous, pas pour le rendez-vous :</b> <em>goal-based investing</em>. C'est aussi la logique de l'<em>Asset-Liability Management</em> institutionnel — on adosse des actifs à des engagements datés.</p>
+</section>
+
+<section id="s2">
+<h2><span class="n">02</span><span>L'horizon d'investissement n'est pas l'âge du client</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>M. Lauren a 60 ans. Son portefeuille, lui, a 30 ans — parce que l'argent ne s'arrête pas à lui.</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Beaucoup de banquiers vous diraient : vous avez 60 ans, donc horizon 20 ans, donc portefeuille prudent. Je crois que c'est une erreur d'analyse.</p>
+<p>Vous nous avez dit vouloir transmettre progressivement à vos enfants. Cet argent-là ne sera pas consommé à votre décès : il continuera d'être investi par eux. L'horizon réel de cette poche, c'est votre espérance de vie <strong>plus</strong> la leur. Trente ans, au bas mot.</p>
+<p>Et c'est une très bonne nouvelle : le temps est le seul ingrédient qui transforme le risque en rendement. Nous avons le droit d'en prendre.</p>
+</div>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« Mais si j'ai besoin de tout d'un coup ? »</span>
+<p>C'est exactement le rôle de la poche A. Elle est dimensionnée pour cela, et nous pouvons la redimensionner à tout moment. Le long terme de la poche C n'est pas un enfermement : c'est une décision que nous prenons ensemble et que nous pouvons réviser chaque année.</p></div>
+</section>
+
+<section id="s3">
+<h2><span class="n">03</span><span>La tension centrale : « dynamique » contre 15 %</span></h2>
+<p class="lede hide-oral"><strong>C'est le point le plus important du rendez-vous.</strong> Le traiter en premier, frontalement. Ne jamais laisser le client le découvrir seul.</p>
+<div class="idea"><span class="lbl">L'idée</span>Le client demande deux choses qui se contredisent partiellement. Notre valeur ajoutée est de le dire, puis de résoudre.</div>
+<div class="speak hot"><span class="lbl">Au client</span>
+<p>Vous nous avez dit deux choses. Un : votre profil de risque est dynamique. Deux : vous ne voulez pas perdre plus de 15 %.</p>
+<p>Je dois vous dire honnêtement que ces deux phrases ne sont pas tout à fait compatibles. Un portefeuille dynamique standard, dans notre industrie, c'est environ 13 % de volatilité annuelle. Et un portefeuille à 13 % de volatilité, en 2008, a perdu 35 %. En 2022, 20 %. Si nous vous vendions un profil dynamique classique, nous vous exposerions à des pertes de plus du double de ce que vous acceptez.</p>
+<p>Donc voilà notre lecture : entre les deux, <strong>c'est la contrainte de 15 % qui commande.</strong> Le mot « dynamique » décrit votre état d'esprit — vous n'êtes pas un client obligataire, vous acceptez la volatilité, vous ne paniquerez pas. Nous en tenons compte. Mais c'est le chiffre qui pilote l'allocation, pas l'adjectif.</p>
+</div>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« Alors vous me classez prudent ? Je ne suis pas un retraité. »</span>
+<p>Non. Un profil prudent, c'est 3 à 4 % de volatilité et un rendement qui ne couvre pas l'inflation. Nous vous positionnons à environ 8 %, soit le haut de la fourchette équilibrée.</p>
+<p>Ce qui vous différencie d'un client prudent, ce n'est pas le niveau de risque global — c'est <strong>où</strong> nous le plaçons : dans la poche à 30 ans, pas dans celle à 2 ans. Nous prenons du risque là où le temps le rémunère.</p></div>
+
+<h3 class="hide-oral">La définition retenue, et pourquoi</h3>
+<div class="idea hide-oral"><span class="lbl">Définition contractuelle</span>Perte maximale de pic à creux sur toute fenêtre de <strong>12 mois glissants</strong>, mesurée au niveau <strong>consolidé</strong>, en <strong>euros</strong>, avec une probabilité de dépassement <strong>inférieure à 10 %</strong>.</div>
+<div class="scroll hide-oral"><table>
+<thead><tr><th>Choix</th><th>Justification</th></tr></thead>
+<tbody>
+<tr><td>Drawdown, pas VaR</td><td>C'est ce que le client vit : l'écart entre son meilleur relevé et le pire. La VaR est un concept de salle de marché. Le drawdown est aussi le plus contraignant — le choisir, c'est être conservateur.</td></tr>
+<tr><td>Niveau consolidé</td><td>Appliquer les 15 % ligne à ligne interdirait toute exposition actions.</td></tr>
+<tr><td>Probabilité &lt; 10 %</td><td>Aucun gérant honnête ne peut garantir un plafond absolu. « Moins d'une année sur dix » est défendable et vérifiable.</td></tr>
+</tbody></table></div>
+<div class="speak"><span class="lbl">Au client — sur le dernier point</span>
+<p>Je ne vais pas vous promettre que vous ne perdrez jamais 15 %. Personne ne peut le promettre, et si on vous le promet, méfiez-vous. Ce que je vous dis, c'est que nous construisons le portefeuille pour que cela arrive <strong>moins d'une année sur dix</strong>, et nous vous montrerons les simulations qui le démontrent.</p>
+</div>
+<div class="speak hot"><span class="lbl">Au client — et il faut le dire, pas l'omettre</span>
+<p>Un chiffre que je préfère vous donner moi-même plutôt que vous laisser le découvrir. Nous avons testé cette allocation sur vingt-deux ans de données réelles. Le drawdown que nous tenons sous 15 % neuf années sur dix, c'est 13 %.</p>
+<p>Mais <strong>en 2008, cette même allocation aurait perdu 26 %.</strong></p>
+<p>Je vous le dis maintenant, au moment où vous décidez, parce que c'est le seul moment où cette information vous est utile. Une crise de l'ampleur de 2008 dépassera votre contrainte. Votre budget de risque est calibré sur une année normale-mauvaise, pas sur une crise systémique — et aucun portefeuille qui atteint votre objectif de rendement ne pourrait l'être.</p>
+</div>
+</section>
+
+<section id="s4">
+<h2><span class="n">04</span><span>« Protéger contre 4 % » ne veut pas dire « viser 4 % »</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>L'objectif est un rendement <strong>net</strong>. Le portefeuille doit donc produire nettement plus en brut. Beaucoup de concurrents oublieront de le dire.</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Votre objectif est de préserver votre pouvoir d'achat face à une inflation de 4 %. Attention au piège : cela ne veut pas dire viser 4 % de performance.</p>
+<p>Entre la performance brute du portefeuille et ce qui reste dans votre poche, il y a deux prélèvements : nos frais, et l'impôt. <strong>Si je vise 4 % brut, vous vous appauvrissez chaque année.</strong></p>
+</div>
+<div class="calc hide-oral">Objectif net réel                          <b>4,00 %</b>   inflation
++ Frais totaux (mandat + instruments)      0,55 %
++ Friction fiscale annuelle
+    structure optimisée                    0,30 %  →  <span class="hi">4,85 %</span>
+    compte-titres bien géré                0,45 %  →  <span class="hi">5,00 %</span>
+    compte-titres négligent                0,90 %  →  <span class="hi">5,45 %</span>
+
+Objectif de rendement brut retenu          <b>4,85 %</b></div>
+<div class="speak hot"><span class="lbl">Au client — où se trouve vraiment l'argent</span>
+<p>Je veux être précis ici, parce que c'est un endroit où notre profession raconte souvent n'importe quoi.</p>
+<p>Entre une structure optimisée et un compte-titres <em>correctement géré</em>, l'écart de friction fiscale annuelle est d'environ <strong>quinze points de base</strong>. C'est réel, ce n'est pas spectaculaire. Si quelqu'un vous promet des points entiers de performance annuelle grâce à l'enveloppe, demandez-lui le calcul.</p>
+<p>En revanche, entre un compte-titres correctement géré et un compte-titres négligent — des fonds qui distribuent des dividendes taxés chaque année au lieu de les réinvestir — l'écart est de <strong>soixante points de base par an</strong>. Là, c'est considérable. Et c'est entièrement gratuit à corriger : c'est une question de soin, pas d'ingénierie.</p>
+<p><strong>Et le vrai sujet fiscal n'est pas annuel, il est successoral.</strong> 20 % contre 45 % à la transmission. Sur votre patrimoine, ce seul écart pèse plus lourd que tout ce que je gagnerai en optimisant votre allocation pendant trente ans. C'est de cela que nous parlerons au point suivant.</p>
+</div>
+<p class="note hide-oral"><b>Correction assumée.</b> Une version antérieure de ce document annonçait un écart annuel de 0,85 % entre structure optimisée et compte-titres. Cette comparaison opposait une bonne structure à un compte-titres garni de fonds distribuants — un homme de paille. L'argument fiscal est solide, mais sur le terrain successoral, pas sur la friction annuelle.</p>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« 0,55 % de frais, c'est cher. »</span>
+<p>C'est le tarif d'un mandat institutionnel sur cette taille d'actifs, et il inclut les frais des instruments sous-jacents. Nous utilisons des supports indiciels dont le coût moyen est de 0,15 %, pas des fonds maison à 1,5 %. Et ce chiffre est négociable à la baisse en contrepartie d'un engagement de durée.</p></div>
+</section>
+
+<div class="part">Partie II — La méthode</div>
+
+<section id="s5">
+<h2><span class="n">05</span><span>Du « 15 % » à une allocation</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>Il existe une relation stable entre volatilité annuelle et perte maximale. C'est elle qui traduit la contrainte du client en chiffres de gérant.</div>
+<div class="calc hide-oral">Mesuré sur 21,8 ans de données quotidiennes en EUR (2004-2026)
+
+Actifs croissance    vol     DD P90    pire      2008
+        38 %        8,1 %    10,7 %   20,7 %    21,3 %
+        42 %        9,0 %    12,0 %   23,0 %    23,8 %
+     <b>   47 %        9,9 %    13,3 %</b>   25,3 %    26,3 %   ← retenu
+        51 %       10,8 %    14,6 %   27,6 %    28,7 %
+
+Ratio perte max / volatilité      <span class="hi">1,35</span>  (mesuré, pas postulé)</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Votre contrainte de 15 % se traduit techniquement par une volatilité cible d'environ <strong>10 %</strong>, soit <strong>47 % du portefeuille en actifs de croissance</strong>. Ce n'est pas une règle de pouce : nous avons testé cette allocation sur vingt-deux ans de données réelles, jour par jour, en euros.</p>
+</div>
+<h3>La vérification qui boucle le raisonnement</h3>
+<p class="hide-oral"><strong>C'est l'argument le plus solide du pitch.</strong> À maîtriser parfaitement.</p>
+<div class="calc hide-oral">Régime d'inflation      attendu    requis      marge
+  2 %  consensus BCE      4,25 %    2,85 %   <span class="hi">+1,40 %</span>
+  4 %  hypothèse client   5,84 %    4,85 %   <span class="hi">+0,99 %</span>
+
+L'objectif est atteint dans les deux régimes.
+
+Sensibilité, à inflation 4 %
+  frais de mandat 0,40 % → 0,25 %                      +1,14 %
+  sans structuration fiscale                           +0,84 %
+  sans structuration du tout                           +0,39 %</div>
+<div class="speak hot"><span class="lbl">Au client — la phrase la plus importante du rendez-vous</span>
+<p>Votre hypothèse d'inflation à 4 % est nettement au-dessus du consensus, qui table plutôt sur 2 %. <strong>Nous ne l'avons pas corrigée.</strong> Nous avons construit votre portefeuille pour qu'il tienne dans votre scénario, pas dans le nôtre.</p>
+<p>Dans votre scénario à 4 %, nous attendons 5,84 % de rendement brut, et il vous en faut 4,85 %. <strong>Marge : un point par an.</strong></p>
+<p>Et si l'inflation se révèle conforme au consensus, votre marge est plus large encore — environ 1,4 point. Vous êtes couvert dans les deux cas. <strong>Autrement dit, vous ne dépendez pas du fait que nous ayons raison sur l'inflation</strong> — et c'est, je crois, la seule promesse honnête qu'un gérant puisse vous faire sur ce sujet.</p>
+</div>
+<p class="note hide-oral"><b>Correction assumée.</b> Deux versions antérieures annonçaient des marges de +0,10 % puis −0,09 %. Toutes deux comparaient un seuil bâti sur 4 % d'inflation à des rendements attendus bâtis implicitement sur 2 % — un portefeuille évalué dans un monde et jugé dans un autre. Chaque classe d'actifs porte désormais un coefficient de répercussion de l'inflation, et les deux termes sont évalués dans le même régime.</p>
+</section>
+
+<section id="s6">
+<h2><span class="n">06</span><span>Pourquoi l'optimisation classique ne suffit pas</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>L'outil standard raisonne en volatilité. Notre contrainte est un drawdown. Ce ne sont pas les mêmes mathématiques.</div>
+<p>La volatilité mesure l'amplitude moyenne des mouvements ; le drawdown dépend de leur <strong>enchaînement</strong>. Douze mois de −1 % d'affilée, ou six mois de −2 % alternés avec six mois de +2 % : même volatilité, drawdown radicalement différent.</p>
+<div class="calc hide-oral">1.  Black-Litterman      →  intégrer nos vues macro aux rendements d'équilibre
+2.  Optimisation MV      →  frontière efficiente sous contraintes
+    avec resampling         (ESG, UCITS, poids max, liquidité)
+3.  Sélection            →  3 ou 4 allocations candidates
+4.  Block bootstrap      →  10 000 trajectoires réalistes sur 10 ans
+5.  Test de contrainte   →  P(drawdown &gt; 15 %) ≤ 10 % ?
+6.  Si violée            →  retour en 3, moins de risque</div>
+<div class="speak"><span class="lbl">Au client — version courte</span>
+<p>Nous n'optimisons pas une fois. Nous proposons une allocation, nous la passons dans dix mille scénarios de marché, nous regardons combien de fois elle dépasse vos 15 %, et nous corrigeons jusqu'à ce que la réponse soit satisfaisante. <strong>Ce n'est pas un calcul, c'est une boucle de validation.</strong></p>
+</div>
+
+<h3>Black-Litterman — intégrer nos convictions sans casser le modèle</h3>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Le marché reflète le consensus de tous les investisseurs. Notre point de départ, c'est ce consensus. Ensuite, nous exprimons nos convictions personnelles — par exemple : nous pensons que les actions européennes sont plus attractives que ne le dit le consensus — et <strong>avec quel degré de confiance</strong>. Le modèle mélange les deux proportionnellement à notre confiance. Résultat : nos vues influencent le portefeuille sans le déséquilibrer.</p>
+</div>
+<p class="note hide-oral"><b>Pourquoi c'est indispensable ici :</b> l'optimisation classique, nourrie directement de nos prévisions, produirait des portefeuilles absurdes — 80 % sur une seule ligne. Black-Litterman est ce qui rend les vues exploitables.</p>
+
+<h3>Le resampling — obtenir un portefeuille stable</h3>
+<div class="speak"><span class="lbl">Au client</span>
+<p>L'optimisation classique a un défaut connu : elle est hypersensible. Changez une prévision de rendement de deux dixièmes de point, et l'allocation recommandée bascule complètement. Impossible de défendre un portefeuille dont les fondations bougent à ce point.</p>
+<p>Nous optimisons donc des centaines de fois sur des hypothèses légèrement perturbées, et nous retenons la moyenne. On obtient un portefeuille plus diversifié et beaucoup plus robuste.</p>
+</div>
+
+<h3>Le block bootstrap — pourquoi nos simulations sont crédibles</h3>
+<div class="speak"><span class="lbl">Au client</span>
+<p>La plupart des simulations tirent des rendements au hasard, mois par mois, en supposant une distribution bien sage. Le problème, c'est que les crises ne sont pas bien sages : <strong>les mauvais mois s'enchaînent.</strong> Une simulation naïve vous dirait que 2008 était impossible.</p>
+<p>Nous procédons autrement : nous rééchantillonnons l'histoire par <strong>blocs</strong> de plusieurs mois consécutifs, pour préserver les enchaînements réels.</p>
+<p>Mais je dois être franc sur ce que cette technique apporte — et n'apporte pas. Nous l'avons testée sur vos données : elle donne des pertes maximales très proches de celles observées dans l'histoire, parfois même légèrement inférieures. <strong>Elle ne remplace donc pas le relevé historique, elle le recoupe.</strong> Le chiffre sur lequel nous nous engageons reste celui que le marché a réellement produit.</p>
+</div>
+<p class="note hide-oral"><b>Correction assumée.</b> Une version antérieure affirmait que le block bootstrap donnait des estimations plus prudentes qu'un tirage naïf. Mesuré sur nos données (blocs de 21 à 252 jours), il tombe entre 0 et 0,6 point <em>en dessous</em> du P90 historique. Le bootstrap sert à recouper, pas à durcir — et la vraie queue de distribution, c'est 2008 à 26 %, très au-delà du P90.</p>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« Vos simulations reposent sur le passé. »</span>
+<p>Oui, en partie, et c'est une limite réelle. C'est pourquoi nous les complétons par des scénarios de stress nommés : 2008, mars 2020, 2011 sur la dette européenne, et surtout 2022. Nous vous montrons ce que votre portefeuille aurait fait dans chacun. Ce n'est pas une prédiction, c'est un test de résistance.</p></div>
+</section>
+
+<section id="s7">
+<h2><span class="n">07</span><span>Pourquoi le 60/40 ne suffit plus</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>Le portefeuille équilibré traditionnel repose sur une hypothèse — actions et obligations évoluent en sens inverse — qui a cessé d'être vraie au moment exact où on en avait besoin.</div>
+<div class="speak hot"><span class="lbl">Au client</span>
+<p>Le portefeuille classique, 60 % d'actions et 40 % d'obligations, repose sur une idée simple : quand les actions baissent, les obligations montent, et l'ensemble amortit.</p>
+<p>En 2022, cela n'a pas fonctionné. Les actions ont perdu environ 18 %, les obligations environ 17 %, <strong>en même temps</strong>. Un portefeuille équilibré a perdu près de 20 %. Pourquoi ? Parce que la cause de la baisse était l'inflation, et l'inflation fait mal aux deux classes d'actifs simultanément.</p>
+<p>Or c'est précisément votre inquiétude : vous nous demandez de vous protéger contre une inflation de 4 %. Vous protéger avec un 60/40 reviendrait à vous vendre <strong>le seul portefeuille qui échoue dans le scénario que vous craignez.</strong></p>
+</div>
+<div class="scroll hide-oral"><table>
+<thead><tr><th>Brique</th><th>Ce qu'elle apporte</th><th>Ce qu'on en dit</th></tr></thead>
+<tbody>
+<tr><td>Or</td><td>Décorrélé, réserve de valeur, protège contre la défiance monétaire</td><td>Répond à son inquiétude sur l'euro</td></tr>
+<tr><td>Obligations indexées</td><td>Couverture directe du risque cité</td><td>Adossement littéral à l'objectif</td></tr>
+<tr><td>Infrastructure cotée</td><td>Revenus contractuellement indexés sur l'inflation</td><td>Le meilleur actif réel liquide</td></tr>
+<tr><td>Suivi de tendance</td><td>Historiquement performant en 2022</td><td>Vérifié : <strong>non achetable en ETF UCITS</strong> — passe par un fonds logé dans le contrat luxembourgeois</td></tr>
+<tr><td>Actions de qualité</td><td>Entreprises capables de répercuter l'inflation</td><td>La protection inflation par les actions</td></tr>
+</tbody></table></div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Chaque brique du portefeuille répond à une question précise. Je peux vous justifier chaque ligne. <strong>S'il y en a une que je ne sais pas justifier, elle n'a rien à faire dans votre portefeuille.</strong></p>
+</div>
+</section>
+
+<div class="part">Partie III — Les décisions du dossier</div>
+
+<section id="s8">
+<h2><span class="n">08</span><span>La poche de liquidité : montant, devise, duration</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>10 M€ à dépenser sous 2 ans, ce n'est pas « du cash ». C'est un engagement daté qu'on adosse précisément.</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Vos 10 millions doivent être disponibles, mais ils n'ont aucune raison de dormir. Nous les plaçons ainsi :</p>
+<p><strong>En euros, intégralement.</strong> C'est la devise dans laquelle vous allez dépenser cet argent. Y ajouter du risque de change pour gagner quelques dixièmes de point serait la définition même de la mauvaise prise de risque : un gain marginal contre un risque sur le capital d'un projet certain.</p>
+<p><strong>Duration courte, 6 à 12 mois</strong>, calée sur votre calendrier de dépense. En support : des fonds monétaires de haute qualité et des obligations d'État européennes de maturité courte, échelonnées sur vos échéances.</p>
+<p>Cette poche n'a pas vocation à performer. <strong>Elle a vocation à être là.</strong></p>
+</div>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« Pourquoi pas du dollar, si j'ai des dépenses en dollars ? »</span>
+<p>Si une partie de la dépense est effectivement en dollars, alors nous plaçons exactement cette partie en dollars. La règle est simple : <strong>la devise de la poche de liquidité est celle de la dépense, pas celle de l'opportunité.</strong> Dites-nous la ventilation et nous calons dessus.</p></div>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« Et si je ne dépense finalement que 6 millions ? »</span>
+<p>Le reliquat rejoint la poche B au fil de l'eau. Nous révisons le dimensionnement à chaque point d'étape.</p></div>
+</section>
+
+<section id="s9">
+<h2><span class="n">09</span><span>La couverture de change</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>Nous partons en euros, mais nous investissons dans le monde entier. Chaque actif étranger ajoute un risque de devise qui n'est pas rémunéré à long terme.</div>
+<div class="scroll hide-oral"><table>
+<thead><tr><th>Classe d'actifs</th><th class="num">Couverture</th><th>Pourquoi</th></tr></thead>
+<tbody>
+<tr><td>Obligations internationales</td><td class="num">100 %</td><td>Le risque de change (8–10 % de vol.) écraserait celui de l'obligation (4–5 %). On achèterait de la volatilité de devise déguisée en actif défensif.</td></tr>
+<tr><td>Actions internationales</td><td class="num">30–50 %</td><td>Le dollar monte quand les marchés paniquent. Le laisser partiellement nu, c'est une assurance gratuite contre les krachs.</td></tr>
+<tr><td>Or</td><td class="num">0 %</td><td>L'or coté en dollars est une réserve de valeur. Le couvrir annulerait une partie de sa fonction.</td></tr>
+<tr><td>Actions émergentes</td><td class="num">0 %</td><td>Couverture coûteuse, et la devise fait partie du moteur de performance.</td></tr>
+</tbody></table></div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Une règle simple : <strong>on couvre ce qui est là pour la sécurité, on laisse respirer ce qui est là pour la performance.</strong></p>
+<p>Vos obligations sont là pour amortir les chocs. Si je les laisse exposées au dollar, elles deviennent plus volatiles que les actions que je cherchais à compenser. Je les couvre donc intégralement.</p>
+<p>Vos actions américaines, c'est différent. Historiquement, lorsque les marchés chutent, le dollar monte : les investisseurs du monde entier s'y réfugient. En mars 2020, en 2008, ce réflexe a joué. Donc une exposition partielle au dollar sur la poche actions amortit vos baisses. Je la conserve, sans excès.</p>
+</div>
+<div class="speak hot"><span class="lbl">Au client — sur son inquiétude euro <em>et</em> dollar</span>
+<p>Vous nous avez dit être inquiet sur l'Europe <strong>et</strong> sur les États-Unis. Je prends cette remarque très au sérieux, parce qu'elle élimine la réponse paresseuse.</p>
+<p>La réponse paresseuse serait : « vous craignez l'euro, mettons du dollar ». Mais vous craignez aussi le dollar. Donc notre réponse n'est pas de choisir une devise contre l'autre — c'est de <strong>ne dépendre d'aucune des deux</strong> : une exposition résiduelle au franc suisse et au yen, de l'or, et des actifs réels dont la valeur ne dépend pas d'une banque centrale en particulier.</p>
+<p>Au fond, votre inquiétude porte moins sur une devise que sur la monnaie papier en général. C'est une inquiétude légitime, et elle a une réponse d'allocation.</p>
+</div>
+</section>
+
+<section id="s10">
+<h2><span class="n">10</span><span>Le contenant compte plus que le contenu</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>La performance nette dépend autant de <em>où</em> l'actif est logé que de <em>quel</em> actif c'est.</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Il y a deux questions distinctes, et la deuxième est souvent négligée : qu'est-ce que j'achète, et dans quoi je le range.</p>
+<p>Le même fonds, exactement le même, logé dans un compte-titres ou dans un contrat luxembourgeois, ne produit pas le même résultat net. <strong>Sur trente ans, l'écart se compte en millions.</strong></p>
+</div>
+<div class="scroll hide-oral"><table>
+<thead><tr><th>Enveloppe</th><th>Pendant la vie</th><th>À la transmission</th></tr></thead>
+<tbody>
+<tr><td>Compte-titres</td><td>Flat tax 30 % sur revenus et plus-values réalisées</td><td>Droits de succession jusqu'à 45 %</td></tr>
+<tr><td>Assurance-vie luxembourgeoise</td><td>Zéro impôt tant qu'il n'y a pas de rachat</td><td>152 500 € d'abattement par bénéficiaire, puis 20 % / 31,25 %</td></tr>
+<tr><td>Contrat de capitalisation</td><td>Idem</td><td>Pas d'avantage propre, mais donnable en démembrement</td></tr>
+<tr><td>PEA</td><td>Exonération d'IR après 5 ans</td><td>Plafond 150 k€ : marginal, mais gratuit</td></tr>
+</tbody></table></div>
+
+<h3>Les trois arguments sur le contrat luxembourgeois</h3>
+<div class="speak"><span class="lbl">Au client — 1. Le report d'imposition</span>
+<p>Tant que vous ne retirez rien, il n'y a pas d'impôt. Les gains se réinvestissent en totalité. Ce n'est pas de l'évasion, c'est du report — mais sur trente ans, le report capitalisé représente des sommes considérables.</p>
+</div>
+<div class="speak"><span class="lbl">Au client — 2. Le super-privilège</span>
+<p>En France, si votre assureur fait faillite, vous êtes garanti à hauteur de 70 000 €. Sur un contrat de plusieurs dizaines de millions, cette garantie est symbolique.</p>
+<p>Au Luxembourg, vous êtes <strong>créancier de premier rang</strong> sur les actifs cantonnés de l'assureur — avant l'État, avant les salariés. Sur votre taille de patrimoine, ce n'est pas un détail juridique, c'est une différence de nature.</p>
+</div>
+<div class="speak"><span class="lbl">Au client — 3. Le fonds d'assurance spécialisé</span>
+<p>Résident français, vous n'avez pas accès en direct à certains supports pour des raisons réglementaires. À l'intérieur d'un contrat luxembourgeois, le champ des actifs éligibles est nettement plus large.</p>
+<p>Cela résout <strong>deux de vos contraintes d'un coup</strong> : l'accès à des supports non disponibles en direct, et le multi-devises natif — vous pouvez détenir des compartiments en dollars, en francs suisses, sans changer de contrat. Ce dernier point répond directement à votre inquiétude sur l'euro.</p>
+</div>
+
+<h3>Quel actif dans quelle enveloppe</h3>
+<div class="calc hide-oral">→  Assurance-vie    obligations à coupon élevé, haut rendement,
+                   stratégies à forte rotation, actifs distribuants,
+                   alternatifs
+                   <span class="hi">lourdement taxés ailleurs, neutralisés ici</span>
+
+→  Compte-titres   ETF actions capitalisants, faible rotation, buy &amp; hold
+                   <span class="hi">aucun impôt avant cession → report quasi gratuit</span></div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Un fonds capitalisant, qui réinvestit ses dividendes au lieu de vous les verser, ne déclenche aucun impôt tant que vous ne vendez pas. Un fonds distribuant vous verse des dividendes taxés à 30 % chaque année, et vous devez ensuite les réinvestir. Même actif, même performance brute. L'écart net, sur trente ans, se compte en dizaines de points de patrimoine final.</p>
+<p>Nous n'achèterons donc que des supports capitalisants hors assurance-vie. <strong>C'est une décision gratuite, et pourtant très souvent négligée.</strong></p>
+</div>
+<div class="speak"><span class="lbl">Au client — le détail qui montre le niveau de soin</span>
+<p>Pour vos actions américaines, nous choisirons systématiquement des fonds domiciliés en Irlande. La convention fiscale entre l'Irlande et les États-Unis ramène la retenue à la source sur les dividendes américains de 30 % à 15 %. Sur un rendement de 1,5 %, cela vous fait <strong>22 points de base de performance par an, gratuitement.</strong> Multiplié par trente ans, c'est une somme réelle.</p>
+</div>
+</section>
+
+<section id="s11">
+<h2><span class="n">11</span><span>La transmission : changer la fonction objectif</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>L'objectif de M. Lauren n'est pas de maximiser sa fortune. C'est de maximiser <strong>ce qui arrive effectivement à ses enfants</strong>. Ce n'est pas le même problème.</div>
+<div class="calc hide-oral">Objectif classique      max  E[ Patrimoine final ]
+Objectif du dossier     max  E[ Patrimoine final × (1 − coût de transmission) ]</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Nous mesurons notre performance sur le mauvais indicateur si nous regardons uniquement la valeur du portefeuille. Ce qui compte pour vous, c'est ce qui arrivera à vos enfants, <strong>après droits</strong>. Entre les deux, il peut y avoir 45 % d'écart. Aucune décision d'allocation ne produira jamais un gain de cette ampleur.</p>
+</div>
+
+<h3>1. La donation en nue-propriété — le levier majeur</h3>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Voici un mécanisme que beaucoup de gens découvrent trop tard.</p>
+<p>La pleine propriété d'un actif se décompose en deux droits : l'usufruit — le droit d'en percevoir les revenus — et la nue-propriété — le droit d'en être propriétaire à terme. Vous pouvez donner la nue-propriété à vos enfants tout en conservant l'usufruit : <strong>vous continuez de percevoir les revenus, votre train de vie ne change pas.</strong></p>
+<p>L'intérêt fiscal est double. D'abord, la valeur taxable de la donation n'est pas 100 % de l'actif, mais seulement la valeur de la nue-propriété — déterminée par un barème légal fondé sur votre âge. À 60 ans, c'est <strong>50 %</strong>. Vous transmettez un actif de 10 millions en payant des droits sur 5.</p>
+<p>Ensuite, et c'est le plus important : <strong>toute l'appréciation future appartient déjà à vos enfants.</strong> Si ces 10 millions en valent 40 dans trente ans, les 30 millions de plus-value leur reviennent sans aucun droit supplémentaire.</p>
+<p>Et à votre décès, l'usufruit s'éteint. Vos enfants deviennent pleins propriétaires. <strong>Sans aucun droit de succession</strong> sur cette part.</p>
+</div>
+<div class="speak hot"><span class="lbl">Au client — le point de timing, à placer impérativement</span>
+<p>Un dernier point, et il est urgent. Le barème légal évolue par tranches d'âge. À 60 ans, la nue-propriété que vous transmettez est valorisée à 50 %. <strong>À partir de 61 ans, elle passe à 60 %.</strong></p>
+<p>Concrètement : une donation réalisée avant votre prochain anniversaire coûte dix points de base taxable de moins que la même donation quelques mois plus tard. Sur les montants dont nous parlons, cela représente <strong>plusieurs centaines de milliers d'euros de droits.</strong></p>
+<p>C'est la raison pour laquelle je vous dis que ce dossier a un calendrier, et que ce calendrier commence maintenant.</p>
+</div>
+<p class="note hide-oral"><b>C'est l'argument qui fait gagner le mandat.</b> Il montre qu'on a travaillé le dossier, pas seulement l'allocation.</p>
+
+<h3>2. L'assurance-vie avant 70 ans</h3>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Les versements effectués avant votre 70<sup>e</sup> anniversaire bénéficient d'un régime de transmission spécifique : 152 500 € d'abattement par bénéficiaire, puis une taxation à 20 % — contre un barème successoral qui monte à 45 % en ligne directe.</p>
+<p>Vous avez 60 ans. <strong>Cette fenêtre vous est ouverte pour dix ans encore. Elle se fermera.</strong> C'est une raison supplémentaire de structurer maintenant plutôt que dans cinq ans.</p>
+</div>
+
+<h3>3. L'abattement de 100 000 €, renouvelable</h3>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Chaque parent peut donner 100 000 € à chaque enfant sans droits, tous les quinze ans. Avec votre épouse et deux enfants : 400 000 € par cycle. À votre échelle, c'est modeste — mais c'est gratuit, et cela se renouvelle. Il faut simplement <strong>démarrer le compteur tôt</strong> pour pouvoir le réutiliser.</p>
+</div>
+
+<h3>4. La donation-partage</h3>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Elle fige la valeur des biens au jour de la donation et répartit entre vos deux enfants de manière définitive. Son intérêt principal n'est pas fiscal, il est familial : <strong>elle évite les contestations au moment de la succession.</strong> Sur une transmission de cette taille entre deux enfants, ce n'est pas un sujet secondaire.</p>
+</div>
+<div class="speak"><span class="lbl">Au client — la réserve, à énoncer explicitement</span>
+<p>Tout ce que je viens de vous présenter devra être validé par votre notaire et votre avocat fiscaliste avant mise en œuvre. Nous construisons la stratégie patrimoniale ; ils sécurisent la rédaction des actes. Nous travaillons habituellement avec eux et nous coordonnons.</p>
+</div>
+</section>
+
+<section id="s12">
+<h2><span class="n">12</span><span>La crypto : répondre au fils sans se dédire</span></h2>
+<p class="lede hide-oral">C'est le fils qui est intéressé, pas M. Lauren. Deux réponses sont mauvaises : refuser sèchement — on perd le fils, futur détenteur du patrimoine ; accepter mollement — on perd la crédibilité du père.</p>
+<div class="idea"><span class="lbl">L'idée</span>Ne pas répondre par une allocation. Répondre par un <strong>cadre de gouvernance</strong>.</div>
+<div class="speak hot"><span class="lbl">Au client</span>
+<p>Je vais vous donner une réponse en trois temps, parce que la question mérite mieux qu'un oui ou un non.</p>
+<p><strong>Premièrement, le constat factuel.</strong> Le bitcoin a une volatilité d'environ 60 %, soit quatre fois celle des actions. Ses baisses historiques dépassent 70 %. Et il ne s'est pas comporté comme une protection : en 2022, quand vous aviez besoin d'un actif décorrélé, il a chuté davantage que les actions. L'argument « or numérique » n'a pas résisté à son premier vrai test.</p>
+<p><strong>Deuxièmement, ce que cela implique pour votre contrainte.</strong> Votre plafond est de 15 % de perte. Une ligne crypto de 2 % qui perd 70 % coûte 1,4 point à votre portefeuille : c'est absorbable. À 10 %, elle coûte 7 points — presque la moitié de votre budget de risque total, sur un seul actif. La réponse à « combien » n'est donc pas une question d'opinion sur la crypto : <strong>elle est déterminée par votre contrainte de risque.</strong></p>
+<p>Et ce n'est pas une intuition : nous l'avons chiffré. Une ligne de 2 % ajoute <strong>0,7 point</strong> à votre perte maximale ; à 5 %, elle en ajoute 1,6. Le plafond n'est pas un jugement moral sur la crypto, c'est une soustraction.</p>
+<p><strong>Troisièmement, notre recommandation.</strong> Une enveloppe plafonnée à 2 %, soit 2 millions, logée dans la poche transmise à vos enfants — celle dont l'horizon est le plus long et qui peut absorber ce type de risque. Avec une règle explicite : jamais de renforcement après une hausse, et un rééquilibrage automatique qui prend les profits au-delà du plafond.</p>
+</div>
+<div class="chal"><span class="lbl">Pourquoi cette réponse est bonne — si on vous le demande</span>
+<p>Elle donne raison à votre fils sur le fond — cet actif a sa place dans un patrimoine long — et elle vous donne raison sur la prudence. Elle transforme un désaccord familial en règle écrite. Et franchement, sur un sujet patrimonial, <strong>une règle écrite vaut mieux qu'un consensus.</strong></p></div>
+<p class="note hide-oral"><b>Implémentation :</b> pas d'accès direct en tant que résident français retail. Les voies sont soit un ETP coté européen, soit — plus élégant — un compartiment logé dans le contrat luxembourgeois. Cela relie la réponse crypto à l'argument du <a class="ref" href="#s10">§10</a>.</p>
+</section>
+
+<section id="s13">
+<h2><span class="n">13</span><span>Le benchmark se déduit, il ne se choisit pas</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>Un benchmark n'est pas une référence qu'on choisit parce qu'elle est flatteuse. C'est le portefeuille passif qui aurait la même politique d'investissement que le nôtre.</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Vous devez pouvoir juger notre travail. Pour cela, il vous faut un point de comparaison — mais un point de comparaison honnête.</p>
+<p>Comparer votre portefeuille au CAC 40 n'aurait aucun sens : vous n'êtes pas investi à 100 % en actions françaises. Un tel indice nous ferait passer pour des génies dans les années de baisse et des incompétents dans les hausses. <strong>Ce serait du bruit, pas de l'information.</strong></p>
+<p>Votre référence doit donc être construite sur mesure : la même répartition par classes d'actifs que votre portefeuille, les mêmes filtres éthiques, la même devise, la même politique de couverture. La seule différence : elle est purement passive.</p>
+<p>Ainsi, quand nous faisons mieux, vous saurez que c'est grâce à nos choix — <strong>et quand nous faisons moins bien, vous le verrez aussi.</strong> C'est le sens du mot transparence.</p>
+</div>
+<div class="scroll hide-oral"><table>
+<thead><tr><th>Critère de validité</th><th>Ce que ça impose</th></tr></thead>
+<tbody>
+<tr><td>Investissable</td><td>Chaque composant doit être achetable sous forme d'ETF</td></tr>
+<tr><td>Réplicable</td><td>Pondérations publiques, règles de rebalancement écrites</td></tr>
+<tr><td>Cohérent en devise</td><td>Libellé en euros, même politique de couverture</td></tr>
+<tr><td>Cohérent en ESG</td><td>Indices filtrés — sinon la référence contredit le mandat</td></tr>
+</tbody></table></div>
+<div class="chal"><span class="lbl">Si on me challenge</span><span class="q">« Un benchmark sur mesure, c'est pratique pour vous. »</span>
+<p>La critique est légitime et je la comprends. C'est pourquoi il est figé par écrit dans le mandat, avant d'investir, et ne peut être modifié qu'avec votre accord formel. <strong>Un benchmark qui bouge n'est pas un benchmark.</strong></p>
+<p>Et nous le complétons par un second repère, plus rustique : votre objectif absolu, inflation + 0 %. Vous nous jugerez sur les deux.</p></div>
+</section>
+
+<section id="s14">
+<h2><span class="n">14</span><span>La gouvernance : rebalancement par bandes</span></h2>
+<div class="idea"><span class="lbl">L'idée</span>Rebalancer à date fixe, c'est arbitraire. Rebalancer par seuils, c'est discipliné.</div>
+<div class="speak"><span class="lbl">Au client</span>
+<p>Le portefeuille dérive naturellement : ce qui monte prend de la place, ce qui baisse en perd. Sans intervention, votre allocation devient progressivement plus risquée pendant les hausses — <strong>exactement au pire moment.</strong></p>
+<p>Nous fixons donc des bandes de tolérance : tant qu'une classe d'actifs reste à plus ou moins trois points de sa cible, nous ne touchons à rien. Au-delà, nous ramenons à la cible.</p>
+<p>L'avantage : elle nous force mécaniquement à vendre ce qui a beaucoup monté et à acheter ce qui a baissé. <strong>Elle impose la discipline que l'émotion rend difficile.</strong> Et elle réduit les frais et l'impôt par rapport à un rebalancement trimestriel systématique.</p>
+</div>
+<div class="scroll hide-oral"><table>
+<thead><tr><th>Fréquence</th><th>Objet</th></tr></thead>
+<tbody>
+<tr><td>Mensuelle</td><td>Reporting — performance, risque, suivi du drawdown vs les 15 %</td></tr>
+<tr><td>Trimestrielle</td><td>Revue tactique, respect des bandes</td></tr>
+<tr><td>Annuelle</td><td>Révision de l'IPS, hypothèses de marché, calendrier de transmission</td></tr>
+<tr><td>Déclenchée</td><td>Drawdown ≥ 10 % — soit deux tiers du budget de risque</td></tr>
+</tbody></table></div>
+<div class="speak"><span class="lbl">Au client — sur le dernier point</span>
+<p>Nous ne vous appellerons pas seulement pour les bonnes nouvelles. Si votre portefeuille atteint 10 % de baisse — deux tiers de votre budget de risque — <strong>nous vous appelons, que vous le demandiez ou non, avec un plan.</strong></p>
+</div>
+</section>
+
+<footer>
+<div class="col">
+<h3 style="margin-top:0">L'architecture du raisonnement</h3>
+<div class="calc hide-oral">              Objectif : inflation 4 %
+                        │
+        ┌───────────────┴───────────────┐
+   Rendement brut requis        Contrainte de perte 15 %
+        <b>4,85 %</b>                       │
+        │                    Volatilité cible <b>9,9 %</b>
+        └───────────────┬───────────────┘
+                        │
+       Ces deux chiffres se croisent à <span class="hi">47 % d'actifs de croissance</span>
+            attendu <b>5,84 %</b> — marge <span class="hi">+0,99 %</span>
+                        │
+        ┌───────────────┴───────────────┐
+  Ce qui rend l'égalité          Ce qui la sécurise
+       possible                         │
+        │                     Diversification au-delà
+  Structuration fiscale          du 60/40 (or, inflation,
+  (−0,8 % de brut requis)             actifs réels)
+        └───────────────┬───────────────┘
+                        │
+              <b>PORTEFEUILLE MODÈLE</b>
+                        │
+          Benchmark hybride — le même, en passif</div>
+<div class="speak"><span class="lbl">La phrase de conclusion du rendez-vous</span>
+<p>Votre objectif est atteignable, avec environ <strong>un point de marge par an</strong> — et cela reste vrai que l'inflation soit celle que vous craignez ou celle que le consensus anticipe. En revanche, à ce niveau de risque, une crise comme 2008 dépasserait votre contrainte de 15 %.</p>
+<p>Je vous dis ces deux choses maintenant, au moment où vous décidez, plutôt que le jour où elles se matérialisent. C'est pour cela que nous avons commencé par définir précisément votre contrainte de risque et par la structure successorale, avant de parler du moindre fonds.</p>
+<p>La plupart de nos concurrents feront l'inverse.</p>
+</div>
+</div>
+</footer>
+
+</div>
+</main>
+</div>
+
+<div class="bar">
+  <button id="oral" aria-pressed="false">Mode oral</button>
+</div>
+
+<script>
+(function(){
+  var btn=document.getElementById('oral');
+  var KEY='lauren-oral';
+  function set(on){
+    document.body.classList.toggle('oral',on);
+    btn.setAttribute('aria-pressed',on?'true':'false');
+    btn.textContent=on?'Tout afficher':'Mode oral';
+    try{localStorage.setItem(KEY,on?'1':'0')}catch(e){}
+  }
+  var saved='0';
+  try{saved=localStorage.getItem(KEY)||'0'}catch(e){}
+  if(saved==='1')set(true);
+  btn.addEventListener('click',function(){set(!document.body.classList.contains('oral'))});
+
+  var links=Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+  var map={};
+  links.forEach(function(a){
+    var el=document.querySelector(a.getAttribute('href'));
+    if(el)map[el.id]=a;
+  });
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        var a=map[e.target.id];
+        if(!a)return;
+        if(e.isIntersecting){links.forEach(function(x){x.classList.remove('on')});a.classList.add('on')}
+      });
+    },{rootMargin:'-10% 0px -70% 0px',threshold:0});
+    Object.keys(map).forEach(function(id){io.observe(document.getElementById(id))});
+  }
+})();
+</script>
