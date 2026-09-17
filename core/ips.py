@@ -169,24 +169,37 @@ FX_HEDGE_RATIO = {
 #   que 5 % de cash. Les 5 % manquants sont desormais explicites en
 #   souverain court, qui est bien ce que decrit l'IPS §6.2.
 SAA_INDICATIVE = {
-    "equity_developed":      0.26,
-    "equity_emerging":       0.12,
-    "infrastructure":        0.10,
+    "equity_developed":      0.23,
+    "equity_emerging":       0.11,
+    "infrastructure":        0.09,
     "crypto":                0.02,
-    "inflation_linked":      0.14,
-    "govt_bonds_eur":        0.08,
-    "credit_ig_eur":         0.08,
-    "gold":                  0.06,
+    "inflation_linked":      0.15,
+    "govt_bonds_eur":        0.10,
+    "credit_ig_eur":         0.09,
+    "gold":                  0.07,
     "alternatives":          0.04,
     "govt_bonds_eur_short":  0.05,   # poche A
     "cash":                  0.05,   # poche A
 }
 
-# Issue de scripts/optimize_saa.py, second passage (contraintes de second
-# niveau). Trois ecarts notables par rapport a l'allocation indicative :
-#   emergents      8 % -> 12 %   l'optimiseur voulait 21 %, plafonne
-#   infrastructure 7 % -> 10 %   voulait 28 %, plafonne (un seul secteur)
-#   indexees      10 % -> 14 %   la seule classe a repercussion integrale
+# Issue de scripts/optimize_saa.py (second passage), puis DE-RISQUEE apres les
+# stress tests de l'etape 4.
+#
+# L'allocation issue de l'optimisation (croissance 50 %) ressortait a 14,1 %
+# de drawdown P90 et 9,2 % de probabilite de depassement -- soit juste sous
+# les seuils de 15 % et 10 %. Elle satisfaisait la contrainte, sans marge.
+#
+# Or l'estimation elle-meme porte une erreur : un seul bug d'echelle avait
+# deja deplace ce chiffre de 12,0 % a 14,1 %. Construire a la limite d'une
+# mesure aussi sensible n'est pas defendable.
+#
+# De-risquage par ROTATION vers l'obligataire et l'or, PAS vers le monetaire :
+# la poche A est dimensionnee sur le besoin de liquidite de 10 M EUR, la
+# gonfler reviendrait a confondre deux decisions distinctes.
+#   croissance   50 % -> 45 %
+#   obligataire  30 % -> 34 %
+#   actifs reels 10 % -> 11 %
+# Cout : 19 pb de rendement. Gain : 1,5 pt de marge sur le drawdown.
 #
 # PARTAGE DE LA POCHE A -- decision hors optimisation.
 #   L'optimiseur place les 10 % integralement en monetaire : a rendement

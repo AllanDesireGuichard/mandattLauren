@@ -44,12 +44,19 @@ HEDGE = {"equity_us": 0.40, "equity_dev_exus": 0.40, "equity_emerging": 0.00,
 # projetee sur les proxys longs. Les actions developpees sont scindees
 # 60/40 entre US et hors-US, conformement a la composition d'un indice monde.
 SAA_RISKY = {
-    "equity_us": 0.156, "equity_dev_exus": 0.104, "equity_emerging": 0.12,
-    "infrastructure": 0.10, "govt_bonds": 0.08, "inflation_linked": 0.14,
-    "credit_ig": 0.08, "gold": 0.06,
+    "equity_us": 0.138, "equity_dev_exus": 0.092, "equity_emerging": 0.11,
+    "infrastructure": 0.09, "govt_bonds": 0.10, "inflation_linked": 0.15,
+    "credit_ig": 0.09, "gold": 0.07,
 }
 RISKLESS_W = 0.10          # poche A : monetaire + souverain court
 ALTS_W = 0.04              # alternatifs : modelises en sans risque (conservateur)
+
+# BUG CORRIGE (etape 4). Les poids de SAA_RISKY somment deja a 84 % -- ils
+# EXCLUENT la poche A et les alternatifs. Les multiplier en plus par
+# `scale = 1 - RISKLESS_W - ALTS_W` les reduisait une seconde fois, a 72 %.
+# Le portefeuille teste etait donc nettement moins risque que le vrai, et le
+# drawdown P90 ressortait a 12,0 % au lieu de 14,1 %.
+# Une erreur d'echelle ne se voit pas dans le resultat : elle le deplace.
 RISKLESS_YIELD = 0.022
 
 
@@ -87,7 +94,7 @@ def main() -> int:
           f"({(rets.index[-1]-rets.index[0]).days/365.25:.1f} ans)")
 
     rl_daily = RISKLESS_YIELD / 252
-    scale = 1.0 - RISKLESS_W - ALTS_W          # part reellement risquee
+    scale = 1.0                                # les poids sont deja nets
 
     def build(mult: float) -> pd.Series:
         """Portefeuille consolide, part risquee multipliee par `mult`."""

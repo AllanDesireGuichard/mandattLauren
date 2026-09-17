@@ -1,5 +1,5 @@
 # Investment Policy Statement — Famille Lauren
-**Version 1.3 — 17 septembre 2026**
+**Version 1.4 — 17 septembre 2026**
 
 > Révisée après passe de validation empirique. Les corrections de la v1.0
 > sont signalées en encadré à chaque endroit concerné.
@@ -325,6 +325,95 @@ risques que la matrice de covariance ne peut pas voir :
 Effet mesurable des contraintes : l'instabilité moyenne des poids entre
 tirages passe de **3,8 % à 2,3 %**. Le portefeuille contraint est non
 seulement plus prudent, il est plus **reproductible**.
+
+### 6.3 ter Stress tests — ce que le client vivrait réellement
+
+*`scripts/stress_tests.py`, 21,8 ans de données quotidiennes en EUR.*
+
+| Crise | Perte max | Durée de baisse | Retour au point haut |
+|---|---|---|---|
+| **Lehman et crise financière** 2007-2009 | **25,6 %** | 386 jours | 12 mois |
+| Dette souveraine européenne 2011 | 6,8 % | 26 jours | 3 mois |
+| **Choc COVID** 2020 | **17,5 %** | 28 jours | 5 mois |
+| Choc d'inflation 2022 | 13,8 % | 287 jours | **17 mois** |
+
+> **Deux des quatre crises auraient dépassé la contrainte de 15 %.** C'est à
+> dire au client au moment de la décision, pas le jour où cela se produit.
+
+> **Le point le plus contre-intuitif, et le plus utile en rendez-vous :** le
+> choc de 2022 est moins profond que le COVID (13,8 % contre 17,5 %) mais
+> **trois fois plus long à récupérer** — 17 mois contre 5. Parce qu'en 2020 il
+> y a eu un sauvetage monétaire, et qu'en 2022 la cause de la baisse était
+> précisément la fin de ce sauvetage. Un client ne vit pas la profondeur d'une
+> perte, il vit sa durée.
+
+Dans les quatre épisodes, les trois premières contributions à la perte sont
+toujours **actions développées, actions émergentes et infrastructure**. L'or
+et les obligations indexées n'apparaissent jamais parmi les contributeurs
+négatifs : ils font leur travail.
+
+### Distribution complète des pertes sur 12 mois glissants
+
+*5 438 fenêtres observées.*
+
+```
+centile 50         5,3 %
+centile 75         8,2 %
+centile 90        13,8 %      ← le chiffre de l'IPS
+centile 95        17,5 %
+centile 99        24,4 %
+pire cas          24,9 %
+
+P(perte > 15 %)    9,1 %      tolérance 10 %   CONTRAINTE SATISFAITE
+P(perte > 10 %)   18,1 %      seuil de revue exceptionnelle
+```
+
+### Temps passé sous l'eau
+
+```
+en perte latente            84,2 % du temps
+à plus de 5 % de perte      20,7 %
+à plus de 10 %               6,1 %
+à plus de 15 %               3,1 %
+
+épisode le plus long        27,6 mois
+```
+
+> **À dire au client :** « Votre portefeuille passera 84 % du temps en dessous
+> de son plus haut. C'est normal, c'est le cas de tout portefeuille investi.
+> Ce qui compte n'est pas d'être sous l'eau, c'est de savoir à quelle
+> profondeur et pour combien de temps. »
+
+### Le résultat qui a changé l'allocation
+
+**Correction d'un bug d'échelle.** `validate_saa_risk.py` multipliait une
+seconde fois des poids déjà nets de la poche de liquidité. Le portefeuille
+testé était à 72 % de risqué au lieu de 84 %. Le drawdown P90 annoncé à
+l'étape 3 — 12,0 % — valait en réalité **14,1 %**. Une erreur d'échelle ne se
+voit pas dans le résultat : elle le déplace.
+
+**Conséquence : de-risquage de l'allocation.** L'optimisation donnait 50 %
+d'actifs de croissance, soit un P90 de 14,1 % et 9,2 % de probabilité de
+dépassement — juste sous les seuils. Construire à la limite d'une mesure qui
+venait de bouger de deux points n'était pas défendable. Croissance ramenée à
+**45 %**, par rotation vers l'obligataire et l'or.
+
+**Et le constat que cette rotation a produit — le plus instructif de l'étape :**
+
+| Méthode de dé-risquage | Effet sur le P90 |
+|---|---|
+| Rotation actions → obligations (5 pts) | 14,1 % → **13,8 %** |
+| Transfert vers le monétaire (9 pts) | 13,8 % → **12,3 %** |
+
+**Passer des actions aux obligations ne réduit presque pas la queue de
+distribution.** Seul le monétaire la réduit vraiment. C'est la confirmation
+chiffrée, sur notre propre portefeuille, de l'argument du §7 de l'argumentaire :
+dans les crises qui comptent, les obligations ne sont pas un substitut sans
+risque. En 2008 et en 2022, elles baissent avec le reste.
+
+> Conséquence pour le pitch : ne jamais présenter la poche obligataire comme
+> une protection contre les krachs. Elle est là pour le portage et pour le
+> scénario de récession — pas pour amortir un choc de corrélation.
 
 ### 6.4 Politique de couverture de change
 
