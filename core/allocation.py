@@ -31,8 +31,8 @@ DEFAUTS_IG = 0.11
 ORDRE = ("actions_europe", "usa", "japon", "emergents", "etats_courts",
          "etats_longs", "credit_court", "indexees", "or", "matieres", "crypto")
 
-# Décision d'Allan (2026-09-18) : poche crypto de 1 à 2 %, choix du client,
-# posée à côté du calcul et non choisie par lui.
+# Décision d'Allan (2026-09-18) : pas de crypto. Le bitcoin reste mesuré
+# (blocs 1 et 2) pour montrer pourquoi, mais n'entre pas dans le calcul.
 HORS_CALCUL = ("crypto",)
 
 
@@ -258,3 +258,19 @@ def avec_poche_actions(s: pd.DataFrame) -> pd.DataFrame:
 def rendement_poche(e: pd.DataFrame) -> float:
     return float(sum(p * e.loc[k, "rendement"]
                      for k, p in MIX_ACTIONS.items()))
+
+
+# ----------------------------------------------------------------------
+# Bloc 5 — le portefeuille retenu
+
+MONTANT = 100e6
+RETENU = "r4_marge"
+
+
+def poids_retenus() -> dict:
+    """Poids par support du portefeuille retenu, poche actions éclatée."""
+    p = dict(resultats()["scenarios"][RETENU]["poids"])
+    poche = p.pop("poche_actions")
+    for k, m in MIX_ACTIONS.items():
+        p[k] = poche * m
+    return {k: p.get(k, 0.0) for k in ORDRE if k not in HORS_CALCUL}

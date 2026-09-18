@@ -12,7 +12,7 @@ Décisions d'Allan (2026-09-18) :
   - un seul modèle de risque (covariance sur séries longues, vérifiée sur
     les crises) ; Black-Litterman retiré, les vues de l'étape 2 étant déjà
     dans les rendements espérés ;
-  - crypto : poche de 1 à 2 %, choix du client, hors optimisation.
+  - pas de crypto (d'abord envisagée à 1-2 %, écartée par Allan).
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import allocation, pedago, viz
+from core import actions, allocation, fonds, obligations, pedago, taux, viz
 
 
 def _pct(v: float) -> str:
@@ -42,11 +42,7 @@ def render() -> None:
     _bloc_risque()
     _bloc_libre()
     _bloc_regles()
-    pedago.a_construire(
-        4, "Allocation",
-        "**Le portefeuille retenu**, en pourcentages puis en millions "
-        "d'euros par support, et son écart au portefeuille libre.",
-    )
+    _bloc_retenu()
 
 
 # ----------------------------------------------------------------------
@@ -88,10 +84,11 @@ def _bloc_entrees() -> None:
          "en rapportant 4 %, on passera à une limite en probabilité "
          "(dépassée moins d'une fois sur vingt)."),
         ("Et la crypto ?",
-         "Une poche de 1 à 2 %, posée à côté du calcul",
-         "Son rendement espéré est nul (étape 2) : un calcul ne la choisirait "
-         "jamais. La détenir est un choix du client, dont on montrera le "
-         "coût en risque."),
+         "Aucune",
+         "Son rendement espéré est nul (étape 2) et elle baisse avec les "
+         "actions (bloc 2) : elle consommerait de la place sous la limite "
+         "de 15 % sans rien rapporter. Elle reste mesurée ci-dessous, pour "
+         "montrer pourquoi."),
     ], columns=["Question laissée ouverte", "Hypothèse retenue", "Pourquoi"])
         .set_index("Question laissée ouverte"))
 
@@ -229,7 +226,7 @@ def _bloc_entrees() -> None:
 
     st.markdown("#### Ce que le bloc 1 transmet au bloc 2")
     st.markdown(
-        f"Onze supports, dont dix entrent dans le calcul, chacun avec un "
+        f"Dix supports retenus (le bitcoin, mesuré, n'est pas retenu), chacun avec un "
         f"rendement espéré et une série quotidienne en euros depuis octobre "
         f"2006, qui traverse les quatre crises de référence. Le bloc 2 "
         f"mesure ce que chacun y a perdu, et surtout s'ils ont perdu en même "
@@ -775,4 +772,167 @@ def _bloc_regles() -> None:
         f"{viz.fr(-r4['pire_baisse'], '%', 1)} depuis son plus haut entre "
         f"2006 et aujourd'hui. Le bloc 5 la traduit en millions d'euros, "
         f"support par support."
+    )
+
+
+# ----------------------------------------------------------------------
+def _me(v: float, dec: int = 2) -> str:
+    return viz.fr(v / 1e6, "M€", dec)
+
+
+@st.cache_data(show_spinner="Sélection des 30 titres…")
+def _trente() -> pd.DataFrame:
+    return actions.selection(actions.univers())
+
+
+def _bloc_retenu() -> None:
+    e = allocation.entrees()
+    res = allocation.resultats()
+    r4 = res["scenarios"][allocation.RETENU]
+    w = allocation.poids_retenus()
+    M = allocation.MONTANT
+    cl = fonds.charger()["classes"]
+    fonds_de = {"usa": "usa", "japon": "japon", "emergents": "emergents",
+                "indexees": "indexees", "or": "or", "matieres": "matieres"}
+
+    st.markdown("#### Le portefeuille retenu, en millions d'euros")
+    st.markdown(
+        "La répartition du bloc 4, appliquée aux 100 M€ du client et "
+        "déclinée support par support : les supports choisis à l'étape 3, "
+        "les montants fixés ici."
+    )
+
+    # --- 1. vue d'ensemble -------------------------------------------
+    lignes, contrib = [], 0.0
+    for k, x in w.items():
+        if x < 0.0005:
+            continue
+        sup = e.loc[k, "support"]
+        if k in fonds_de:
+            c = cl[fonds_de[k]]
+            sup = f"{c['retenu'].split('.')[0]} · {c['candidats'][c['retenu']]['nom']}"
+        ct = x * e.loc[k, "rendement"]
+        contrib += ct
+        lignes.append((e.loc[k, "classe"], sup, viz.fr(x * 100, "%", 1),
+                       _me(x * M, 1),
+                       _pct(e.loc[k, "rendement"]), viz.fr(ct, "pt", 2)))
+    lignes.append(("Total", "", "100 %", _me(M, 1), "",
+                   viz.fr(contrib, "pt", 2)))
+    st.table(pd.DataFrame(lignes, columns=[
+        "Classe", "Support", "Poids", "Montant", "Rendement espéré",
+        "Contribution*"]).set_index("Classe"))
+    st.caption(
+        "* Poids × rendement espéré : ce que chaque ligne apporte au "
+        "rendement du portefeuille. Crédit et matières premières : zéro "
+        "(bloc 4). Pas de crypto (décision du client)."
+    )
+    part_act = sum(w[k] for k in allocation.MIX_ACTIONS)
+    oblig = w["etats_courts"] + w["etats_longs"] + w["indexees"]
+    st.markdown(
+        f"**Lecture.** {viz.fr(part_act * 100, '%', 1)} d'actions, "
+        f"{viz.fr(oblig * 100, '%', 1)} d'obligations d'État (dont les "
+        f"indexées), {viz.fr(w['or'] * 100, '%', 1)} d'or. Les actions font "
+        f"{_poids(part_act)} du patrimoine mais "
+        f"{_poids(sum(w[k] * e.loc[k, 'rendement'] for k in allocation.MIX_ACTIONS) / contrib)} "
+        f"du rendement espéré : ce sont elles qui portent l'objectif de 4 %, "
+        f"les obligations qui tiennent la limite de 15 %."
+    )
+
+    # --- 2. les actions européennes ----------------------------------
+    st.markdown("**Les 30 actions européennes, à parts égales**")
+    sel = _trente()
+    par_titre = w["actions_europe"] * M / len(sel)
+    st.markdown(
+        f"{_me(w['actions_europe'] * M, 1)} répartis également entre les "
+        f"{len(sel)} titres de l'étape 3, soit **{_me(par_titre)} par "
+        f"titre**. Parts égales, comme dans la mesure de risque du panier à "
+        f"l'étape 3."
+    )
+    t = sel.sort_values(["secteur", "nom"])
+    st.table(pd.DataFrame({
+        "Société": t["nom"].str.title(), "Pays": t["pays"],
+        "Secteur": t["secteur"], "Montant": _me(par_titre),
+    }).set_index("Société"))
+
+    # --- 3. les emprunts d'État --------------------------------------
+    st.markdown("**Les emprunts d'État en direct**")
+    sv = taux.charger()["svensson"]
+    ech = obligations.echelle(allocation.TRANCHES, sv["aaa"])
+    investi = w["etats_courts"] * M
+    cout = sum(x["cout"] for x in ech)
+    f = investi / cout
+    lignes = [(f"Dans {int(x['echeance'] * 12)} mois", "AAA",
+               _me(x["cout"] * f), _me(x["montant"] * f), _pct(x["taux"]))
+              for x in ech]
+    par_marche = w["etats_longs"] * M / len(allocation.ECHELLE_LONGUE)
+    for m in allocation.ECHELLE_LONGUE:
+        a = obligations.analyse(m, sv["toutes"])
+        lignes.append((f"{m} ans", "Zone euro", _me(par_marche), "—",
+                       _pct(a["rendement"])))
+    st.table(pd.DataFrame(lignes, columns=[
+        "Échéance", "Émetteurs", "Investi", "Remboursé à l'échéance",
+        "Rendement"]).set_index("Échéance"))
+    st.caption(
+        f"Échelle AAA : l'étape 3 chiffrait à {_me(cout)} le coût des "
+        f"10 M€ à recevoir ; le plancher de 10 % du bloc 4 y place "
+        f"{_me(investi)}, qui rendront {_me(sum(x['montant'] for x in ech) * f)}. "
+        f"Le besoin est couvert avec une petite réserve. Échelle longue : "
+        f"cinq échéances à parts égales, réinvesties à 10 ans à chaque "
+        f"remboursement."
+    )
+
+    # --- 4. les fonds -------------------------------------------------
+    st.markdown("**Les fonds**")
+    lignes, frais = [], 0.0
+    for k, fk in fonds_de.items():
+        if w[k] < 0.0005:
+            continue
+        c = cl[fk]["candidats"][cl[fk]["retenu"]]
+        montant = w[k] * M
+        frais += montant * c["frais"] / 100
+        lignes.append((e.loc[k, "classe"], cl[fk]["retenu"].split(".")[0],
+                       c["isin"], _me(montant, 1),
+                       viz.fr(c["taille"] / 1000, "Md€", 1),
+                       viz.fr(montant / (c["taille"] * 1e6) * 100, "%", 2),
+                       viz.fr(c["frais"], "%", 2)))
+    st.table(pd.DataFrame(lignes, columns=[
+        "Classe", "Fonds", "ISIN", "Montant", "Taille du fonds",
+        "Part du fonds", "Frais courants"]).set_index("Classe"))
+    st.caption(
+        f"Aucune ligne ne dépasse 1 % de son fonds : on peut entrer et "
+        f"sortir sans peser sur les prix. Frais des fonds : "
+        f"{viz.fr(frais / 1e3, 'k€', 0)} par an, soit "
+        f"{viz.fr(frais / M * 100, '%', 3)} du patrimoine ; ils ne sont pas "
+        f"déduits du rendement espéré (étape 1). Actions européennes et "
+        f"emprunts d'État en direct : pas de frais de gestion, seulement "
+        f"des frais de transaction."
+    )
+
+    # --- synthèse -----------------------------------------------------
+    c = st.columns(4)
+    c[0].metric("Rendement espéré", _pct(r4["rendement_espere"]))
+    c[1].metric("Au-dessus des 4 %", viz.fr(r4["rendement_espere"] - 4,
+                                           "pt", 2))
+    c[2].metric("Pire baisse, 2006-2026", viz.fr(r4["pire_baisse"], "%", 1))
+    c[3].metric("Rendement obtenu, 2006-2026*",
+                viz.fr(r4["realise"], "%", 2) + " / an")
+    st.caption(
+        "* Ce qu'aurait rapporté cette répartition, rééquilibrée chaque "
+        "mois, d'octobre 2006 à aujourd'hui, sur les séries du bloc 1. Il "
+        "ne se compare pas au rendement espéré : le passé comptait dix ans "
+        "de taux négatifs, l'avenir part de taux à 3 %."
+    )
+
+    st.markdown("#### Ce que l'étape 4 transmet à l'étape 5")
+    st.markdown(
+        f"Un portefeuille de 100 M€ : {_poids(part_act)} d'actions en quatre "
+        f"zones, dont 30 titres européens en direct ; {_poids(oblig)} "
+        f"d'obligations d'État, dont deux échelles en direct ; "
+        f"{_poids(w['or'])} d'or. Rendement espéré "
+        f"{_pct(r4['rendement_espere'])}, pire baisse "
+        f"{viz.fr(r4['pire_baisse'], '%', 1)} sur les données qui ont servi "
+        f"à le construire. L'étape 5 le fera traverser les crises une à une "
+        f"et mesurera combien de temps il reste sous son plus haut — la "
+        f"question que le calcul, qui ne regarde que la profondeur des "
+        f"baisses, ne s'est pas posée."
     )
