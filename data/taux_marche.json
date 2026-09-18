@@ -35,6 +35,60 @@
       "nominal_meme_date": 3.47,
       "date": "2026-07-31",
       "source": "iShares € Inflation Linked Govt Bond (IBCI), fiche mensuelle, taux réel (« Yield to Worst »)"
+    },
+    "us_3m": {
+      "valeur": 4.14,
+      "date": "2026-09-16",
+      "source": "FRED, DGS3MO — Trésor américain 3 mois"
+    },
+    "us_2a": {
+      "valeur": 4.74,
+      "date": "2026-09-16",
+      "source": "FRED, DGS2 — Trésor américain 2 ans"
+    },
+    "us_10a": {
+      "valeur": 5.01,
+      "date": "2026-09-16",
+      "source": "FRED, DGS10 — Trésor américain 10 ans"
+    },
+    "us_30a": {
+      "valeur": 5.35,
+      "date": "2026-09-16",
+      "source": "FRED, DGS30 — Trésor américain 30 ans"
+    },
+    "credit_ig_us": {
+      "valeur": 5.74,
+      "date": "2026-09-16",
+      "source": "FRED, BAMLC0A0CMEY — ICE BofA US Corporate, rendement effectif"
+    },
+    "hy_us": {
+      "valeur": 7.53,
+      "date": "2026-09-16",
+      "source": "FRED, BAMLH0A0HYM2EY — ICE BofA US High Yield, rendement effectif"
+    },
+    "hy_euro": {
+      "valeur": 6.05,
+      "date": "2026-09-16",
+      "source": "FRED, BAMLHE00EHYIEY — ICE BofA Euro High Yield, rendement effectif"
+    },
+    "em_corp": {
+      "valeur": 6.1,
+      "date": "2026-09-16",
+      "source": "FRED, BAMLEMCBPIEY — ICE BofA Emerging Markets Corporate Plus, rendement effectif (obligations en dollars)"
+    },
+    "eurusd": {
+      "valeur": 1.1604,
+      "date": "2026-09-11",
+      "source": "FRED, DEXUSEU — Dollars pour un euro, Réserve fédérale"
+    },
+    "change_12m": {
+      "mediane": 6.6,
+      "part_plus_5": 64,
+      "part_plus_10": 32,
+      "pire": 26,
+      "debut": "1999",
+      "date": "2026-09-11",
+      "source": "FRED, DEXUSEU, fin de mois, variations sur 12 mois glissants"
     }
   },
   "courbes": {

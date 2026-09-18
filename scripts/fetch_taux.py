@@ -31,6 +31,8 @@ from pathlib import Path
 import pandas as pd
 import requests
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 RACINE = Path(__file__).resolve().parents[1]
 SORTIE = RACINE / "data" / "taux_marche.json"
 
@@ -54,9 +56,49 @@ ETF = {
 }
 
 
+# Taux hors zone euro, FRED. Rendements EFFECTIFS (« EY ») des indices ICE
+# BofA, pas leurs écarts de crédit (« OAS ») : on compare des rendements.
+FRED = {
+    "us_3m":   ("DGS3MO", "Trésor américain 3 mois"),
+    "us_2a":   ("DGS2", "Trésor américain 2 ans"),
+    "us_10a":  ("DGS10", "Trésor américain 10 ans"),
+    "us_30a":  ("DGS30", "Trésor américain 30 ans"),
+    "credit_ig_us": ("BAMLC0A0CMEY", "ICE BofA US Corporate, rendement effectif"),
+    "hy_us":   ("BAMLH0A0HYM2EY", "ICE BofA US High Yield, rendement effectif"),
+    "hy_euro": ("BAMLHE00EHYIEY", "ICE BofA Euro High Yield, rendement effectif"),
+    "em_corp": ("BAMLEMCBPIEY",
+                "ICE BofA Emerging Markets Corporate Plus, rendement effectif "
+                "(obligations en dollars)"),
+    "eurusd":  ("DEXUSEU", "Dollars pour un euro, Réserve fédérale"),
+}
+
+
 # --------------------------------------------------------------------------
 # Sources
 # --------------------------------------------------------------------------
+
+def _fred_key() -> str:
+    import tomllib
+    from core.sources import CleManquante, fred_key
+    try:
+        return fred_key()
+    except CleManquante:
+        f = Path(__file__).resolve().parents[1] / ".streamlit" / "secrets.toml"
+        return tomllib.loads(f.read_text())["FRED_API_KEY"]
+
+
+def point_fred(serie: str, source: str) -> dict:
+    r = requests.get("https://api.stlouisfed.org/fred/series/observations",
+                     params={"series_id": serie, "api_key": _fred_key(),
+                             "file_type": "json", "sort_order": "desc",
+                             "limit": 15}, timeout=60)
+    r.raise_for_status()
+    for o in r.json()["observations"]:
+        if o["value"] != ".":
+            return {"valeur": float(o["value"]), "date": o["date"],
+                    "source": f"FRED, {serie} — {source}"}
+    raise RuntimeError(f"aucune valeur récente pour {serie}")
+
 
 def _bce(cle: str) -> pd.DataFrame:
     url = f"https://data-api.ecb.europa.eu/service/data/{cle}"
@@ -127,6 +169,31 @@ def indexees_reel() -> dict:
                       "mensuelle, taux réel (« Yield to Worst »)"}
 
 
+def variations_change() -> dict:
+    """
+    Ampleur des variations de l'euro contre le dollar sur 12 mois glissants,
+    mesurée sur toute l'histoire de l'euro (fin de mois, depuis 1999).
+    Sert à dire ce que coûte, en risque, un placement en dollars non couvert.
+    """
+    r = requests.get("https://api.stlouisfed.org/fred/series/observations",
+                     params={"series_id": "DEXUSEU", "api_key": _fred_key(),
+                             "file_type": "json",
+                             "observation_start": "1999-01-01"}, timeout=90)
+    r.raise_for_status()
+    s = pd.Series({o["date"]: float(o["value"])
+                   for o in r.json()["observations"] if o["value"] != "."})
+    s.index = pd.to_datetime(s.index)
+    m = s.resample("ME").last()
+    v = (m / m.shift(12) - 1).dropna().abs()
+    return {"mediane": round(float(v.median()) * 100, 1),
+            "part_plus_5": round(float((v > 0.05).mean()) * 100),
+            "part_plus_10": round(float((v > 0.10).mean()) * 100),
+            "pire": round(float((m / m.shift(12) - 1).dropna().abs().max()) * 100),
+            "debut": str(m.index[0].year), "date": str(s.index[-1].date()),
+            "source": "FRED, DEXUSEU, fin de mois, variations sur 12 mois "
+                      "glissants"}
+
+
 # --------------------------------------------------------------------------
 
 def main() -> int:
@@ -157,6 +224,9 @@ def main() -> int:
     for nom, (ident, slug, lib) in ETF.items():
         essayer(nom, etf_ishares, ident, slug, lib)
     essayer("indexees_reel", indexees_reel)
+    for nom, (serie, lib) in FRED.items():
+        essayer(nom, point_fred, serie, lib)
+    essayer("change_12m", variations_change)
 
     SORTIE.write_text(json.dumps(neuf, ensure_ascii=False, indent=2) + "\n")
     print(f"\n{SORTIE.relative_to(RACINE)} écrit"

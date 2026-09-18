@@ -39,6 +39,7 @@ def render() -> None:
         "de rendements espérés, qui devient l'entrée de l'étape 4.",
     )
     _bloc_taux()
+    _bloc_etranger()
     _suite()
 
 
@@ -218,6 +219,187 @@ def _courbe(photo: dict) -> None:
 
 
 # --------------------------------------------------------------------------
+# Bloc 2 — les placements de taux hors zone euro, ramenés en euros
+# --------------------------------------------------------------------------
+
+def _bloc_etranger() -> None:
+    photo = taux.charger()
+    p = photo["points"]
+    fx = p["change_12m"]
+    cout = p["us_3m"]["valeur"] - p["estr"]["valeur"]     # coût de couverture
+
+    st.markdown("#### Ailleurs, les taux sont plus élevés : est-ce une "
+                "meilleure affaire ?")
+    st.markdown(
+        f"Le Trésor américain paie {_pct(p['us_10a']['valeur'])} à dix ans, "
+        f"contre {_pct(p['etat_euro']['valeur'])} pour les États de la zone "
+        "euro. Mais un client qui vit en euros ne touche pas des dollars : il "
+        "faut ramener ces rendements en euros. Il y a deux façons de le "
+        "faire, et aucune n'est gratuite."
+    )
+
+    lignes = [
+        ("Trésor américain à 10 ans", p["us_10a"]["valeur"], True,
+         "L'avantage sur les emprunts européens disparaît presque "
+         "entièrement une fois le change couvert."),
+        ("Crédit d'entreprises américaines bien notées",
+         p["credit_ig_us"]["valeur"], True,
+         "Couvert, il rapporte à peu près autant que son équivalent "
+         "européen. Aucun gain à aller le chercher."),
+        ("Dette d'entreprises émergentes",
+         p["em_corp"]["valeur"], True,
+         "Un peu au-dessus du seuil, pour un risque de défaut et un risque "
+         "politique plus élevés."),
+        ("Haut rendement américain", p["hy_us"]["valeur"], True,
+         "Au-dessus du seuil sur le papier. Mais ce rendement suppose "
+         "qu'aucune entreprise ne fasse défaut."),
+        ("Haut rendement européen", p["hy_euro"]["valeur"], False,
+         "Déjà en euros, pas de couverture à payer. Même réserve : c'est un "
+         "rendement avant défauts."),
+    ]
+    tableau = pd.DataFrame(
+        [(nom, _pct(r), _pct(r - cout) if couvert else "déjà en euros",
+          _ecart((r - cout if couvert else r) - SEUIL), sens)
+         for nom, r, couvert, sens in lignes],
+        columns=["Placement", "Rendement affiché", "Ramené en euros "
+                 "(change couvert)", f"Après {viz.fr(SEUIL, '%', 0)} "
+                 "d'inflation", "Ce que cela signifie"],
+    )
+    st.table(tableau.set_index("Placement"))
+    st.caption(
+        f"Couvrir le change coûte aujourd'hui environ {_pct(cout)} par an : "
+        f"c'est l'écart entre les taux courts américains "
+        f"({_pct(p['us_3m']['valeur'])}) et européens "
+        f"({_pct(p['estr']['valeur'])}). Ordre de grandeur, qui varie avec "
+        "la durée de la couverture."
+    )
+
+    st.info(
+        "**Le supplément de rendement américain est, pour l'essentiel, le "
+        "prix du risque de change.** Si on le couvre, il disparaît. Si on "
+        "ne le couvre pas, on le garde, mais en échange d'un pari sur le "
+        "dollar bien plus gros que le gain. Les seuls placements de taux qui "
+        "dépassent nettement le seuil sont ceux à haut rendement, et leur "
+        "rendement affiché n'est pas celui qu'on touchera.",
+        icon=":material/lightbulb:",
+    )
+
+    c = st.columns(3)
+    c[0].metric("Variation typique du dollar en un an",
+                viz.fr(fx["mediane"], "%", 1), "valeur médiane",
+                delta_color="off")
+    c[1].metric("Années où elle dépasse 10 %",
+                f"{fx['part_plus_10']} %", "environ une sur trois",
+                delta_color="off")
+    c[2].metric("Plus forte variation observée", f"{fx['pire']} %",
+                f"en douze mois, depuis {fx['debut']}", delta_color="off")
+
+    _synthese(photo, cout)
+
+    pedago.explique(
+        "Comment on ramène un rendement étranger en euros",
+        "<strong>Sans couverture</strong>, on achète des dollars, on place "
+        "ces dollars, et on les revend dans dix ans. On touche le taux "
+        "américain entier, mais le résultat en euros dépend de ce que vaudra "
+        "le dollar ce jour-là. Mesuré depuis la création de l'euro, le "
+        f"dollar varie en un an de {viz.fr(fx['mediane'], '%', 1)} en "
+        f"valeur médiane, et de plus de 10 % une année sur trois. Un gain "
+        f"de rendement d'un ou deux points par an pèse peu face à cela : "
+        "c'est un pari sur une devise, pas un placement obligataire.",
+        "<strong>Avec couverture</strong>, on s'engage dès aujourd'hui à "
+        "revendre ses dollars à un prix fixé d'avance. Ce prix n'est pas "
+        "le cours du jour : il intègre l'écart entre les taux courts des "
+        "deux zones. Le mécanisme est automatique. Celui qui couvre rend "
+        "donc à peu près l'écart de taux courts, et c'est pour cela que le "
+        "supplément de rendement américain s'évapore.",
+        "La règle qu'on en tire est simple : dans la partie obligataire, "
+        "dont le rôle est de stabiliser le portefeuille, on couvre le "
+        "change. Une obligation doit rester une obligation, pas devenir un "
+        "pari sur le dollar.",
+    )
+    pedago.explique(
+        "Rendement affiché et rendement réellement touché : le haut rendement",
+        "Le rendement d'une obligation à haut rendement suppose que "
+        "l'entreprise paie tous ses coupons et rembourse à l'échéance. Or "
+        "une partie de ces entreprises fera défaut, et on ne récupère alors "
+        "qu'une fraction de sa mise. Le rendement affiché est donc un "
+        "maximum, pas une espérance.",
+        "Une grande partie de l'écart entre le haut rendement et les "
+        "emprunts d'État sert précisément à payer ces défauts. Ce qui reste "
+        "une fois les pertes déduites est bien plus mince que ne le laisse "
+        "croire le chiffre affiché. Les pertes attendues seront estimées à "
+        "l'étape 4, au moment de construire l'allocation. D'ici là, ces "
+        "rendements doivent se lire comme des plafonds.",
+        "Pour les obligations bien notées, la question se pose à peine : "
+        "les défauts y sont rares, et l'écart entre rendement affiché et "
+        "rendement touché est faible.",
+    )
+    pedago.explique(
+        "D'où viennent ces chiffres",
+        f"<strong>Taux américains</strong> : Trésor américain, via FRED, au "
+        f"{taux.date_fr(p['us_10a']['date'])}.",
+        "<strong>Crédit, haut rendement et dette émergente</strong> : "
+        "rendements effectifs des indices ICE BofA, via FRED, au "
+        f"{taux.date_fr(p['hy_us']['date'])}. On utilise le rendement "
+        "complet de chaque indice, pas seulement son écart avec les emprunts "
+        "d'État, pour comparer des choses comparables.",
+        "<strong>Coût de la couverture</strong> : écart entre le taux "
+        "américain à 3 mois et le €STR. C'est une approximation : le coût "
+        "réel dépend de la durée de couverture et des conditions de marché.",
+        f"<strong>Variations du dollar</strong> : taux de change euro-dollar "
+        f"de la Réserve fédérale, en fin de mois depuis {fx['debut']}, "
+        "mesuré sur toutes les périodes de douze mois glissants.",
+        source=f"data/taux_marche.json · relevé du "
+               f"{taux.date_fr(photo['releve'])} · scripts/fetch_taux.py",
+    )
+
+
+def _synthese(photo: dict, cout: float) -> None:
+    """Tous les placements de taux, ramenés en euros, face au seuil."""
+    p = photo["points"]
+    c = photo["courbes"]
+    rows = [
+        ("Monétaire", p["estr"]["valeur"]),
+        ("États euro 1-3 ans", (c["toutes"][0] + c["toutes"][2]) / 2),
+        ("États euro, ensemble", p["etat_euro"]["valeur"]),
+        ("Trésor américain 10 ans, couvert", p["us_10a"]["valeur"] - cout),
+        ("Crédit américain bien noté, couvert",
+         p["credit_ig_us"]["valeur"] - cout),
+        ("Crédit euro bien noté", p["credit_ig_euro"]["valeur"]),
+        ("Dette émergente, couverte", p["em_corp"]["valeur"] - cout),
+        ("Obligations indexées (à 4 % d'inflation)",
+         p["indexees_reel"]["valeur"] + SEUIL),
+        ("Haut rendement américain, couvert *", p["hy_us"]["valeur"] - cout),
+        ("Haut rendement euro *", p["hy_euro"]["valeur"]),
+    ]
+    df = pd.DataFrame(rows, columns=["Placement", "Rendement"]).sort_values(
+        "Rendement")
+    fig = go.Figure(go.Bar(
+        x=df["Rendement"], y=df["Placement"], orientation="h",
+        marker={"color": viz.CATEGORICAL[0], "cornerradius": 4},
+        text=[_pct(v) for v in df["Rendement"]], textposition="outside",
+        textfont={"color": viz.INK_2},
+        hovertemplate="%{y}<br>%{x:.2f} %<extra></extra>",
+    ))
+    fig.add_vline(x=SEUIL, line={"color": viz.INK_2, "width": 1.5,
+                                 "dash": "dash"},
+                  annotation={"text": f"Seuil : {viz.fr(SEUIL, '%', 0)}",
+                              "font": {"color": viz.INK_2, "size": 12}},
+                  annotation_position="top")
+    fig.update_layout(**viz.layout(
+        "Tous les placements de taux, ramenés en euros", height=460,
+        bargap=0.35, showlegend=False,
+        xaxis={"title": "Rendement annuel en euros (%)", "ticksuffix": " %",
+               "gridcolor": viz.GRID, "range": [0, 7.2]},
+        yaxis={"gridcolor": "rgba(0,0,0,0)"},
+    ))
+    st.plotly_chart(fig, width="stretch")
+    st.caption("* Rendement avant défauts : un plafond, pas ce qu'on "
+               "touchera. Tout ce qui est à gauche de la ligne pointillée "
+               "perd du pouvoir d'achat dans le monde de l'énoncé.")
+
+
+# --------------------------------------------------------------------------
 # Suite de l'onglet
 # --------------------------------------------------------------------------
 
@@ -225,9 +407,6 @@ def _suite() -> None:
     st.markdown("#### La suite de cet onglet")
     pedago.a_construire(
         2, "Macro top-down, blocs suivants",
-        "**Les taux hors zone euro** : Trésor américain, crédit américain, "
-        "dette émergente, et ce qu'ils rapportent une fois le risque de "
-        "change couvert en euros.",
         "**La chaîne causale**, maillon par maillon, pour les États-Unis, la "
         "zone euro et les émergents : croissance → inflation → politique "
         "monétaire → taux → prime de risque.",
