@@ -1,0 +1,264 @@
+{
+ "releve": "2026-09-18",
+ "debut": "2006-10-02",
+ "fin": "2026-09-18",
+ "echelle_longue": [
+  2,
+  3,
+  5,
+  7,
+  10
+ ],
+ "echelle_courte": [
+  0.5,
+  1,
+  1.5,
+  2
+ ],
+ "credit": {
+  "sensibilite": -1.17,
+  "r2": 0.21,
+  "prime_annuelle": 0.56,
+  "serie_ecart": "ICE BofA US Corporate (FRED BAMLC0A0CM)",
+  "fenetre": "2016-01-07"
+ },
+ "raccords": {
+  "usa": "2018-05-22",
+  "japon": "2018-04-24",
+  "emergents": "2019-10-18",
+  "credit_court": "2016-01-07",
+  "indexees": "2009-01-14",
+  "or": "2009-11-13",
+  "matieres": "2018-05-03",
+  "crypto": "2025-03-24"
+ },
+ "nettoyes": {
+  "VGK": [
+   "2008-11-04",
+   "2008-11-13",
+   "2011-08-08",
+   "2011-08-09"
+  ],
+  "SPY": [
+   "2020-03-12"
+  ],
+  "EEM": [
+   "2008-11-13",
+   "2011-08-08"
+  ],
+  "XZMJ.DE": [
+   "2025-10-24"
+  ]
+ },
+ "classes": {
+  "actions_europe": {
+   "libelle": "Actions européennes",
+   "support": "30 titres en direct",
+   "source": "Vanguard FTSE Europe (VGK), en euros",
+   "debut": "2006-10-02",
+   "controle_ticker": "panier",
+   "raccord": null,
+   "controle": {
+    "debut": "2019-01-11",
+    "annees": 7.7,
+    "correlation": 0.83,
+    "vol_remplacant": 17.8,
+    "vol_support": 17.3,
+    "baisse_remplacant": -34.6,
+    "baisse_support": -34.0,
+    "perf_remplacant": 11.03,
+    "perf_support": 20.63
+   }
+  },
+  "usa": {
+   "libelle": "Actions américaines",
+   "support": "XZMU",
+   "source": "SPDR S&P 500 (SPY), en euros",
+   "debut": "2006-10-02",
+   "controle_ticker": "XZMU.DE",
+   "raccord": "2018-05-22",
+   "controle": {
+    "debut": "2018-05-22",
+    "annees": 8.3,
+    "correlation": 0.86,
+    "vol_remplacant": 17.2,
+    "vol_support": 17.0,
+    "baisse_remplacant": -30.6,
+    "baisse_support": -28.4,
+    "perf_remplacant": 15.11,
+    "perf_support": 15.7
+   }
+  },
+  "japon": {
+   "libelle": "Actions japonaises",
+   "support": "XZMJ",
+   "source": "iShares MSCI Japan (EWJ), en euros",
+   "debut": "2006-10-02",
+   "controle_ticker": "XZMJ.DE",
+   "raccord": "2018-04-24",
+   "controle": {
+    "debut": "2018-04-24",
+    "annees": 8.4,
+    "correlation": 0.84,
+    "vol_remplacant": 17.0,
+    "vol_support": 17.3,
+    "baisse_remplacant": -23.6,
+    "baisse_support": -28.0,
+    "perf_remplacant": 8.54,
+    "perf_support": 5.9
+   }
+  },
+  "emergents": {
+   "libelle": "Actions émergentes",
+   "support": "XZEM",
+   "source": "iShares MSCI Emerging Markets (EEM), en euros",
+   "debut": "2006-10-02",
+   "controle_ticker": "XZEM.DE",
+   "raccord": "2019-10-18",
+   "controle": {
+    "debut": "2019-10-18",
+    "annees": 6.9,
+    "correlation": 0.89,
+    "vol_remplacant": 18.4,
+    "vol_support": 18.4,
+    "baisse_remplacant": -29.1,
+    "baisse_support": -36.2,
+    "perf_remplacant": 8.91,
+    "perf_support": 5.49
+   }
+  },
+  "etats_courts": {
+   "libelle": "États AAA, 6 à 24 mois (les 10 M€)",
+   "support": "échelle en direct",
+   "source": "Reconstitué : courbe AAA de la BCE",
+   "debut": "2006-10-02",
+   "controle_ticker": "IBGS.AS",
+   "raccord": null,
+   "controle": {
+    "debut": "2008-01-02",
+    "annees": 18.8,
+    "correlation": 0.47,
+    "vol_remplacant": 0.7,
+    "vol_support": 1.7,
+    "baisse_remplacant": -7.0,
+    "baisse_support": -6.0,
+    "perf_remplacant": 0.79,
+    "perf_support": 0.84
+   }
+  },
+  "etats_longs": {
+   "libelle": "États zone euro, 2 à 10 ans",
+   "support": "échelle en direct",
+   "source": "Reconstitué : courbe de la BCE, toutes émissions",
+   "debut": "2006-10-02",
+   "controle_ticker": "EUNH.DE",
+   "raccord": null,
+   "controle": {
+    "debut": "2009-04-17",
+    "annees": 17.5,
+    "correlation": 0.9,
+    "vol_remplacant": 3.7,
+    "vol_support": 4.8,
+    "baisse_remplacant": -16.3,
+    "baisse_support": -22.2,
+    "perf_remplacant": 2.26,
+    "perf_support": 1.22
+   }
+  },
+  "credit_court": {
+   "libelle": "Crédit euro bien noté, court",
+   "support": "QDVL",
+   "source": "QDVL dès 2016, État 1,5 an + prime de crédit reconstitués avant",
+   "debut": "2006-10-02",
+   "controle_ticker": "QDVL.DE",
+   "raccord": "2016-01-07",
+   "controle": {
+    "debut": "2016-01-07",
+    "annees": 10.7,
+    "correlation": 0.57,
+    "vol_remplacant": 0.9,
+    "vol_support": 1.5,
+    "baisse_remplacant": -3.6,
+    "baisse_support": -4.9,
+    "perf_remplacant": 0.97,
+    "perf_support": 0.88
+   }
+  },
+  "indexees": {
+   "libelle": "Obligations indexées euro",
+   "support": "IBCI",
+   "source": "IBCI dès 2009, État 7 ans reconstitué avant",
+   "debut": "2006-10-02",
+   "controle_ticker": "IBCI.DE",
+   "raccord": "2009-01-14",
+   "controle": {
+    "debut": "2009-01-14",
+    "annees": 17.7,
+    "correlation": 0.69,
+    "vol_remplacant": 5.0,
+    "vol_support": 5.8,
+    "baisse_remplacant": -20.8,
+    "baisse_support": -15.0,
+    "perf_remplacant": 2.93,
+    "perf_support": 1.93
+   }
+  },
+  "or": {
+   "libelle": "Or",
+   "support": "4GLD",
+   "source": "SPDR Gold Shares (GLD), en euros",
+   "debut": "2006-10-02",
+   "controle_ticker": "4GLD.DE",
+   "raccord": "2009-11-13",
+   "controle": {
+    "debut": "2009-11-13",
+    "annees": 16.9,
+    "correlation": 0.91,
+    "vol_remplacant": 15.4,
+    "vol_support": 14.8,
+    "baisse_remplacant": -36.3,
+    "baisse_support": -36.2,
+    "perf_remplacant": 9.62,
+    "perf_support": 10.08
+   }
+  },
+  "matieres": {
+   "libelle": "Matières premières",
+   "support": "SXRS",
+   "source": "iPath Bloomberg Commodity (DJP), en euros",
+   "debut": "2006-10-30",
+   "controle_ticker": "SXRS.DE",
+   "raccord": "2018-05-03",
+   "controle": {
+    "debut": "2018-05-03",
+    "annees": 8.4,
+    "correlation": 0.93,
+    "vol_remplacant": 18.2,
+    "vol_support": 15.7,
+    "baisse_remplacant": -32.0,
+    "baisse_support": -27.1,
+    "perf_remplacant": 9.86,
+    "perf_support": 9.19
+   }
+  },
+  "crypto": {
+   "libelle": "Bitcoin",
+   "support": "IB1T",
+   "source": "Bitcoin (BTC-USD), en euros, depuis 2014",
+   "debut": "2014-09-17",
+   "controle_ticker": "IB1T.DE",
+   "raccord": "2025-03-24",
+   "controle": {
+    "debut": "2025-03-24",
+    "annees": 1.5,
+    "correlation": 0.95,
+    "vol_remplacant": 41.1,
+    "vol_support": 43.1,
+    "baisse_remplacant": -49.7,
+    "baisse_support": -49.5,
+    "perf_remplacant": -7.24,
+    "perf_support": -7.46
+   }
+  }
+ }
+}
