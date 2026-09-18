@@ -41,10 +41,9 @@ def render() -> None:
     _bloc_entrees()
     _bloc_risque()
     _bloc_libre()
+    _bloc_regles()
     pedago.a_construire(
         4, "Allocation",
-        "**Chaque contrainte listée une par une**, avec ce qu'elle encode et "
-        "son coût chiffré en rendement.",
         "**Le portefeuille retenu**, en pourcentages puis en millions "
         "d'euros par support, et son écart au portefeuille libre.",
     )
@@ -638,4 +637,142 @@ def _bloc_libre() -> None:
         "défauts à corriger par des règles : les 10 M€, la clé des actions, "
         "la concentration, et la ligne des indexées mal mesurée en 2008. Le "
         "bloc 4 les ajoute une par une et mesure ce que chacune coûte."
+    )
+
+
+# ----------------------------------------------------------------------
+def _par_ligne(poids: dict) -> dict:
+    """Poids par support, la poche actions éclatée selon la clé."""
+    out = dict(poids)
+    poche = out.pop("poche_actions", None)
+    if poche is not None:
+        for k, m in allocation.MIX_ACTIONS.items():
+            out[k] = poche * m
+    return out
+
+
+def _bloc_regles() -> None:
+    e = allocation.entrees()
+    res = allocation.resultats()
+    sc = res["scenarios"]
+    ordre = ["libre"] + res["etapes"]
+
+    st.markdown("#### Les règles, une par une, et ce qu'elles coûtent")
+    st.markdown(
+        "On reprend le calcul libre et on lui ajoute les règles l'une après "
+        "l'autre ; chaque ligne garde les règles des lignes précédentes. "
+        "Chaque règle corrige un défaut vu au bloc 3, et coûte du rendement "
+        "espéré : c'est le prix payé pour ne pas miser sur un passé appris "
+        "par cœur."
+    )
+    encode = {
+        "r1_aaa": ("Au moins 10 % sur l'échelle AAA",
+                   "Le besoin de 10 M€ sous deux ans, qui n'est pas dans les "
+                   "données de marché"),
+        "r2_cle": ("Actions réparties Europe 40 / États-Unis 35 / Japon 10 "
+                   "/ émergents 15",
+                   "On ne parie pas sur une zone pour sa tenue passée (le "
+                   "yen refuge)"),
+        "r3_plafonds": ("Indexées 15 % au plus ; or 10 % ; matières "
+                        "premières 5 % ; crédit 20 %",
+                        "Pas de concentration, et peu de poids sur la ligne "
+                        "mal mesurée en 2008"),
+        "r4_marge": ("Pire baisse visée : 14 % au lieu de 15 %",
+                     "Une marge pour les remplaçants qui flattent 2008 "
+                     "(émergents, Japon, indexées)"),
+    }
+    lignes, prec = [], None
+    for n in ordre:
+        x = sc[n]
+        regle, pourquoi = encode.get(n, ("Seule la limite de 15 %", "—"))
+        cout = ("—" if prec is None else
+                viz.fr(x["rendement_espere"] - prec, "pt", 2))
+        pires = [c for c, v in x["crises"].items()
+                 if v <= x["pire_baisse"] + 0.5]
+        lignes.append((x["nom"] if n != "libre" else "Calcul libre (bloc 3)",
+                       regle, pourquoi, _pct(x["rendement_espere"]), cout,
+                       viz.fr(x["pire_baisse"], "%", 1),
+                       " et ".join(pires)))
+        prec = x["rendement_espere"]
+    st.table(pd.DataFrame(lignes, columns=[
+        "Étape", "Règle ajoutée", "Ce qu'elle encode", "Rendement espéré",
+        "Coût", "Pire baisse", "Crise qui fixe la limite"]).set_index("Étape"))
+
+    # --- les poids, étape par étape -----------------------------------
+    st.markdown("**Ce que chaque règle change dans le portefeuille**")
+    cols = {n: _par_ligne(sc[n]["poids"]) for n in ordre}
+    noms = {"libre": "Libre", "r1_aaa": "+ AAA", "r2_cle": "+ clé",
+            "r3_plafonds": "+ plafonds", "r4_marge": "+ marge"}
+    lignes = []
+    tot = {n: sum(cols[n].get(k, 0) for k in allocation.MIX_ACTIONS)
+           for n in ordre}
+    lignes.append(["Actions, total"] + [_poids(tot[n]) for n in ordre])
+    for k in allocation.ORDRE:
+        if k in allocation.HORS_CALCUL:
+            continue
+        nom = NOMS.get(k, e.loc[k, "classe"]).replace(" (40 %)", "").replace(
+            " (35 %)", "").replace(" (10 %)", "").replace(" (15 %)", "")
+        lignes.append([nom] + [_poids(cols[n].get(k, 0)) for n in ordre])
+    st.table(pd.DataFrame(lignes, columns=["Support"] + [
+        noms[n] for n in ordre]).set_index("Support"))
+
+    r1, r2, r3, r4 = (sc[n] for n in res["etapes"])
+    c2 = _par_ligne(r2["poids"])
+    c3 = _par_ligne(r3["poids"])
+    t2 = sum(c2[k] for k in allocation.MIX_ACTIONS)
+    t3 = sum(c3[k] for k in allocation.MIX_ACTIONS)
+    jp = allocation.pendant_la_baisse(allocation.series_risque())[0]
+    st.table(pd.DataFrame([
+        ("Les 10 M€ en AAA",
+         f"Presque gratuit ({viz.fr(r1['rendement_espere'] - sc['libre']['rendement_espere'], 'pt', 2)}) : "
+         f"l'échelle courte prend la place d'emprunts d'État et de crédit "
+         f"qui rapportaient à peine plus. Le besoin du client ne coûte rien."),
+        ("La clé des actions",
+         f"La règle la plus chère "
+         f"({viz.fr(r2['rendement_espere'] - r1['rendement_espere'], 'pt', 2)}). "
+         f"Privé du Japon, le calcul se replie sur les indexées "
+         f"({_poids(c2['indexees'])}) et réduit les actions à "
+         f"{_poids(t2)}. C'est le prix du renoncement au pari sur le yen."),
+        ("Les plafonds",
+         f"Coût {viz.fr(r3['rendement_espere'] - r2['rendement_espere'], 'pt', 2)}. "
+         f"Les indexées passent de {_poids(c2['indexees'])} à "
+         f"{_poids(c3['indexees'])}, remplacées par les emprunts d'État à "
+         f"2-10 ans ({_poids(c3['etats_longs'])}). Et les actions "
+         f"remontent, de {_poids(t2)} à {_poids(t3)} : en 2020, qui "
+         f"fixait la limite, les indexées avaient baissé avec les actions "
+         f"({_v(jp.loc['indexees', '2020'])}), les États presque pas "
+         f"({_v(jp.loc['etats_longs', '2020'])}). Des États à la place des "
+         f"indexées libèrent de la place pour les actions."),
+        ("La marge de sécurité",
+         f"Coût {viz.fr(r4['rendement_espere'] - r3['rendement_espere'], 'pt', 2)}"
+         f" pour un point de perte en moins : les actions passent de "
+         f"{_poids(t3)} à "
+         f"{_poids(sum(_par_ligne(r4['poids'])[k] for k in allocation.MIX_ACTIONS))}."),
+    ], columns=["Règle", "Ce qu'on observe"]).set_index("Règle"))
+    st.caption(
+        "Le crédit et les matières premières restent à zéro dans toutes les "
+        "étapes. Le crédit court rapporte moins que l'échelle d'États "
+        f"({_pct(e.loc['credit_court', 'rendement'])} contre "
+        f"{_pct(e.loc['etats_longs', 'rendement'])}) et a davantage baissé "
+        "en 2020 ; les matières premières rapportent autant que l'or et "
+        "baissent avec les actions. Le calcul a raison de les écarter."
+    )
+
+    total = r4["rendement_espere"] - sc["libre"]["rendement_espere"]
+    c = st.columns(4)
+    c[0].metric("Rendement espéré retenu", _pct(r4["rendement_espere"]))
+    c[1].metric("Au-dessus des 4 % à battre",
+                viz.fr(r4["rendement_espere"] - 4, "pt", 2))
+    c[2].metric("Coût total des règles", viz.fr(total, "pt", 2))
+    c[3].metric("Pire baisse, 2006-2026", viz.fr(r4["pire_baisse"], "%", 1))
+
+    st.markdown("#### Ce que le bloc 4 transmet au bloc 5")
+    st.markdown(
+        f"Une répartition en pourcentages qui rapporte "
+        f"{_pct(r4['rendement_espere'])} espérés, "
+        f"{viz.fr(r4['rendement_espere'] - 4, 'point', 2)} au-dessus de "
+        f"l'inflation de l'énoncé, et qui aurait perdu au plus "
+        f"{viz.fr(-r4['pire_baisse'], '%', 1)} depuis son plus haut entre "
+        f"2006 et aujourd'hui. Le bloc 5 la traduit en millions d'euros, "
+        f"support par support."
     )

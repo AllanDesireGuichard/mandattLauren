@@ -1,6 +1,12 @@
 {
  "releve": "2026-09-18",
  "limite": 0.15,
+ "etapes": [
+  "r1_aaa",
+  "r2_cle",
+  "r3_plafonds",
+  "r4_marge"
+ ],
  "rebalancement": "mensuel",
  "departs": 16,
  "fenetre": [
@@ -142,6 +148,108 @@
     "delta": -0.5,
     "rendement": 4.93
    }
+  },
+  "r1_aaa": {
+   "nom": "+ les 10 M€ en AAA",
+   "note": "Au moins 10 % sur l'échelle AAA.",
+   "poids": {
+    "actions_europe": 0.0,
+    "usa": 0.0,
+    "japon": 0.3184,
+    "emergents": 0.0,
+    "etats_courts": 0.1,
+    "etats_longs": 0.0007,
+    "credit_court": 0.0,
+    "indexees": 0.5809,
+    "or": 0.0,
+    "matieres": 0.0
+   },
+   "rendement_espere": 6.465,
+   "pire_baisse": -15.0,
+   "sommet": "2020-02-06",
+   "creux": "2020-03-16",
+   "crises": {
+    "2008": -15.0,
+    "2011": -12.9,
+    "2020": -15.0,
+    "2022": -14.2
+   },
+   "realise": 2.9
+  },
+  "r2_cle": {
+   "nom": "+ la clé des actions",
+   "note": "Actions réparties Europe 40 / États-Unis 35 / Japon 10 / émergents 15.",
+   "poids": {
+    "poche_actions": 0.1977,
+    "etats_courts": 0.1,
+    "etats_longs": 0.0,
+    "credit_court": 0.0,
+    "indexees": 0.7023,
+    "or": 0.0,
+    "matieres": 0.0
+   },
+   "rendement_espere": 5.78,
+   "pire_baisse": -15.0,
+   "sommet": "2020-02-17",
+   "creux": "2020-03-18",
+   "crises": {
+    "2008": -7.5,
+    "2011": -11.5,
+    "2020": -15.0,
+    "2022": -13.1
+   },
+   "realise": 3.35,
+   "limite": 0.15
+  },
+  "r3_plafonds": {
+   "nom": "+ les plafonds",
+   "note": "Indexées 15 %, or 10 %, matières premières 5 %, crédit 20 %.",
+   "poids": {
+    "poche_actions": 0.3219,
+    "etats_courts": 0.1,
+    "etats_longs": 0.3736,
+    "credit_court": 0.0,
+    "indexees": 0.15,
+    "or": 0.0544,
+    "matieres": 0.0
+   },
+   "rendement_espere": 5.4,
+   "pire_baisse": -15.0,
+   "sommet": "2007-10-29",
+   "creux": "2009-03-09",
+   "crises": {
+    "2008": -15.0,
+    "2011": -7.1,
+    "2020": -14.6,
+    "2022": -13.1
+   },
+   "realise": 4.76,
+   "limite": 0.15
+  },
+  "r4_marge": {
+   "nom": "+ la marge de sécurité",
+   "note": "Pire baisse visée : 14 % au lieu de 15 %.",
+   "poids": {
+    "poche_actions": 0.3041,
+    "etats_courts": 0.1,
+    "etats_longs": 0.4129,
+    "credit_court": 0.0,
+    "indexees": 0.15,
+    "or": 0.033,
+    "matieres": 0.0
+   },
+   "rendement_espere": 5.306,
+   "pire_baisse": -14.0,
+   "sommet": "2020-02-19",
+   "creux": "2020-03-18",
+   "crises": {
+    "2008": -14.0,
+    "2011": -7.2,
+    "2020": -14.0,
+    "2022": -13.4
+   },
+   "realise": 4.47,
+   "limite": 0.14
   }
  }
 }

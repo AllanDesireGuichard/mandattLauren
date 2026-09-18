@@ -130,7 +130,50 @@ def main() -> int:
         print(nom, scenarios[nom]["rendement_espere"],
               f"{time.time() - t0:.0f} s")
 
+    # ------------------------------------------------------------------
+    # Bloc 4 : les règles, ajoutées une par une (chaque scénario garde les
+    # précédentes). Décisions d'Allan du 2026-09-18.
+    etapes = []
+    b = list(libre)
+    b[cles.index("etats_courts")] = (allocation.MIN_AAA, 1.0)
+    w = optimiser(chemin, mu, b, lim)
+    scenarios["r1_aaa"] = decrire("+ les 10 M€ en AAA", cles, w, mu, s,
+                                  "Au moins 10 % sur l'échelle AAA.")
+    etapes.append("r1_aaa")
+    print("r1", scenarios["r1_aaa"]["rendement_espere"])
+
+    # Clé des actions : les quatre zones deviennent une seule poche.
+    s2 = allocation.avec_poche_actions(s)
+    cles2 = list(s2.columns)
+    mu2 = np.array([allocation.rendement_poche(e) if k == "poche_actions"
+                    else e.loc[k, "rendement"] for k in cles2])
+    ch2 = allocation.Chemin(s2)
+
+    def bornes(plafonds: bool) -> list[tuple[float, float]]:
+        out = [(0.0, 1.0)] * len(cles2)
+        out[cles2.index("etats_courts")] = (allocation.MIN_AAA, 1.0)
+        if plafonds:
+            for k, c in allocation.PLAFONDS.items():
+                out[cles2.index(k)] = (0.0, c)
+        return out
+
+    for nom, lib, note, plaf, limite in (
+        ("r2_cle", "+ la clé des actions", "Actions réparties Europe 40 / "
+         "États-Unis 35 / Japon 10 / émergents 15.", False, lim),
+        ("r3_plafonds", "+ les plafonds", "Indexées 15 %, or 10 %, matières "
+         "premières 5 %, crédit 20 %.", True, lim),
+        ("r4_marge", "+ la marge de sécurité", "Pire baisse visée : 14 % au "
+         "lieu de 15 %.", True, allocation.LIMITE_MARGE),
+    ):
+        w = optimiser(ch2, mu2, bornes(plaf), limite)
+        scenarios[nom] = decrire(lib, cles2, w, mu2, s2, note)
+        scenarios[nom]["limite"] = limite
+        etapes.append(nom)
+        print(nom, scenarios[nom]["rendement_espere"],
+              f"{time.time() - t0:.0f} s")
+
     out = {"releve": date.today().isoformat(), "limite": lim,
+           "etapes": etapes,
            "rebalancement": "mensuel", "departs": DEPARTS,
            "fenetre": [s.index[0].date().isoformat(),
                        s.index[-1].date().isoformat()],

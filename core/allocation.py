@@ -204,6 +204,10 @@ def correlations(s: pd.DataFrame, ref: str = "poche_actions") -> pd.DataFrame:
 # Blocs 3 et 4 — l'optimisation (calculée par scripts/optimiser.py)
 
 LIMITE = 0.15
+# Règles du bloc 4, décisions d'Allan (2026-09-18)
+MIN_AAA = 0.10                 # les 10 M€ à décaisser
+PLAFONDS = {"indexees": .15, "or": .10, "matieres": .05, "credit_court": .20}
+LIMITE_MARGE = 0.14            # marge d'un point sous la limite du mandat
 RESULTATS = DATA / "allocation_optim.json"
 
 
@@ -241,3 +245,16 @@ class Chemin:
 
 def resultats() -> dict:
     return json.loads(RESULTATS.read_text(encoding="utf-8"))
+
+
+def avec_poche_actions(s: pd.DataFrame) -> pd.DataFrame:
+    """Les quatre zones d'actions remplacées par la poche 40/35/10/15."""
+    autres = [k for k in s if k not in MIX_ACTIONS]
+    out = pd.concat([portefeuille(s, MIX_ACTIONS).rename("poche_actions"),
+                     s[autres]], axis=1).dropna()
+    return out
+
+
+def rendement_poche(e: pd.DataFrame) -> float:
+    return float(sum(p * e.loc[k, "rendement"]
+                     for k, p in MIX_ACTIONS.items()))
