@@ -86,3 +86,114 @@ def entrees() -> pd.DataFrame:
             "hors_calcul": k in HORS_CALCUL,
         })
     return pd.DataFrame(lignes).set_index("cle")
+
+
+# ----------------------------------------------------------------------
+# Bloc 2 — le risque
+
+# Répartition FIXE de la poche actions, décision d'Allan (2026-09-18) :
+# sans elle, le calcul met toutes les actions sur la zone au rendement espéré
+# le plus haut (le Japon, 0,2 pt devant l'Europe, écart dans la marge
+# d'erreur). Europe surpondérée : détenue en direct.
+MIX_ACTIONS = {"actions_europe": .40, "usa": .35, "japon": .10,
+               "emergents": .15}
+
+# Crises définies À L'AVANCE, par leurs dates, et non repérées dans les
+# données : les repérer par les baisses du portefeuille biaiserait les
+# mesures faites « en crise ». La perte se mesure depuis le plus haut
+# atteint AVANT (toute l'histoire), la fenêtre dit seulement où chercher
+# le point bas.
+CRISES = {
+    "2008": ("2007-06-01", "2009-06-30", "Crise financière"),
+    "2011": ("2011-04-01", "2012-06-30", "Crise des dettes de la zone euro"),
+    "2020": ("2020-02-01", "2020-06-30", "Covid"),
+    "2022": ("2022-01-01", "2023-12-31", "Retour de l'inflation"),
+}
+
+
+def portefeuille(s: pd.DataFrame, poids: dict) -> pd.Series:
+    """
+    Valeur d'un portefeuille remis à ses poids le premier jour de chaque
+    mois (base 100). Entre deux rééquilibrages, chaque ligne vit sa vie.
+    """
+    cles = list(poids)
+    p = s[cles].dropna()
+    w = pd.Series(poids, dtype=float)
+    w = w / w.sum()
+    mois = p.index.to_period("M")
+    niveau, morceaux = 100.0, []
+    for _, bloc in p.groupby(mois):
+        if morceaux:
+            base = p.loc[:bloc.index[0]].iloc[-2]      # veille du mois
+        else:
+            base = bloc.iloc[0]
+        v = niveau * (bloc / base) @ w
+        morceaux.append(v)
+        niveau = float(v.iloc[-1])
+    return pd.concat(morceaux)
+
+
+def series_risque() -> pd.DataFrame:
+    """Séries du bloc 2 : la poche actions (40/35/10/15) + les autres."""
+    s = series()
+    out = {"poche_actions": portefeuille(s, MIX_ACTIONS)}
+    for k in ORDRE:
+        out[k] = s[k]
+    return pd.DataFrame(out)
+
+
+def baisse_depuis_plus_haut(v: pd.Series) -> pd.Series:
+    v = v.dropna()
+    return v / v.cummax() - 1
+
+
+def pertes_crises(s: pd.DataFrame) -> pd.DataFrame:
+    """Pire baisse depuis le plus haut, dans chaque crise (en %)."""
+    out = {}
+    for k in s:
+        dd = baisse_depuis_plus_haut(s[k])
+        out[k] = {c: (float(dd[a:b].min() * 100)
+                      if len(dd[a:b]) and dd.index[0] <= pd.Timestamp(a)
+                      else float("nan"))
+                  for c, (a, b, _) in CRISES.items()}
+    return pd.DataFrame(out).T
+
+
+def volatilite(s: pd.DataFrame) -> pd.Series:
+    """Volatilité annuelle, sur les variations hebdomadaires (en %)."""
+    r = s.resample("W-FRI").last().pct_change(fill_method=None)
+    return r.std() * 52 ** .5 * 100
+
+
+def pendant_la_baisse(s: pd.DataFrame, ref: str = "poche_actions"
+                      ) -> tuple[pd.DataFrame, dict]:
+    """
+    Pour chaque crise : du sommet au creux de la poche actions DANS la
+    fenêtre de crise, ce qu'a fait chaque support sur ces mêmes dates (en %).
+    Sommet pris dans la fenêtre, et non sur toute l'histoire : en 2011, les
+    actions n'avaient pas retrouvé leur plus haut de 2007, et partir de 2007
+    mesurerait quatre ans de marché, pas la crise.
+    """
+    out, dates = {}, {}
+    for c, (a, b, _) in CRISES.items():
+        v = s[ref].dropna()
+        creux = v[a:b].idxmin()
+        debut = pd.Timestamp(a) - pd.DateOffset(months=3)
+        sommet = v[debut:creux].idxmax()
+        dates[c] = (sommet, creux)
+        out[c] = {k: (float(s[k].asof(creux) / s[k].asof(sommet) - 1) * 100
+                      if s[k].first_valid_index() <= sommet else float("nan"))
+                  for k in s}
+    return pd.DataFrame(out), dates
+
+
+def correlations(s: pd.DataFrame, ref: str = "poche_actions") -> pd.DataFrame:
+    """Corrélation hebdomadaire avec la poche actions : hors crise / en crise."""
+    r = s.resample("W-FRI").last().pct_change(fill_method=None)
+    en_crise = pd.Series(False, index=r.index)
+    for a, b, _ in CRISES.values():
+        en_crise[a:b] = True
+    return pd.DataFrame({
+        "hors_crise": r[~en_crise].corr()[ref],
+        "en_crise": r[en_crise].corr()[ref],
+    })
