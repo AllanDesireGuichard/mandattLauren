@@ -16,7 +16,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from core import credit, macro, pedago, taux, viz
+from core import credit, macro, marches, pedago, taux, viz
 from core.ips import INFLATION_TARGET
 
 SEUIL = INFLATION_TARGET * 100          # en points de pourcentage
@@ -43,6 +43,7 @@ def render() -> None:
     _bloc_etranger()
     _bloc_cycle()
     _bloc_credit()
+    _bloc_marches()
     _suite()
 
 
@@ -823,6 +824,163 @@ def _graphique_credit() -> None:
 
 
 # --------------------------------------------------------------------------
+# Bloc 5 — la dynamique des marchés actions
+# --------------------------------------------------------------------------
+
+HORIZONS = ["1 mois", "3 mois", "6 mois", "12 mois", "Depuis janvier"]
+
+
+def _couleur_perf(v: float) -> str:
+    """Divergente : bleu pour la hausse, orange pour la baisse, gris au centre."""
+    if pd.isna(v) or abs(v) < 1:
+        return "background-color: #f1f3f6"
+    a = min(abs(v) / 30, 1) * 0.55 + 0.1
+    base = "42,120,214" if v > 0 else "235,104,52"
+    return f"background-color: rgba({base},{a:.2f})"
+
+
+def _tableau_perf(lignes: dict, groupes: tuple[str, ...]) -> None:
+    rows = [(d["libelle"], *[d[h] for h in HORIZONS], d["ecart_mm200"])
+            for d in lignes.values() if d["groupe"] in groupes]
+    df = pd.DataFrame(rows, columns=["Marché", *HORIZONS,
+                                     "Écart à sa moyenne 200 jours"])
+    df = df.sort_values("12 mois", ascending=False).set_index("Marché")
+    cols = [*HORIZONS, "Écart à sa moyenne 200 jours"]
+    sty = (df.style
+           .map(_couleur_perf, subset=cols)
+           .format(lambda v: ("+" if v > 0 else "") + viz.fr(v, "%", 1),
+                   subset=cols))
+    st.table(sty)
+
+
+def _bloc_marches() -> None:
+    m = marches.charger()
+    L = m["lignes"]
+
+    def p(t, h="12 mois"):
+        return ("+" if L[t][h] > 0 else "") + viz.fr(L[t][h], "%", 1)
+
+    st.markdown("#### Où va l'argent : la dynamique des marchés actions")
+    st.markdown(
+        "Les indicateurs économiques décrivent le passé récent. Les marchés, "
+        "eux, montrent en temps réel où les investisseurs placent leur "
+        "argent. Ce tableau mesure la performance des grandes zones et des "
+        "grands secteurs sur plusieurs horizons, **en euros**, c'est-à-dire "
+        "ce qu'aurait réellement gagné ou perdu le client."
+    )
+
+    st.markdown("**Par zone géographique**")
+    _tableau_perf(L, ("zone",))
+    st.markdown("**Par secteur (monde entier), et l'or**")
+    _tableau_perf(L, ("secteur", "reel"))
+    st.caption(
+        "Bleu : hausse, orange : baisse, d'autant plus foncé que le "
+        "mouvement est fort. Classement par performance sur 12 mois. "
+        "« Écart à sa moyenne 200 jours » : au-dessus de zéro, le marché "
+        "est dans une tendance haussière. Données au "
+        f"{taux.date_fr(next(iter(L.values()))['date'])}."
+    )
+
+    _graphique_marches(m)
+
+    st.markdown(f"**Ce qu'on en lit, au {taux.date_fr(m['releve'])}**")
+    st.markdown(
+        f"Sur un an, presque tout a monté : pays développés "
+        f"{p('EUNL.DE')}, Japon {p('EUNN.DE')}, émergents {p('XMME.DE')}. "
+        f"Deux exceptions notables, la Chine ({p('XCS6.DE')}) et l'Inde "
+        f"({p('QDV5.DE')}) : la hausse des émergents vient d'autres marchés "
+        f"qu'eux, et confirme qu'il faut les regarder pays par pays."
+    )
+    st.markdown(
+        f"Le secteur de l'énergie mène très largement ({p('XDW0.DE')} sur "
+        f"un an, {p('XDW0.DE', '3 mois')} sur trois mois). Le marché "
+        f"confirme ainsi ce que montrait la chaîne économique : la hausse "
+        f"de l'inflation vient de l'énergie. La technologie suit "
+        f"({p('XDWT.DE')}). À l'inverse, la consommation discrétionnaire "
+        f"recule ({p('XDWC.DE')}), ce qui est cohérent avec des ménages "
+        f"dont l'énergie ampute le budget."
+    )
+    st.markdown(
+        f"Sur le dernier mois, l'élan faiblit en Europe "
+        f"({p('EXSA.DE', '1 mois')}) et dans l'industrie "
+        f"({p('XDWI.DE', '1 mois')}), dans un contexte de taux en hausse. "
+        f"C'est un signal à surveiller, pas encore un retournement."
+    )
+
+    st.info(
+        "**Les marchés confirment le diagnostic économique : l'énergie et "
+        "les matières premières mènent, la consommation souffre.** Mais la "
+        "dynamique est un signal de court terme. Elle dit ce qui monte, pas "
+        "ce qui est bon marché : un marché qui a pris 20 ou 30 % en un an "
+        "est aussi devenu plus cher. Le bloc suivant mesure les valorisations "
+        "et en tire les rendements espérés.",
+        icon=":material/lightbulb:",
+    )
+
+    pedago.explique(
+        "Pourquoi regarder ce qui a monté",
+        "C'est l'un des phénomènes les mieux documentés en finance : sur un "
+        "horizon de trois à douze mois, ce qui a monté a tendance à "
+        "continuer de monter, et ce qui a baissé à continuer de baisser. Les "
+        "informations se diffusent lentement, et les investisseurs "
+        "rejoignent une tendance progressivement.",
+        "Sur plusieurs années, l'effet s'inverse : les excès finissent par "
+        "se corriger. C'est pourquoi la dynamique sert à ajuster une "
+        "allocation à la marge, jamais à la fonder. Le process TCP Kenz "
+        "l'utilise de cette façon : un tableau multi-horizons pour repérer "
+        "les tendances en cours et celles qui s'essoufflent.",
+        "La moyenne des 200 dernières séances est le repère le plus simple "
+        "de la tendance de fond. Un marché au-dessus est en tendance "
+        "haussière ; un marché qui passe en dessous envoie un premier "
+        "signal de faiblesse.",
+    )
+    pedago.explique(
+        "D'où viennent ces chiffres, et comment ils ont été contrôlés",
+        "Chaque marché est représenté par un ETF coté à Francfort, en "
+        "euros. Tous ont la même devise et la même heure de clôture : les "
+        "performances sont comparables entre elles et correspondent à ce "
+        "qu'aurait vécu un investisseur en euros, change compris. Les "
+        "dividendes sont réinvestis.",
+        "À chaque mise à jour, le nom et la devise de chaque ETF sont "
+        "vérifiés. Ce contrôle a déjà servi : trois des libellés de la base "
+        "de départ étaient faux (un ETF présenté comme l'EURO STOXX 50 "
+        "suivait en réalité les valeurs technologiques allemandes).",
+        "Les prix sont aussi contrôlés. Un mauvais prix isolé, du type "
+        "+16 % un jour puis retour au niveau précédent le lendemain, est "
+        "retiré : c'est arrivé le 24 octobre 2025 sur les ETF émergents et "
+        "Brésil. Enfin, la performance des émergents, étonnante au regard "
+        "de la Chine et de l'Inde, a été recoupée avec un ETF d'un autre "
+        "émetteur (iShares) : même ordre de grandeur, à 2 à 3 points près.",
+        source=f"data/marches.json · relevé du {taux.date_fr(m['releve'])} "
+               f"· scripts/fetch_marches.py · prix Yahoo Finance",
+    )
+
+
+def _graphique_marches(m: dict) -> None:
+    choix = [("SXR8.DE", "États-Unis"), ("EXSA.DE", "Europe"),
+             ("XMME.DE", "Émergents"), ("4GLD.DE", "Or")]
+    fig = go.Figure()
+    for (t, nom), couleur in zip(choix, viz.CATEGORICAL):
+        b = m["base100"][t]
+        fig.add_trace(go.Scatter(
+            x=b["dates"], y=b["valeurs"], name=nom, mode="lines",
+            line={"color": couleur, "width": 2},
+            hovertemplate=f"{nom} : %{{y:.1f}}<extra></extra>",
+        ))
+        fig.add_annotation(x=b["dates"][-1], y=b["valeurs"][-1], text=nom,
+                           showarrow=False, xanchor="left", xshift=6,
+                           font={"color": viz.INK_2, "size": 11})
+    fig.add_hline(y=100, line={"color": viz.GRID, "width": 1})
+    fig.update_layout(**viz.layout(
+        "Un an de marchés, en euros (base 100 il y a un an)", height=400,
+        hovermode="x unified",
+        margin={"l": 10, "r": 80, "t": 46, "b": 10},
+        yaxis={"gridcolor": viz.GRID}, xaxis={"gridcolor": viz.GRID},
+    ))
+    st.plotly_chart(fig, width="stretch")
+
+
+# --------------------------------------------------------------------------
 # Suite de l'onglet
 # --------------------------------------------------------------------------
 
@@ -830,8 +988,6 @@ def _suite() -> None:
     st.markdown("#### La suite de cet onglet")
     pedago.a_construire(
         2, "Macro top-down, blocs suivants",
-        "**La dynamique des marchés actions** sur plusieurs horizons, zone "
-        "par zone et secteur par secteur.",
         "**Les rendements espérés par classe d'actifs**, construits sur ces "
         "observations : c'est la sortie de l'onglet.",
     )
