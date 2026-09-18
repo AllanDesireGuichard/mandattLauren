@@ -1,0 +1,147 @@
+{
+ "releve": "2026-09-18",
+ "limite": 0.15,
+ "rebalancement": "mensuel",
+ "departs": 16,
+ "fenetre": [
+  "2006-10-30",
+  "2026-09-18"
+ ],
+ "cles": [
+  "actions_europe",
+  "usa",
+  "japon",
+  "emergents",
+  "etats_courts",
+  "etats_longs",
+  "credit_court",
+  "indexees",
+  "or",
+  "matieres"
+ ],
+ "scenarios": {
+  "libre": {
+   "nom": "Calcul libre",
+   "note": "Seule exigence : ne jamais perdre plus de 15 % depuis le plus haut.",
+   "poids": {
+    "actions_europe": 0.0,
+    "usa": 0.0,
+    "japon": 0.3204,
+    "emergents": 0.0,
+    "etats_courts": 0.0124,
+    "etats_longs": 0.0937,
+    "credit_court": 0.0221,
+    "indexees": 0.5514,
+    "or": 0.0,
+    "matieres": 0.0
+   },
+   "rendement_espere": 6.471,
+   "pire_baisse": -15.0,
+   "sommet": "2020-02-06",
+   "creux": "2020-03-16",
+   "crises": {
+    "2008": -15.0,
+    "2011": -12.9,
+    "2020": -15.0,
+    "2022": -15.0
+   },
+   "realise": 3.04
+  },
+  "moins_japon": {
+   "nom": "Calcul libre, actions japonaises à 8.94 %",
+   "note": "Même calcul, rendement espéré actions japonaises abaissé de 0.50 point.",
+   "poids": {
+    "actions_europe": 0.0,
+    "usa": 0.0,
+    "japon": 0.2769,
+    "emergents": 0.0,
+    "etats_courts": 0.0334,
+    "etats_longs": 0.0,
+    "credit_court": 0.0,
+    "indexees": 0.6897,
+    "or": 0.0,
+    "matieres": 0.0
+   },
+   "rendement_espere": 6.321,
+   "pire_baisse": -15.0,
+   "sommet": "2020-02-06",
+   "creux": "2020-03-18",
+   "crises": {
+    "2008": -12.5,
+    "2011": -13.1,
+    "2020": -15.0,
+    "2022": -14.5
+   },
+   "realise": 2.89,
+   "variante": {
+    "cle": "japon",
+    "delta": -0.5,
+    "rendement": 8.94
+   }
+  },
+  "japon_egal_usa": {
+   "nom": "Calcul libre, actions japonaises à 7.19 %",
+   "note": "Même calcul, rendement espéré actions japonaises abaissé de 2.25 point.",
+   "poids": {
+    "actions_europe": 0.0,
+    "usa": 0.0,
+    "japon": 0.0815,
+    "emergents": 0.1455,
+    "etats_courts": 0.0466,
+    "etats_longs": 0.0,
+    "credit_court": 0.0,
+    "indexees": 0.7264,
+    "or": 0.0,
+    "matieres": 0.0
+   },
+   "rendement_espere": 5.894,
+   "pire_baisse": -15.0,
+   "sommet": "2022-03-07",
+   "creux": "2022-10-19",
+   "crises": {
+    "2008": -10.6,
+    "2011": -12.8,
+    "2020": -15.0,
+    "2022": -15.0
+   },
+   "realise": 2.98,
+   "variante": {
+    "cle": "japon",
+    "delta": -2.249999999999999,
+    "rendement": 7.19
+   }
+  },
+  "moins_indexees": {
+   "nom": "Calcul libre, obligations indexées euro à 4.93 %",
+   "note": "Même calcul, rendement espéré obligations indexées euro abaissé de 0.50 point.",
+   "poids": {
+    "actions_europe": 0.0,
+    "usa": 0.0,
+    "japon": 0.3258,
+    "emergents": 0.0,
+    "etats_courts": 0.0,
+    "etats_longs": 0.0764,
+    "credit_court": 0.0392,
+    "indexees": 0.5203,
+    "or": 0.0383,
+    "matieres": 0.0
+   },
+   "rendement_espere": 6.204,
+   "pire_baisse": -15.0,
+   "sommet": "2020-02-13",
+   "creux": "2020-03-16",
+   "crises": {
+    "2008": -15.0,
+    "2011": -12.0,
+    "2020": -15.0,
+    "2022": -14.5
+   },
+   "realise": 3.42,
+   "variante": {
+    "cle": "indexees",
+    "delta": -0.5,
+    "rendement": 4.93
+   }
+  }
+ }
+}

@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from core import obligations, rendements, taux
@@ -197,3 +198,46 @@ def correlations(s: pd.DataFrame, ref: str = "poche_actions") -> pd.DataFrame:
         "hors_crise": r[~en_crise].corr()[ref],
         "en_crise": r[en_crise].corr()[ref],
     })
+
+
+# ----------------------------------------------------------------------
+# Blocs 3 et 4 — l'optimisation (calculée par scripts/optimiser.py)
+
+LIMITE = 0.15
+RESULTATS = DATA / "allocation_optim.json"
+
+
+class Chemin:
+    """
+    Évaluation rapide d'un portefeuille rééquilibré chaque mois : la même
+    règle que portefeuille(), écrite en matrices pour que l'optimiseur
+    puisse l'appeler des milliers de fois.
+    """
+
+    def __init__(self, s: pd.DataFrame):
+        p = s.dropna()
+        self.index = p.index
+        mois = p.index.to_period("M")
+        fin_prec = p.groupby(mois).last().shift(1)
+        base = fin_prec.reindex(mois).set_axis(p.index)
+        base[mois == mois[0]] = p.iloc[0].values
+        self.g = (p / base).to_numpy()
+        m = np.asarray(mois.astype(str))
+        self.fins = np.r_[np.nonzero(m[1:] != m[:-1])[0], len(m) - 1]
+
+    def valeur(self, w: np.ndarray) -> np.ndarray:
+        x = self.g @ w
+        v = np.empty_like(x)
+        niveau, debut = 100.0, 0
+        for f in self.fins:
+            v[debut:f + 1] = niveau * x[debut:f + 1]
+            niveau, debut = v[f], f + 1
+        return v
+
+    def pire_baisse(self, w: np.ndarray) -> float:
+        v = self.valeur(w)
+        return float((v / np.maximum.accumulate(v) - 1).min())
+
+
+def resultats() -> dict:
+    return json.loads(RESULTATS.read_text(encoding="utf-8"))

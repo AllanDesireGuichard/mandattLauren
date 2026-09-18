@@ -40,11 +40,9 @@ def render() -> None:
     )
     _bloc_entrees()
     _bloc_risque()
+    _bloc_libre()
     pedago.a_construire(
         4, "Allocation",
-        "**L'optimisation libre, affichée avant le résultat retenu** : ce "
-        "que propose le calcul quand on ne lui impose que la limite de "
-        "perte. C'est elle qui montre ce que le modèle ignore.",
         "**Chaque contrainte listée une par une**, avec ce qu'elle encode et "
         "son coût chiffré en rendement.",
         "**Le portefeuille retenu**, en pourcentages puis en millions "
@@ -473,4 +471,171 @@ def _graphique_baisses(s: pd.DataFrame) -> None:
         "descend quand il s'en éloigne. Zones grises : les quatre crises. "
         "Supports pris séparément : la baisse d'un portefeuille qui les "
         "combine sera calculée au bloc 3."
+    )
+
+
+# ----------------------------------------------------------------------
+COURTS = {"actions_europe": "Europe", "usa": "États-Unis", "japon": "Japon",
+          "emergents": "émergents", "etats_courts": "échelle AAA",
+          "etats_longs": "États 2-10 ans", "credit_court": "crédit",
+          "indexees": "indexées", "or": "or", "matieres": "matières premières"}
+
+
+def _poids(x: float) -> str:
+    return "—" if x < 0.005 else viz.fr(x * 100, "%", 0)
+
+
+def _bloc_libre() -> None:
+    e = allocation.entrees()
+    res = allocation.resultats()
+    sc, cles = res["scenarios"], res["cles"]
+    lib = sc["libre"]
+    p = lib["poids"]
+
+    st.markdown("#### Ce que propose un calcul sans garde-fou")
+    st.markdown(
+        "On demande au calcul la répartition qui rapporte le plus, avec une "
+        "seule exigence : que le portefeuille ne perde jamais plus de 15 % "
+        "depuis son plus haut sur les vingt années de données. Aucune autre "
+        "règle — pas même les 10 M€ à décaisser. Ce résultat n'est pas une "
+        "proposition : il sert à voir ce que le calcul fait des données "
+        "quand on le laisse seul, avant de lui ajouter des règles."
+    )
+    st.table(pd.DataFrame([
+        ("On cherche", "La répartition au rendement espéré le plus élevé"),
+        ("Sous l'exigence", "Jamais plus de 15 % de baisse depuis le plus "
+         f"haut, d'octobre 2006 au {pd.Timestamp(res['fenetre'][1]).strftime('%d/%m/%Y')}"),
+        ("Comment le portefeuille vit",
+         "Remis à ses poids le premier jour de chaque mois"),
+        ("Supports", "Les dix du bloc 1, sans le bitcoin ; chaque zone "
+         "d'actions séparément, sans la clé 40/35/10/15"),
+    ], columns=["", "Réglage"]).set_index(""))
+
+    lignes = [(e.loc[k, "classe"], _pct(e.loc[k, "rendement"]), _poids(p[k]))
+              for k in cles]
+    c1, c2 = st.columns([3, 2])
+    with c1:
+        st.table(pd.DataFrame(lignes, columns=[
+            "Support", "Rendement espéré", "Poids"]).set_index("Support"))
+    with c2:
+        st.metric("Rendement espéré", _pct(lib["rendement_espere"]))
+        st.metric("Pire baisse depuis le plus haut",
+                  viz.fr(lib["pire_baisse"], "%", 1))
+        st.caption("Baisse la plus forte dans chaque crise : " + " · ".join(
+            f"{c} : {viz.fr(v, '%', 1)}" for c, v in lib["crises"].items()))
+
+    top = sorted(p, key=p.get, reverse=True)[:2]
+    jp = allocation.pendant_la_baisse(allocation.series_risque())[0]
+    st.markdown(
+        f"**Lecture.** Deux supports font "
+        f"{viz.fr((p[top[0]] + p[top[1]]) * 100, '%', 0)} du portefeuille : "
+        f"les obligations indexées ({_poids(p['indexees'])}) et les actions "
+        f"japonaises ({_poids(p['japon'])}). Les 10 M€ à décaisser ne sont "
+        f"couverts qu'à {_poids(p['etats_courts'])}. Le portefeuille respecte "
+        f"la limite, et rapporte sur le papier "
+        f"{_pct(lib['rendement_espere'])} ; il est pourtant inutilisable."
+    )
+
+    # --- pourquoi ces deux-là ----------------------------------------
+    st.markdown("**Pourquoi ces deux supports ?**")
+    st.markdown(
+        "On pourrait croire que le calcul choisit le Japon parce que son "
+        "rendement espéré est le plus élevé des actions. On l'a vérifié en "
+        "le baissant : ce n'est pas la raison."
+    )
+    lignes = []
+    for n in ("libre", "moins_japon", "japon_egal_usa", "moins_indexees"):
+        x = sc[n]
+        v = x.get("variante")
+        if v is None:
+            quoi = "Rendements espérés du bloc 1"
+        else:
+            quoi = (f"{e.loc[v['cle'], 'classe']} ramenées à "
+                    f"{_pct(v['rendement'])}"
+                    + (" (le niveau des États-Unis)"
+                       if n == "japon_egal_usa" else ""))
+        autres = [f"{COURTS[k]} {_poids(w)}"
+                  for k, w in sorted(x["poids"].items(), key=lambda kv: -kv[1])
+                  if k not in ("japon", "indexees") and w >= .005]
+        lignes.append((quoi, _poids(x["poids"]["japon"]),
+                       _poids(x["poids"]["indexees"]),
+                       ", ".join(autres) or "—",
+                       _pct(x["rendement_espere"])))
+    st.table(pd.DataFrame(lignes, columns=[
+        "Si l'on suppose", "Japon", "Indexées", "Le reste",
+        "Rendement espéré"]).set_index("Si l'on suppose"))
+    st.caption(
+        "Chaque ligne est un nouveau calcul complet, avec la même limite de "
+        "15 %. Un demi-point est dans la marge d'erreur des estimations de "
+        "l'étape 2."
+    )
+    st.table(pd.DataFrame([
+        ("Les actions japonaises",
+         f"Même à un rendement espéré inférieur à celui de l'Europe, le "
+         f"calcul les garde. Il ne les lâche qu'au niveau des États-Unis. "
+         f"Ce qu'il retient, c'est leur tenue en crise : "
+         f"{_v(jp.loc['japon', '2020'])} pendant le krach de 2020, contre "
+         # yen / euro : EURJPY=X (Yahoo), du sommet au creux des actions,
+         # relevé le 2026-09-18 : +35 % en 2008, −8 % en 2022
+         f"{_v(jp.loc['actions_europe', '2020'])} pour l'Europe. En partie "
+         f"grâce au yen, monnaie refuge, qui a pris 35 % contre l'euro "
+         f"en 2008. Rien ne garantit que le yen jouera ce rôle la prochaine "
+         f"fois : en 2022, il a perdu 8 % contre l'euro."),
+        ("Les obligations indexées",
+         "Ce sont les seules obligations qui rapportent plus que 4 %, "
+         "puisque leur rendement suit l'inflation de l'énoncé. Et elles "
+         "ont bien traversé 2008 — mais cette tenue est celle de leur "
+         "remplaçant, un emprunt d'État classique (bloc 1). Le calcul "
+         "s'appuie sur la ligne la moins bien mesurée."),
+    ], columns=["Support", "Ce que le calcul a retenu"]).set_index("Support"))
+    st.markdown(
+        "Le calcul a **appris le passé par cœur** : il a trouvé les deux "
+        "supports qui ont le mieux traversé ces quatre crises précises, et "
+        "il a tout misé dessus. Changer les rendements espérés n'y change "
+        "presque rien ; c'est l'historique qui décide."
+    )
+
+    # --- ce que le calcul ignore -------------------------------------
+    st.markdown("**Ce que le calcul ignore**")
+    st.table(pd.DataFrame([
+        ("Le besoin de 10 M€ sous deux ans",
+         f"Il ne place que {_poids(p['etats_courts'])} sur l'échelle AAA. Le "
+         f"besoin du client n'est pas dans les données de marché : il faut "
+         f"le lui imposer."),
+        ("La diversification",
+         "Deux supports pour près de 90 % du patrimoine : si l'un des deux "
+         "se comporte autrement qu'entre 2006 et 2026, rien ne compense."),
+        ("La qualité des données",
+         "Il ne distingue pas une série réelle d'un remplaçant. Il a chargé "
+         "la ligne dont la mesure de 2008 est la plus fragile."),
+        ("La répartition des actions",
+         "Il ignore la clé 40/35/10/15 et laisse l'Europe à zéro, alors que "
+         "c'est la poche que l'étape 3 a construite titre par titre."),
+    ], columns=["Ce qu'il ignore", "Conséquence"]).set_index(
+        "Ce qu'il ignore"))
+
+    pedago.explique(
+        "Pourquoi montrer un résultat qu'on ne retiendra pas",
+        "Parce que c'est lui qui justifie les règles du bloc 4. Chaque "
+        "règle ajoutée ensuite corrige un défaut visible ici, et on pourra "
+        "en chiffrer le coût : l'écart de rendement espéré entre ce "
+        "portefeuille libre et le portefeuille retenu est le prix payé pour "
+        "ne pas miser sur un passé appris par cœur.",
+        "C'est un phénomène général, pas un défaut de ce calcul en "
+        "particulier : tout calcul d'optimisation pousse vers les supports "
+        "dont les chiffres sont les plus favorables, y compris quand ces "
+        "chiffres sont les moins fiables.",
+        source=f"scripts/optimiser.py : {res['departs']} points de départ "
+               f"tirés au hasard (graine fixe), meilleur résultat qui "
+               f"respecte la limite. Relevé du "
+               f"{pd.Timestamp(res['releve']).strftime('%d/%m/%Y')}.",
+    )
+
+    st.markdown("#### Ce que le bloc 3 transmet au bloc 4")
+    st.markdown(
+        f"Un plafond de rendement espéré, {_pct(lib['rendement_espere'])}, "
+        "que la limite de 15 % permet au mieux sur ces données ; et quatre "
+        "défauts à corriger par des règles : les 10 M€, la clé des actions, "
+        "la concentration, et la ligne des indexées mal mesurée en 2008. Le "
+        "bloc 4 les ajoute une par une et mesure ce que chacune coûte."
     )
