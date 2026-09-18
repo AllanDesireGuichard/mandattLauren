@@ -1,0 +1,601 @@
+ticker_ishares,nom,secteur,poids,pays,place,devise,date_composition
+ASML,ASML HOLDING,Technologie,4.09,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+HSBA,HSBC HOLDINGS PLC,Finance,2.27,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ROP,ROCHE PS PAR AG,Santé,2.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SHELL,SHELL PLC,Énergie,1.76,Vereinigtes Königreich,Euronext Amsterdam,EUR,16.Sept.2026
+NOVN,NOVARTIS AG,Santé,1.74,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+AZN,ASTRAZENECA PLC,Santé,1.65,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NESN,NESTLE SA,Consommation de base,1.59,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SIE,SIEMENS N AG,Industrie,1.44,Deutschland,Xetra,EUR,16.Sept.2026
+SAP,SAP,Technologie,1.42,Deutschland,Xetra,EUR,16.Sept.2026
+SAN,BANCO SANTANDER,Finance,1.41,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+TTE,TOTALENERGIES,Énergie,1.37,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ALV,ALLIANZ,Finance,1.28,Deutschland,Xetra,EUR,16.Sept.2026
+SU,SCHNEIDER ELECTRIC,Industrie,1.21,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+RR.,ROLLS-ROYCE HOLDINGS PLC,Industrie,1.06,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BBVA,BANCO BILBAO VIZCAYA ARGENTARIA SA,Finance,1.05,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+UBSG,UBS GROUP AG,Finance,1.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+ABBN,ABB LTD,Industrie,0.98,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+IBE,IBERDROLA,Services aux collectivités,0.96,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+UCG,UNICREDIT,Finance,0.94,Italien,Borsa Italiana,EUR,16.Sept.2026
+SAF,SAFRAN SA,Industrie,0.91,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ULVR,UNILEVER PLC,Consommation de base,0.89,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NOVO B,NOVO NORDISK CLASS B,Santé,0.88,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+AIR,AIRBUS GROUP,Industrie,0.87,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ENR,SIEMENS ENERGY N AG,Industrie,0.84,Deutschland,Xetra,EUR,16.Sept.2026
+BP.,BP PLC,Énergie,0.82,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BATS,BRITISH AMERICAN TOBACCO,Consommation de base,0.8,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BNP,BNP PARIBAS SA,Finance,0.8,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+AI,LAIR LIQUIDE SOCIETE ANONYME POUR,Matériaux,0.8,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ISP,INTESA SANPAOLO,Finance,0.78,Italien,Borsa Italiana,EUR,16.Sept.2026
+MC,LVMH,Consommation discrétionnaire,0.77,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+DTE,DEUTSCHE TELEKOM N AG,Télécoms et médias,0.75,Deutschland,Xetra,EUR,16.Sept.2026
+ZURN,ZURICH INSURANCE GROUP AG,Finance,0.74,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+CFR,COMPAGNIE FINANCIERE RICHEMONT SA,Consommation discrétionnaire,0.73,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+INGA,ING GROEP,Finance,0.7,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+OR,LOREAL SA,Consommation de base,0.69,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+RIO,RIO TINTO PLC,Matériaux,0.68,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+GSK,GLAXOSMITHKLINE,Santé,0.66,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SAN,SANOFI SA,Santé,0.63,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+CS,AXA SA,Finance,0.59,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+BARC,BARCLAYS PLC,Finance,0.57,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+LLOY,LLOYDS BANKING GROUP PLC,Finance,0.57,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BA.,BAE SYSTEMS PLC,Industrie,0.56,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+IFX,INFINEON TECHNOLOGIES AG,Technologie,0.54,Deutschland,Xetra,EUR,16.Sept.2026
+ABI,ANHEUSER-BUSCH INBEV SA,Consommation de base,0.53,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+ENEL,ENEL,Services aux collectivités,0.52,Italien,Borsa Italiana,EUR,16.Sept.2026
+NG.,NATIONAL GRID PLC,Services aux collectivités,0.52,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NWG,NATWEST GROUP PLC,Finance,0.51,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+MUV2,MUENCHENER RUECKVERSICHERUNGS-GESE,Finance,0.49,Deutschland,Xetra,EUR,16.Sept.2026
+DG,VINCI SA,Industrie,0.49,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+INVE B,INVESTOR CLASS B,Finance,0.49,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+DBK,DEUTSCHE BANK AG,Finance,0.49,Deutschland,Xetra,EUR,16.Sept.2026
+GLEN,GLENCORE PLC,Matériaux,0.48,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NDA FI,NORDEA BANK,Finance,0.45,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+ITX,INDUSTRIA DE DISENO TEXTIL SA,Consommation discrétionnaire,0.44,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+GLE,SOCIETE GENERALE SA,Finance,0.42,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+REL,RELX PLC,Industrie,0.41,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+DHL,DHL AG,Industrie,0.4,Deutschland,Xetra,EUR,16.Sept.2026
+ARGX,ARGENX,Santé,0.4,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+DB1,DEUTSCHE BOERSE AG,Finance,0.39,Deutschland,Xetra,EUR,16.Sept.2026
+AAL,ANGLO AMERICAN PLC,Matériaux,0.38,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+G,ASSICURAZIONI GENERALI,Finance,0.38,Italien,Borsa Italiana,EUR,16.Sept.2026
+ENI,ENI,Énergie,0.37,Italien,Borsa Italiana,EUR,16.Sept.2026
+RMS,HERMES INTERNATIONAL,Consommation discrétionnaire,0.37,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+STAN,STANDARD CHARTERED PLC,Finance,0.36,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NOKIA,NOKIA,Technologie,0.36,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+BAYN,BAYER AG,Santé,0.36,Deutschland,Xetra,EUR,16.Sept.2026
+CPG,COMPASS GROUP PLC,Consommation discrétionnaire,0.36,Vereinigtes Königreich,London Stock Exchange,USD,16.Sept.2026
+RHM,RHEINMETALL AG,Industrie,0.36,Deutschland,Xetra,EUR,16.Sept.2026
+VOLV B,VOLVO CLASS B,Industrie,0.36,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+ENGI,ENGIE SA,Services aux collectivités,0.35,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+BAS,BASF N,Matériaux,0.35,Deutschland,Xetra,EUR,16.Sept.2026
+CABK,CAIXABANK SA,Finance,0.35,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+LSEG,LONDON STOCK EXCHANGE GROUP PLC,Finance,0.35,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+EL,ESSILORLUXOTTICA SA,Santé,0.34,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+PRX,PROSUS NV CLASS N,Consommation discrétionnaire,0.34,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+ATCO A,ATLAS COPCO CLASS A,Industrie,0.34,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SREN,SWISS RE AG,Finance,0.33,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+RACE,FERRARI,Consommation discrétionnaire,0.32,Italien,Borsa Italiana,EUR,16.Sept.2026
+DGE,DIAGEO PLC,Consommation de base,0.32,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+LONN,LONZA GROUP AG,Santé,0.3,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+EOAN,E.ON N,Services aux collectivités,0.3,Deutschland,Xetra,EUR,16.Sept.2026
+BN,DANONE SA,Consommation de base,0.3,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+HOLN,HOLCIM LTD AG,Matériaux,0.29,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+RWE,RWE AG,Services aux collectivités,0.29,Deutschland,Xetra,EUR,16.Sept.2026
+RKT,RECKITT BENCKISER GROUP PLC,Consommation de base,0.29,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ASM,ASM INTERNATIONAL NV,Technologie,0.29,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+PRY,PRYSMIAN,Industrie,0.27,Italien,Borsa Italiana,EUR,16.Sept.2026
+LR,LEGRAND SA,Industrie,0.27,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+TSCO,TESCO PLC,Consommation de base,0.27,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+EBS,ERSTE GROUP BANK AG,Finance,0.27,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+HLN,HALEON PLC,Santé,0.27,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SAND,SANDVIK,Industrie,0.27,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SGO,COMPAGNIE DE SAINT GOBAIN SA,Industrie,0.26,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+SSE,SSE PLC,Services aux collectivités,0.26,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+EQNR,EQUINOR,Énergie,0.25,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+DSV,DSV,Industrie,0.25,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+REP,REPSOL,Énergie,0.25,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+MBG,MERCEDES-BENZ GROUP N AG,Consommation discrétionnaire,0.24,Deutschland,Xetra,EUR,16.Sept.2026
+SWED A,SWEDBANK,Finance,0.24,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+DANSKE,DANSKE BANK,Finance,0.24,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+SEB A,SKANDINAVISKA ENSKILDA BANKEN,Finance,0.24,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SIKA,SIKA AG,Matériaux,0.24,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+ORA,ORANGE SA,Télécoms et médias,0.23,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+SDZ,SANDOZ GROUP AG,Santé,0.23,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+GALD,GALDERMA GROUP N AG,Santé,0.23,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+ASSA B,ASSA ABLOY B,Industrie,0.23,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+III,3I GROUP PLC,Finance,0.22,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ALC,ALCON AG,Santé,0.22,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+VOD,VODAFONE GROUP PLC,Télécoms et médias,0.22,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+EXPN,EXPERIAN PLC,Industrie,0.22,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+PRU,PRUDENTIAL PLC,Finance,0.22,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+KBC,KBC GROEP,Finance,0.22,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+ADYEN,ADYEN,Finance,0.21,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+AD,KONINKLIJKE AHOLD DELHAIZE,Consommation de base,0.21,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+MT,ARCELORMITTAL SA,Matériaux,0.21,Frankreich,Euronext Amsterdam,EUR,16.Sept.2026
+STMMI,STMICROELECTRONICS,Technologie,0.21,Frankreich,Borsa Italiana,EUR,16.Sept.2026
+VWS,VESTAS WIND SYSTEMS,Industrie,0.21,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+SLHN,SWISS LIFE HOLDING AG,Finance,0.21,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+ABN,ABN AMRO BANK NV,Finance,0.2,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+GIVN,GIVAUDAN SA,Matériaux,0.2,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+BMPS,BANCA MONTE DEI PASCHI DI SIENA SP,Finance,0.2,Italien,Borsa Italiana,EUR,16.Sept.2026
+ADS,ADIDAS N AG,Consommation discrétionnaire,0.19,Deutschland,Xetra,EUR,16.Sept.2026
+UCB,UCB SA,Santé,0.19,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+ERIC B,ERICSSON B,Technologie,0.19,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+AV.,AVIVA PLC,Finance,0.19,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+DNB,DNB BANK,Finance,0.19,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+AMS,AMADEUS IT GROUP,Consommation discrétionnaire,0.18,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+A5G,AIB GROUP PLC,Finance,0.18,Irland,Irish Stock Exchange - All Market,EUR,16.Sept.2026
+PKO,POWSZECHNA KASA OSZCZEDNOSCI BANK,Finance,0.18,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+FER,FERROVIAL NV,Industrie,0.18,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+SAMPO,SAMPO CLASS A,Finance,0.18,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+HO,THALES SA,Industrie,0.18,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+PUB,PUBLICIS GROUPE,Télécoms et médias,0.17,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+DTG,DAIMLER TRUCK HOLDING E AG,Industrie,0.17,Deutschland,Xetra,EUR,16.Sept.2026
+ML,MICHELIN,Consommation discrétionnaire,0.17,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+EQT,EQT,Finance,0.17,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+IMB,IMPERIAL BRANDS PLC,Consommation de base,0.16,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BPE,BPER BANCA,Finance,0.16,Italien,Borsa Italiana,EUR,16.Sept.2026
+VIE,VEOLIA ENVIRON. SA,Services aux collectivités,0.16,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+SHB A,SVENSKA HANDELSBANKEN-A SHS,Finance,0.16,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+PKN,ORLEN,Énergie,0.16,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+NN,NN GROUP,Finance,0.16,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+BMW,BMW,Consommation discrétionnaire,0.15,Deutschland,Xetra,EUR,16.Sept.2026
+ACA,CREDIT AGRICOLE SA,Finance,0.15,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+HEIA,HEINEKEN NV,Consommation de base,0.15,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+NSIS B,NOVOZYMES B,Matériaux,0.15,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+GEBN,GEBERIT AG,Industrie,0.15,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+IHG,INTERCONTINENTAL HOTELS GROUP PLC,Consommation discrétionnaire,0.15,Vereinigtes Königreich,London Stock Exchange,USD,16.Sept.2026
+KNEBV,KONE,Industrie,0.15,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+LDO,LEONARDO FINMECCANICA SPA,Industrie,0.15,Italien,Borsa Italiana,EUR,16.Sept.2026
+LGEN,LEGAL AND GENERAL GROUP PLC,Finance,0.15,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NXT,NEXT PLC,Consommation discrétionnaire,0.15,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ACS,ACS ACTIVIDADES DE CONSTRUCCION Y,Industrie,0.14,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+CBK,COMMERZBANK AG,Finance,0.14,Deutschland,Xetra,EUR,16.Sept.2026
+FRE,FRESENIUS N,Santé,0.14,Deutschland,Xetra,EUR,16.Sept.2026
+GMAB,GENMAB,Santé,0.14,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+MTX,MTU AERO ENGINES HOLDING AG,Industrie,0.14,Deutschland,Xetra,EUR,16.Sept.2026
+HEI,HEIDELBERG MATERIALS AG,Matériaux,0.14,Deutschland,Xetra,EUR,16.Sept.2026
+BIRG,BANK OF IRELAND GROUP PLC,Finance,0.14,Irland,Irish Stock Exchange - All Market,EUR,16.Sept.2026
+SCMN,SWISSCOM AG,Télécoms et médias,0.14,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SAB,BANCO DE SABADELL,Finance,0.14,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+RYA,RYANAIR HOLDINGS PLC,Industrie,0.14,Irland,Irish Stock Exchange - All Market,EUR,16.Sept.2026
+AENA,AENA SME SA,Industrie,0.14,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+CAP,CAPGEMINI,Technologie,0.14,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+BAMI,BANCO BPM,Finance,0.14,Italien,Borsa Italiana,EUR,16.Sept.2026
+HEXA B,HEXAGON CLASS B,Technologie,0.13,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+HBAN,HELVETIA BALOISE HOLDING N AG,Finance,0.13,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SAAB B,SAAB CLASS B,Industrie,0.13,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+PHIA,KONINKLIJKE PHILIPS,Santé,0.13,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+MRK,MERCK,Santé,0.13,Deutschland,Xetra,EUR,16.Sept.2026
+SGSN,SGS SA,Industrie,0.13,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+VACN,VAT GROUP AG,Industrie,0.13,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+KER,KERING SA,Consommation discrétionnaire,0.13,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+UMG,UNIVERSAL MUSIC GROUP,Télécoms et médias,0.12,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+ANTO,ANTOFAGASTA PLC,Matériaux,0.12,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+VOW3,VOLKSWAGEN NON-VOTING PREF AG,Consommation discrétionnaire,0.12,Deutschland,Xetra,EUR,16.Sept.2026
+KPN,KONINKLIJKE KPN NV,Télécoms et médias,0.12,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+WKL,WOLTERS KLUWER,Industrie,0.12,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+BAER,JULIUS BAER GRUPPE AG,Finance,0.12,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+DSFIR,DSM FIRMENICH AG,Matériaux,0.12,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+DSY,DASSAULT SYSTEMES,Technologie,0.12,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+BT.A,BT GROUP PLC,Télécoms et médias,0.12,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+HLMA,HALMA PLC,Technologie,0.12,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+HNR1,HANNOVER RUECK,Finance,0.11,Deutschland,Xetra,EUR,16.Sept.2026
+PGHN,PARTNERS GROUP HOLDING AG,Finance,0.11,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+KRX,KINGSPAN GROUP PLC,Industrie,0.11,Irland,Irish Stock Exchange - All Market,EUR,16.Sept.2026
+EPI A,EPIROC CLASS A,Industrie,0.11,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SHL,SIEMENS HEALTHINEERS AG,Santé,0.11,Deutschland,Xetra,EUR,16.Sept.2026
+NESTE,NESTE,Énergie,0.11,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+EDP,EDP ENERGIAS DE PORTUGAL,Services aux collectivités,0.11,Portugal,Nyse Euronext - Euronext Lisbon,EUR,16.Sept.2026
+FBK,FINECOBANK BANCA FINECO,Finance,0.11,Italien,Borsa Italiana,EUR,16.Sept.2026
+ALFA,ALFA LAVAL,Industrie,0.1,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+TEF,TELEFONICA SA,Télécoms et médias,0.1,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+ELE,ENDESA SA,Services aux collectivités,0.1,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+SGRO,SEGRO REIT PLC,Immobilier,0.1,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BG,BAWAG GROUP AG,Finance,0.1,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+UPM,UPM-KYMMENE,Matériaux,0.1,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+INF,INFORMA PLC,Télécoms et médias,0.1,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+WRT1V,WARTSILA,Industrie,0.1,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+VNA,VONOVIA SE,Immobilier,0.1,Deutschland,Xetra,EUR,16.Sept.2026
+KRZ,KERRY GROUP PLC,Consommation de base,0.1,Irland,Irish Stock Exchange - All Market,EUR,16.Sept.2026
+BESI,BE SEMICONDUCTOR INDUSTRIES NV,Technologie,0.1,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+TRN,TERNA RETE ELETTRICA NAZIONALE,Services aux collectivités,0.1,Italien,Borsa Italiana,EUR,16.Sept.2026
+ESSITY B,ESSITY CLASS B,Consommation de base,0.1,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+BOL,BOLIDEN,Matériaux,0.1,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+TIT,TELECOM ITALIA,Télécoms et médias,0.1,Italien,Borsa Italiana,EUR,16.Sept.2026
+KOG,KONGSBERG GRUPPEN,Industrie,0.1,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+SOON,SONOVA HOLDING AG,Santé,0.09,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+LOGN,LOGITECH INTERNATIONAL,Technologie,0.09,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+CLNX,CELLNEX TELECOM,Télécoms et médias,0.09,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+KNIN,KUEHNE UND NAGEL INTERNATIONAL AG,Industrie,0.09,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+ENX,EURONEXT NV,Finance,0.09,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+STMN,STRAUMANN HOLDING AG,Santé,0.09,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SY1,SYMRISE AG,Matériaux,0.09,Deutschland,Xetra,EUR,16.Sept.2026
+EN,BOUYGUES SA,Industrie,0.09,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+PST,POSTE ITALIANE,Finance,0.09,Italien,Borsa Italiana,EUR,16.Sept.2026
+AGS,AGEAS,Finance,0.09,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+IAG,INTERNATIONAL AIRLINES GROUP,Industrie,0.09,Spanien,London Stock Exchange,GBP,16.Sept.2026
+UU.,UNITED UTILITIES GROUP PLC,Services aux collectivités,0.09,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+RI,PERNOD RICARD SA,Consommation de base,0.09,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+METSO,METSO CORPORATION,Industrie,0.09,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+ADM,ADMIRAL GROUP PLC,Finance,0.09,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+HEN3,HENKEL & KGAA PREF AG,Consommation de base,0.09,Deutschland,Xetra,EUR,16.Sept.2026
+CCH,COCA COLA HBC AG,Consommation de base,0.09,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SCHP,SCHINDLER HOLDING PAR AG,Industrie,0.09,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+PEO,BANK PEKAO SA,Finance,0.09,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+UNI,UNIPOL ASSICURAZIONI SPA,Finance,0.08,Italien,Borsa Italiana,EUR,16.Sept.2026
+SRG,SNAM,Services aux collectivités,0.08,Italien,Borsa Italiana,EUR,16.Sept.2026
+DPLM,DIPLOMA PLC,Industrie,0.08,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SGE,THE SAGE GROUP,Technologie,0.08,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ITRK,INTERTEK GROUP PLC,Industrie,0.08,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+KGH,KGHM POLSKA MIEDZ SA,Matériaux,0.08,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+BCP,BANCO COMERCIAL PORTUGUES SA,Finance,0.08,Portugal,Nyse Euronext - Euronext Lisbon,EUR,16.Sept.2026
+ASRNL,ASR NEDERLAND,Finance,0.08,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+CA,CARREFOUR SA,Consommation de base,0.08,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+AKRBP,AKER BP,Énergie,0.08,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+SPSN,SWISS PRIME SITE AG,Immobilier,0.08,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+FORTUM,FORTUM,Services aux collectivités,0.08,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+NTGY,NATURGY ENERGY GROUP SA,Services aux collectivités,0.08,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+CARL B,CARLSBERG AS CL B,Consommation de base,0.08,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+OMV,OMV,Énergie,0.08,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+BKT,BANKINTER SA,Finance,0.08,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+SN.,SMITH AND NEPHEW PLC,Santé,0.08,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+EVO,EVOLUTION,Consommation discrétionnaire,0.08,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+NHY,NORSK HYDRO,Matériaux,0.08,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+FGR,EIFFAGE SA,Industrie,0.08,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+URW,UNIBAIL RODAMCO WE STAPLED UNITS,Immobilier,0.08,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+MAERSK B,A P MOLLER MAERSK B,Industrie,0.08,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+BVI,BUREAU VERITAS SA,Industrie,0.08,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ALE,ALLEGRO SA,Consommation discrétionnaire,0.07,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+TELIA,TELIA COMPANY,Télécoms et médias,0.07,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+AGN,AEGON,Finance,0.07,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+SMIN,SMITHS GROUP PLC,Industrie,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BNZL,BUNZL,Industrie,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+AKZA,AKZO NOBEL,Matériaux,0.07,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+MONC,MONCLER,Consommation discrétionnaire,0.07,Italien,Borsa Italiana,EUR,16.Sept.2026
+G1A,GEA GROUP AG,Industrie,0.07,Deutschland,Xetra,EUR,16.Sept.2026
+RTO,RENTOKIL INITIAL PLC,Industrie,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SOBI,SWEDISH ORPHAN BIOVITRUM,Santé,0.07,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+PZU,PZU SA,Finance,0.07,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+AC,ACCOR SA,Consommation discrétionnaire,0.07,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+IMI,IMI PLC,Industrie,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BEZ,BEAZLEY PLC,Finance,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ORNBV,ORION CLASS B,Santé,0.07,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+SDLF,STANDARD LIFE PLC,Finance,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+LISP,CHOCOLADEFABRIKEN LINDT & SPRUENGL,Consommation de base,0.07,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SVT,SEVERN TRENT PLC,Services aux collectivités,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+STLAM,STELLANTIS,Consommation discrétionnaire,0.07,Italien,Borsa Italiana,EUR,16.Sept.2026
+MNG,M&G PLC,Finance,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+PSON,PEARSON PLC,Consommation discrétionnaire,0.07,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+RBI,RAIFFEISEN BANK INTERNATIONAL AG,Finance,0.07,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+GALP,GALP ENERGIA SGPS SA CLASS B,Énergie,0.07,Portugal,Nyse Euronext - Euronext Lisbon,EUR,16.Sept.2026
+MKS,MARKS AND SPENCER GROUP PLC,Consommation de base,0.06,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ERF,EUROFINS SCIENTIFIC,Santé,0.06,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ORSTED,ORSTED A/S,Services aux collectivités,0.06,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+COLO B,COLOPLAST B,Santé,0.06,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+CNA,CENTRICA PLC,Services aux collectivités,0.06,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+INDU C,INDUSTRIVARDEN SERIES,Finance,0.06,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+TEL2 B,TELE2 B,Télécoms et médias,0.06,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+MICC,MAGNUM ICE CREAM,Consommation de base,0.06,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+WEIR,WEIR PLC,Industrie,0.06,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+TEL,TELENOR,Télécoms et médias,0.06,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+WISE,WISE PLC CLASS A,Finance,0.06,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+LI,KLEPIERRE REIT SA,Immobilier,0.06,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+GTT,GAZTRANSPORT & TECHNIGAZ SA,Énergie,0.06,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+MOWI,MOWI,Consommation de base,0.06,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+SKA B,SKANSKA B,Industrie,0.06,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+RXL,REXEL SA,Industrie,0.06,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+SKF B,SKF B,Industrie,0.06,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+BEAN,BELIMO N AG,Industrie,0.06,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+CON,CONTINENTAL AG,Consommation discrétionnaire,0.06,Deutschland,Xetra,EUR,16.Sept.2026
+TREL B,TRELLEBORG B,Industrie,0.06,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+FME,FRESENIUS MEDICAL CARE AG,Santé,0.06,Deutschland,Xetra,EUR,16.Sept.2026
+PNDORA,PANDORA,Consommation discrétionnaire,0.06,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+HEIO,HEINEKEN HOLDING NV,Consommation de base,0.06,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+TEN,TENARIS SA,Énergie,0.06,Italien,Borsa Italiana,EUR,16.Sept.2026
+STB,STOREBRAND,Finance,0.06,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+HSX,HISCOX LTD,Finance,0.06,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+QIA,QIAGEN,Santé,0.06,Deutschland,Deutsche Börse AG,EUR,16.Sept.2026
+SPIE,SPIE SA,Industrie,0.06,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+BNR,BRENNTAG,Industrie,0.06,Deutschland,Xetra,EUR,16.Sept.2026
+TLX,TALANX AG,Finance,0.06,Deutschland,Xetra,EUR,16.Sept.2026
+ACLN,ACCELLERON N AG,Industrie,0.06,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+ADDT B,ADDTECH CLASS B,Industrie,0.05,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+TKA,THYSSENKRUPP AG,Matériaux,0.05,Deutschland,Xetra,EUR,16.Sept.2026
+FRO,FRONTLINE PLC,Énergie,0.05,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+EBP,ERSTE BANK POLSKA SA,Finance,0.05,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+EXO,EXOR NV,Finance,0.05,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+DHER,DELIVERY HERO,Consommation discrétionnaire,0.05,Deutschland,Xetra,EUR,16.Sept.2026
+EDEN,EDENRED,Finance,0.05,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+SDR,SCHRODERS PLC,Finance,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+PSPN,PSP SWISS PROPERTY AG,Immobilier,0.05,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+HOT,HOCHTIEF AG,Industrie,0.05,Deutschland,Xetra,EUR,16.Sept.2026
+LTMC,LOTTOMATICA GROUP,Consommation discrétionnaire,0.05,Italien,Borsa Italiana,EUR,16.Sept.2026
+HM B,HENNES & MAURITZ,Consommation discrétionnaire,0.05,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+YAR,YARA INTERNATIONAL,Matériaux,0.05,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+SBRY,SAINSBURY(J) PLC,Consommation de base,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+MRO,MELROSE INDUSTRIES PLC,Industrie,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+GAW,GAMES WORKSHOP GROUP PLC,Consommation discrétionnaire,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NKT,NKT,Industrie,0.05,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+SECU B,SECURITAS B,Industrie,0.05,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+BEI,BEIERSDORF AG,Consommation de base,0.05,Deutschland,Xetra,EUR,16.Sept.2026
+SUBC,SUBSEA,Énergie,0.05,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+KBX,KNORR BREMSE AG,Industrie,0.05,Deutschland,Xetra,EUR,16.Sept.2026
+FRES,FRESNILLO PLC,Matériaux,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+LIFCO B,LIFCO CLASS B,Industrie,0.05,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+DCC,DCC ENERGY PLC,Énergie,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+STJ,ST JAMESS PLACE PLC,Finance,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+KCR,KONECRANES,Industrie,0.05,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+ALSYDB,AL SYDBANK,Finance,0.05,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+TRYG,TRYG,Finance,0.05,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+SCA B,SVENSKA CELLULOSA B,Matériaux,0.05,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+ORK,ORKLA,Consommation de base,0.05,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+ABF,ASSOCIATED BRITISH FOODS PLC,Consommation de base,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ELI,ELIA GROUP SA,Services aux collectivités,0.05,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+KGF,KINGFISHER PLC,Consommation discrétionnaire,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+LPP,LPP SA,Consommation discrétionnaire,0.05,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+ICG,ICG PLC,Finance,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+IDR,INDRA SISTEMAS SA,Technologie,0.05,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+RILBA,RINGKJOBING LANDBOBANK,Finance,0.05,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+STERV,STORA ENSO CLASS R,Matériaux,0.05,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+ACKB,ACKERMANS & VAN HAAREN NV,Industrie,0.05,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+AED,AEDIFICA NV,Immobilier,0.05,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+KESKOB,KESKO CLASS B,Consommation de base,0.05,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+ABVX,ABIVAX SA,Santé,0.05,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+JYSK,JYSKE BANK,Finance,0.05,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+SPX,SPIRAX GROUP PLC,Industrie,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BAB,BABCOCK INTERNATIONAL GROUP PLC,Industrie,0.05,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SSAB B,SSAB CLASS B,Matériaux,0.04,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SRT3,SARTORIUS PREF AG,Santé,0.04,Deutschland,Xetra,EUR,16.Sept.2026
+ELISA,ELISA,Télécoms et médias,0.04,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+IPN,IPSEN SA,Santé,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+RNO,RENAULT SA,Consommation discrétionnaire,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+REC,RECORDATI INDUSTRIA CHIMICA E FARM,Santé,0.04,Italien,Borsa Italiana,EUR,16.Sept.2026
+SPM,SAIPEM,Énergie,0.04,Italien,Borsa Italiana,EUR,16.Sept.2026
+EMSN,EMS-CHEMIE HOLDING AG,Matériaux,0.04,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+G24,SCOUT24 N,Télécoms et médias,0.04,Deutschland,Xetra,EUR,16.Sept.2026
+INDT,INDUTRADE,Industrie,0.04,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+ALO,ALSTOM SA,Industrie,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+GBLB,GROUPE BRUXELLES LAMBERT NV,Finance,0.04,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+UHR,THE SWATCH GROUP AG,Consommation discrétionnaire,0.04,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SYENS,SYENSQO NV,Matériaux,0.04,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+IMCD,IMCD NV,Industrie,0.04,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+AMUN,AMUNDI SA,Finance,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+AM,DASSAULT AVIATION SA,Industrie,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+LAND,LAND SECURITIES GROUP REIT PLC,Immobilier,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BGEO,LION FINANCE GROUP PLC,Finance,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NEX,NEXANS SA,Industrie,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+DIM,SARTORIUS STEDIM BIOTECH SA,Santé,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+GET,GETLINK,Industrie,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ISS,ISS A S,Industrie,0.04,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+NIBE B,NIBE INDUSTRIER CLASS B,Industrie,0.04,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+IGG,IG GROUP HOLDINGS PLC,Finance,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BBY,BALFOUR BEATTY PLC,Industrie,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+IG,ITALGAS,Services aux collectivités,0.04,Italien,Borsa Italiana,EUR,16.Sept.2026
+ANDR,ANDRITZ AG,Industrie,0.04,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+SAVE,NORDNET,Finance,0.04,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+MRL,MERLIN PROPERTIES REIT,Immobilier,0.04,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+VOE,VOESTALPINE AG,Matériaux,0.04,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+ZAL,ZALANDO,Consommation discrétionnaire,0.04,Deutschland,Xetra,EUR,16.Sept.2026
+BTRW,BARRATT REDROW PLC,Consommation discrétionnaire,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SCR,SCOR,Finance,0.04,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+LOTB,LOTUS BAKERIES NV,Consommation de base,0.04,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+JMT,JERONIMO MARTINS SA,Consommation de base,0.04,Portugal,Nyse Euronext - Euronext Lisbon,EUR,16.Sept.2026
+GJF,GJENSIDIGE FORSIKRING,Finance,0.04,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+SQN,SWISSQUOTE GROUP HOLDING SA,Finance,0.04,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+ANA,ACCIONA,Services aux collectivités,0.04,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+BMED,BANCA MEDIOLANUM,Finance,0.04,Italien,Borsa Italiana,EUR,16.Sept.2026
+AUTO,AUTOTRADER GROUP PLC,Télécoms et médias,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+CTEC,CONVATEC GROUP PLC,Santé,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ABDN,ABERDEEN GROUP PLC,Finance,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SB1NO,SPAREBANK SR-NORGE,Finance,0.04,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+BEIJ B,BEIJER REF CLASS B,Industrie,0.04,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+EVK,EVONIK INDUSTRIES AG,Matériaux,0.04,Deutschland,Xetra,EUR,16.Sept.2026
+P911,DR ING HC F PORSCHE PRF AG,Consommation discrétionnaire,0.04,Deutschland,Xetra,EUR,16.Sept.2026
+SBMO,SBM OFFSHORE,Énergie,0.04,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+BLND,BRITISH LAND REIT,Immobilier,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+PAH3,PORSCHE AUTOMOBIL HOLDING PREF,Consommation discrétionnaire,0.04,Deutschland,Xetra,EUR,16.Sept.2026
+NDX1,NORDEX,Industrie,0.04,Deutschland,Xetra,EUR,16.Sept.2026
+HWDN,HOWDEN JOINERY GROUP PLC,Industrie,0.04,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+SW,SODEXO SA,Consommation discrétionnaire,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+LHA,DEUTSCHE LUFTHANSA AG,Industrie,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+WTB,WHITBREAD PLC,Consommation discrétionnaire,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+LMP,LONDONMETRIC PROPERTY REIT PLC,Immobilier,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+WDP,WAREHOUSES DE PAUW NV,Immobilier,0.03,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+CRDA,CRODA INTERNATIONAL PLC,Matériaux,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+GETI B,GETINGE B,Santé,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+TPRO,TECHNOPROBE SPA,Technologie,0.03,Italien,Borsa Italiana,EUR,16.Sept.2026
+WPP,WPP PLC,Télécoms et médias,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+UMI,UMICORE SA,Matériaux,0.03,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+HAG,HENSOLDT AG,Industrie,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+RMV,RIGHTMOVE PLC,Télécoms et médias,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+VAR,VAR ENERGI,Énergie,0.03,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+MBK,MBANK SA,Finance,0.03,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+GALE,GALENICA AG,Santé,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+EMG,MAN GROUP PLC,Finance,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+AZA,AVANZA BANK HOLDING,Finance,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+ROR,ROTORK PLC,Industrie,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NDA,AURUBIS AG,Matériaux,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+RED,REDEIA CORPORACION SA,Services aux collectivités,0.03,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+SOF,SOFINA SA,Finance,0.03,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+PSN,PERSIMMON PLC,Consommation discrétionnaire,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+AVOL,AVOLTA AG,Consommation discrétionnaire,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+BRBY,BURBERRY GROUP PLC,Consommation discrétionnaire,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+UNI,UNICAJA BANCO SA,Finance,0.03,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+VALMT,VALMET CORP,Industrie,0.03,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+FHZN,FLUGHAFEN ZUERICH AG,Industrie,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+INVP,INVESTEC PLC,Finance,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+CAST,CASTELLUM,Immobilier,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+GF,GEORG FISCHER AG,Industrie,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+DIE,DIETEREN (D) SA,Consommation discrétionnaire,0.03,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+AZM,AZIMUT HOLDING,Finance,0.03,Italien,Borsa Italiana,EUR,16.Sept.2026
+VER,VERBUND AG,Services aux collectivités,0.03,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+ADEN,ADECCO GROUP AG,Industrie,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+LUND B,LUNDBERGFORETAGEN CLASS B,Finance,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SOI,SOITEC SA,Technologie,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+BARN,BARRY CALLEBAUT AG,Consommation de base,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+BCVN,BC VAUD N,Finance,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+MYCR,MYCRONIC,Technologie,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+AKE,ARKEMA SA,Matériaux,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ZAB,ZABKA GROUP SOCIETE ANONYME SA,Consommation de base,0.03,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+MAP,MAPFRE SA,Finance,0.03,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+SIGN,SIG GROUP N AG,Matériaux,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+INPST,INPOST SA,Industrie,0.03,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+TE,TECHNIP ENERGIES,Énergie,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ZEG,ZEGONA COMMUNICATIONS PLC,Télécoms et médias,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ATS,AT & S AUSTRIA TECHNOLOGIE & SYSTE,Technologie,0.03,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+SECT B,SECTRA CLASS B,Santé,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+ELIS,ELIS SA,Industrie,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+CCC,COMPUTACENTER PLC,Technologie,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+GL9,GLANBIA PLC,Consommation de base,0.03,Irland,Irish Stock Exchange - All Market,EUR,16.Sept.2026
+BKG,BERKELEY GROUP HOLDINGS (THE),Consommation discrétionnaire,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+EDPR,EDP RENEWABLES SA,Services aux collectivités,0.03,Portugal,Nyse Euronext - Euronext Lisbon,EUR,16.Sept.2026
+DNP,DINO POLSKA,Consommation de base,0.03,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+AYV,AYVENS SA,Industrie,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+AIXA,AIXTRON,Technologie,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+A2A,A2A,Services aux collectivités,0.03,Italien,Borsa Italiana,EUR,16.Sept.2026
+AALB,AALBERTS,Industrie,0.03,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+LEG,LEG IMMOBILIEN N,Immobilier,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+SALM,SALMAR,Consommation de base,0.03,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+ENG,ENAGAS SA,Services aux collectivités,0.03,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+RAND,RANDSTAD HOLDING,Industrie,0.03,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+NEM,NEMETSCHEK,Technologie,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+FLS,FLSMIDTH AND CO CLASS B,Industrie,0.03,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+TEMN,TEMENOS AG,Technologie,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+INCH,INCHCAPE PLC,Consommation discrétionnaire,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BGN,BANCA GENERALI,Finance,0.03,Italien,Borsa Italiana,EUR,16.Sept.2026
+DEMANT,DEMANT,Santé,0.03,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+MNDI,MONDI PLC,Matériaux,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BBOX,TRITAX BIG BOX REIT PLC,Immobilier,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+RS1,RS GROUP PLC,Industrie,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+VEND,VEND MARKETPLACES ASA,Télécoms et médias,0.03,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+TEP,TELEPERFORMANCE,Industrie,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+GFC,GECINA SA,Immobilier,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+TUB,FINANCIERE DE TUBIZE SA,Santé,0.03,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+VK,VALLOUREC SA,Énergie,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+LAGR B,LAGERCRANTZ GROUP CLASS B,Technologie,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+CDR,CD PROJEKT RED,Télécoms et médias,0.03,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+AKER,AKER,Industrie,0.03,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+KBCA,KBC ANCORA NV,Finance,0.03,Belgien,Nyse Euronext - Euronext Brussels,EUR,16.Sept.2026
+DRX,DRAX GROUP PLC,Services aux collectivités,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+MANTA,MANDATUM,Finance,0.03,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+CPR,DAVIDE CAMPARI MILANO NV,Consommation de base,0.03,Italien,Borsa Italiana,EUR,16.Sept.2026
+ENT,ENTAIN PLC,Consommation discrétionnaire,0.03,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BIM,BIOMERIEUX SA,Santé,0.03,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+ALLN,ALLREAL HOLDING AG,Immobilier,0.03,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+OCTV SDB,OCTAVE INTELLIGENCE SDR PLC,Technologie,0.03,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+R3NK,RENK GROUP AG,Industrie,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+CVC,CVC CAPITAL PARTNERS PLC,Finance,0.03,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+ING,ING BANK SLASKI SA,Finance,0.03,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+EVD,CTS EVENTIM AG,Télécoms et médias,0.03,Deutschland,Xetra,EUR,16.Sept.2026
+SRP,SERCO GROUP PLC,Industrie,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BFT,BENEFIT SYSTEMS,Industrie,0.02,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+ALK B,ALK-ABELLO CLASS B,Santé,0.02,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+LOOMIS,LOOMIS CLASS B,Industrie,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+JMAT,JOHNSON MATTHEY PLC,Matériaux,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+TW.,TAYLOR WIMPEY PLC,Consommation discrétionnaire,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BZU,BUZZI,Matériaux,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+AAK,AAK,Consommation de base,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SAGA B,SAGAX CLASS B,Immobilier,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+ARCAD,ARCADIS NV,Industrie,0.02,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+FNTN,FREENET AG,Télécoms et médias,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+MIL,BANK MILLENNIUM SA,Finance,0.02,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+RUI,RUBIS,Services aux collectivités,0.02,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+FR,VALEO,Consommation discrétionnaire,0.02,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+KGX,KION GROUP AG,Industrie,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+RAA,RATIONAL AG,Industrie,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+HER,HERA,Services aux collectivités,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+QQ.,QINETIQ GROUP PLC,Industrie,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+ITV,ITV PLC,Télécoms et médias,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+PIRC,PIRELLI & C,Consommation discrétionnaire,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+HUH1V,HUHTAMAKI,Matériaux,0.02,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+TCAP,TP ICAP GROUP PLC,Finance,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+IP,INTERPUMP GROUP,Industrie,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+ACP,ASSECO POLAND SA,Technologie,0.02,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+CWK,CRANSWICK PLC,Consommation de base,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BALD B,FASTIGHETS BALDER CLASS B,Immobilier,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SFZN,SIEGFRIED HOLDING AG,Santé,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+HUBN,HUBER & SUHNER AG,Industrie,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+BC8,BECHTLE AG,Technologie,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+PLUS,PLUS500,Finance,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+GRF,GRIFOLS CLASS A,Santé,0.02,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+ACX,ACERINOX,Matériaux,0.02,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+BAMNB,BAM GROEP KONINKLIJKE NV,Industrie,0.02,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+ADP,AEROPORTS DE PARIS SA,Industrie,0.02,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+AAF,AIRTEL AFRICA PLC,Télécoms et médias,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+TUI1,TUI N AG,Consommation discrétionnaire,0.02,Vereinigtes Königreich,Xetra,EUR,16.Sept.2026
+SUNN,SUNRISE N CLASS A LTD,Télécoms et médias,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SBNOR,SPAREBANKEN NORGE,Finance,0.02,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+VSURE,VERISURE PLC,Industrie,0.02,Schweden,Nasdaq Omx Nordic,EUR,16.Sept.2026
+BC,BRUNELLO CUCINELLI,Consommation discrétionnaire,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+MTO,MITIE GROUP PLC,Industrie,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+HIK,HIKMA PHARMACEUTICALS PLC,Santé,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+NEXI,NEXI,Finance,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+TBCG,TBC BANK GROUP PLC,Finance,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+TGS,TGS NOPEC GEOPHYSICAL,Énergie,0.02,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+REY,REPLY,Technologie,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+NOD,NORDIC SEMICONDUCTOR,Technologie,0.02,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+UTG,UNITE GROUP PLC,Immobilier,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BWY,BELLWAY PLC,Consommation discrétionnaire,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+PNN,PENNON GROUP PLC,Services aux collectivités,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BKW,BKW N AG,Services aux collectivités,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SDF,K+S N AG,Matériaux,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+IFCN,INFICON HOLDING AG,Technologie,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+BOL,BOLLORE,Énergie,0.02,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+AG1,AUTO1 GROUP,Consommation discrétionnaire,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+IVG,IVECO GROUP NV,Industrie,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+VZN,VZ HOLDING AG,Finance,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+VPK,KONINKLIJKE VOPAK,Énergie,0.02,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+ALLFG,ALLFUNDS GROUP PLC,Finance,0.02,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+SUN,SULZER AG,Industrie,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+DLG,DELONGHI,Consommation discrétionnaire,0.02,Italien,Borsa Italiana,EUR,16.Sept.2026
+FDJU,FDJ UNITED,Consommation discrétionnaire,0.02,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+MOBN,MOBIMO HOLDING AG,Immobilier,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+FPE3,FUCHS PREF,Matériaux,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+LATO B,LATOUR INVESTMENT CLASS B,Industrie,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+RBREW,ROYAL UNIBREW,Consommation de base,0.02,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+VATN,VALIANT HOLDING AG,Finance,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+COV,COVIVIO SA,Immobilier,0.02,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+CMBN,CEMBRA MONEY BANK AG,Finance,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+FTK,FLATEXDEGIRO N,Finance,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+SCYR,SACYR,Industrie,0.02,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+COTN,COMET HOLDING AG,Technologie,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+SWEC B,SWECO CLASS B,Industrie,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+KMAR,KONGSBERG MARITIME,Industrie,0.02,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+HOLM B,HOLMEN CLASS B,Matériaux,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+VIS,VISCOFAN SA,Consommation de base,0.02,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+SHC,SHAFTESBURY CAPITAL PLC,Immobilier,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+CSG,CSG CLASS A NV,Industrie,0.02,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+SFSN,SFS GROUP AG,Industrie,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+GBF,BILFINGER,Industrie,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+PHP,PRIMARY HEALTH PROPERTIES REIT PLC,Immobilier,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+QLT,QUILTER PLC,Finance,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+TEG,TAG IMMOBILIEN AG,Immobilier,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+HIAB,HIAB CORPORATION CLASS B,Industrie,0.02,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+TOM,TOMRA SYSTEMS,Industrie,0.02,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+PUM,PUMA,Consommation discrétionnaire,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+ROCK B,ROCKWOOL CLASS B,Industrie,0.02,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+SOP,SOPRA STERIA GROUP,Technologie,0.02,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026
+WIE,WIENERBERGER AG,Matériaux,0.02,Österreich,Wiener Boerse Ag,EUR,16.Sept.2026
+ZEAL,ZEALAND PHARMA,Santé,0.02,Dänemark,Omx Nordic Exchange Copenhagen A/S,DKK,16.Sept.2026
+TPE,TAURON POLSKA ENERGIA,Services aux collectivités,0.02,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+PUIG,PUIG BRANDS SA CLASS B,Consommation de base,0.02,Spanien,Bolsa De Madrid,EUR,16.Sept.2026
+DKSH,DKSH HOLDING AG,Industrie,0.02,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+PAF,PAN AFRICAN RESOURCES PLC,Matériaux,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+BPT,BRIDGEPOINT GROUP PLC,Finance,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+JD.,JD SPORTS FASHION PLC,Consommation discrétionnaire,0.02,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+AXFO,AXFOOD,Consommation de base,0.02,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+FRA,FRAPORT AG,Industrie,0.02,Deutschland,Xetra,EUR,16.Sept.2026
+KTY,GRUPA KETY,Matériaux,0.02,Polen,Warsaw Stock Exchange/Equities/Main Market,PLN,16.Sept.2026
+HOC,HOCHSCHILD MINING PLC,Matériaux,0.01,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+DLN,DERWENT LONDON REIT PLC,Immobilier,0.01,Vereinigtes Königreich,London Stock Exchange,GBP,16.Sept.2026
+KEMIRA,KEMIRA,Matériaux,0.01,Finnland,Nasdaq Omx Helsinki Ltd.,EUR,16.Sept.2026
+LIGHT,SIGNIFY,Industrie,0.01,Niederlande,Euronext Amsterdam,EUR,16.Sept.2026
+THULE,THULE GROUP,Consommation discrétionnaire,0.01,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+AMV0,AUMOVIO N,Consommation discrétionnaire,0.01,Deutschland,Xetra,EUR,16.Sept.2026
+BUCN,BUCHER INDUSTRIES AG,Industrie,0.01,Schweiz,SIX Swiss Exchange,CHF,16.Sept.2026
+BAKKA,BAKKAFROST,Consommation de base,0.01,Norwegen,Oslo Bors Asa,NOK,16.Sept.2026
+WIHL,WIHLBORGS FASTIGHETER,Immobilier,0.01,Schweden,Nasdaq Omx Nordic,SEK,16.Sept.2026
+SESG,SES SA FDR,Télécoms et médias,0.01,Frankreich,Nyse Euronext - Euronext Paris,EUR,16.Sept.2026

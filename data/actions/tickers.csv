@@ -1,0 +1,601 @@
+ticker_ishares,place,ticker,nom_yahoo,statut
+ASML,Euronext Amsterdam,ASML.AS,ASML Holding N.V.,vérifié
+HSBA,London Stock Exchange,HSBA.L,HSBC Holdings plc,vérifié
+ROP,SIX Swiss Exchange,ROP.SW,Roche Holding AG,vérifié
+SHELL,Euronext Amsterdam,SHELL.AS,Shell plc,vérifié
+NOVN,SIX Swiss Exchange,NOVN.SW,Novartis AG,vérifié
+AZN,London Stock Exchange,AZN.L,AstraZeneca PLC,vérifié
+NESN,SIX Swiss Exchange,NESN.SW,Nestlé S.A.,vérifié
+SIE,Xetra,SIE.DE,Siemens Aktiengesellschaft,vérifié
+SAP,Xetra,SAP.DE,SAP SE,vérifié
+SAN,Bolsa De Madrid,SAN.MC,"Banco Santander, S.A.",vérifié
+TTE,Nyse Euronext - Euronext Paris,TTE.PA,TotalEnergies SE,vérifié
+ALV,Xetra,ALV.DE,Allianz SE,vérifié
+SU,Nyse Euronext - Euronext Paris,SU.PA,Schneider Electric S.E.,vérifié
+RR.,London Stock Exchange,RR.L,Rolls-Royce Holdings plc,vérifié
+BBVA,Bolsa De Madrid,BBVA.MC,"Banco Bilbao Vizcaya Argentaria, S.A.",vérifié
+UBSG,SIX Swiss Exchange,UBSG.SW,UBS Group AG,vérifié
+ABBN,SIX Swiss Exchange,ABBN.SW,ABB Ltd,vérifié
+IBE,Bolsa De Madrid,IBE.MC,"Iberdrola, S.A.",vérifié
+UCG,Borsa Italiana,UCG.MI,UniCredit S.p.A.,vérifié
+SAF,Nyse Euronext - Euronext Paris,SAF.PA,Safran SA,vérifié
+ULVR,London Stock Exchange,ULVR.L,Unilever PLC,vérifié
+NOVO B,Omx Nordic Exchange Copenhagen A/S,NOVO-B.CO,Novo Nordisk A/S,vérifié
+AIR,Nyse Euronext - Euronext Paris,AIR.PA,Airbus SE,vérifié
+ENR,Xetra,ENR.DE,Siemens Energy AG,vérifié
+BP.,London Stock Exchange,BP.L,BP p.l.c.,vérifié
+BATS,London Stock Exchange,BATS.L,British American Tobacco p.l.c.,vérifié
+BNP,Nyse Euronext - Euronext Paris,BNP.PA,BNP Paribas SA,vérifié
+AI,Nyse Euronext - Euronext Paris,AI.PA,L'Air Liquide S.A.,vérifié
+ISP,Borsa Italiana,ISP.MI,Intesa Sanpaolo S.p.A.,vérifié
+MC,Nyse Euronext - Euronext Paris,MC.PA,"LVMH Moët Hennessy - Louis Vuitton, Société Européenne",vérifié
+DTE,Xetra,DTE.DE,Deutsche Telekom AG,vérifié
+ZURN,SIX Swiss Exchange,ZURN.SW,Zurich Insurance Group AG,vérifié
+CFR,SIX Swiss Exchange,CFR.SW,Compagnie Financière Richemont SA,vérifié
+INGA,Euronext Amsterdam,INGA.AS,ING Groep N.V.,vérifié
+OR,Nyse Euronext - Euronext Paris,OR.PA,L'Oréal S.A.,vérifié
+RIO,London Stock Exchange,RIO.L,Rio Tinto Group,vérifié
+GSK,London Stock Exchange,GSK.L,GSK plc,vérifié
+SAN,Nyse Euronext - Euronext Paris,SAN.PA,Sanofi,vérifié
+CS,Nyse Euronext - Euronext Paris,CS.PA,AXA SA,vérifié
+BARC,London Stock Exchange,BARC.L,Barclays PLC,vérifié
+LLOY,London Stock Exchange,LLOY.L,Lloyds Banking Group plc,vérifié
+BA.,London Stock Exchange,BA.L,BAE Systems plc,vérifié
+IFX,Xetra,IFX.DE,Infineon Technologies AG,vérifié
+ABI,Nyse Euronext - Euronext Brussels,ABI.BR,Anheuser-Busch InBev SA/NV,vérifié
+ENEL,Borsa Italiana,ENEL.MI,Enel SpA,vérifié
+NG.,London Stock Exchange,NG.L,National Grid plc,vérifié
+NWG,London Stock Exchange,NWG.L,NatWest Group plc,vérifié
+MUV2,Xetra,MUV2.DE,Münchener Rückversicherungs-Gesellschaft Aktiengesellschaft in München,vérifié
+DG,Nyse Euronext - Euronext Paris,DG.PA,Vinci SA,vérifié
+INVE B,Nasdaq Omx Nordic,INVE-B.ST,Investor AB (publ),vérifié
+DBK,Xetra,DBK.DE,Deutsche Bank Aktiengesellschaft,vérifié
+GLEN,London Stock Exchange,GLEN.L,Glencore plc,vérifié
+NDA FI,Nasdaq Omx Helsinki Ltd.,NDA-FI.HE,Nordea Bank Abp,vérifié
+ITX,Bolsa De Madrid,ITX.MC,"Industria de Diseño Textil, S.A.",vérifié
+GLE,Nyse Euronext - Euronext Paris,GLE.PA,Société Générale Société anonyme,vérifié
+REL,London Stock Exchange,REL.L,RELX PLC,vérifié
+DHL,Xetra,DHL.DE,DHL AG,vérifié
+ARGX,Nyse Euronext - Euronext Brussels,ARGX.BR,argenx SE,vérifié
+DB1,Xetra,DB1.DE,Deutsche Börse AG,vérifié
+AAL,London Stock Exchange,AAL.L,Anglo American plc,vérifié
+G,Borsa Italiana,G.MI,Assicurazioni Generali S.p.A.,vérifié
+ENI,Borsa Italiana,ENI.MI,Eni S.p.A.,vérifié
+RMS,Nyse Euronext - Euronext Paris,RMS.PA,Hermès International Société en commandite par actions,vérifié
+STAN,London Stock Exchange,STAN.L,Standard Chartered PLC,vérifié
+NOKIA,Nasdaq Omx Helsinki Ltd.,NOKIA.HE,Nokia Oyj,vérifié
+BAYN,Xetra,BAYN.DE,Bayer Aktiengesellschaft,vérifié
+CPG,London Stock Exchange,CPG.L,Compass Group PLC,vérifié
+RHM,Xetra,RHM.DE,Rheinmetall AG,vérifié
+VOLV B,Nasdaq Omx Nordic,VOLV-B.ST,AB Volvo (publ),vérifié
+ENGI,Nyse Euronext - Euronext Paris,ENGI.PA,Engie SA,vérifié
+BAS,Xetra,BAS.DE,BASF SE,vérifié
+CABK,Bolsa De Madrid,CABK.MC,"CaixaBank, S.A.",vérifié
+LSEG,London Stock Exchange,LSEG.L,London Stock Exchange Group plc,vérifié
+EL,Nyse Euronext - Euronext Paris,EL.PA,EssilorLuxottica Société anonyme,vérifié
+PRX,Euronext Amsterdam,PRX.AS,Prosus N.V.,vérifié
+ATCO A,Nasdaq Omx Nordic,ATCO-A.ST,Atlas Copco AB (publ),vérifié
+SREN,SIX Swiss Exchange,SREN.SW,Swiss Re AG,vérifié
+RACE,Borsa Italiana,RACE.MI,Ferrari N.V.,vérifié
+DGE,London Stock Exchange,DGE.L,Diageo plc,vérifié
+LONN,SIX Swiss Exchange,LONN.SW,Lonza Group AG,vérifié
+EOAN,Xetra,EOAN.DE,E.ON SE,vérifié
+BN,Nyse Euronext - Euronext Paris,BN.PA,Danone S.A.,vérifié
+HOLN,SIX Swiss Exchange,HOLN.SW,Holcim AG,vérifié
+RWE,Xetra,RWE.DE,RWE Aktiengesellschaft,vérifié
+RKT,London Stock Exchange,RKT.L,Reckitt Benckiser Group plc,vérifié
+ASM,Euronext Amsterdam,ASM.AS,ASM International NV,vérifié
+PRY,Borsa Italiana,PRY.MI,Prysmian S.p.A.,vérifié
+LR,Nyse Euronext - Euronext Paris,LR.PA,Legrand SA,vérifié
+TSCO,London Stock Exchange,TSCO.L,Tesco PLC,vérifié
+EBS,Wiener Boerse Ag,EBS.VI,Erste Group Bank AG,vérifié
+HLN,London Stock Exchange,HLN.L,Haleon plc,vérifié
+SAND,Nasdaq Omx Nordic,SAND.ST,Sandvik AB (publ),vérifié
+SGO,Nyse Euronext - Euronext Paris,SGO.PA,Compagnie de Saint-Gobain S.A.,vérifié
+SSE,London Stock Exchange,SSE.L,SSE plc,vérifié
+EQNR,Oslo Bors Asa,EQNR.OL,Equinor ASA,vérifié
+DSV,Omx Nordic Exchange Copenhagen A/S,DSV.CO,DSV A/S,vérifié
+REP,Bolsa De Madrid,REP.MC,"Repsol, S.A.",vérifié
+MBG,Xetra,MBG.DE,Mercedes-Benz Group AG,vérifié
+SWED A,Nasdaq Omx Nordic,SWED-A.ST,Swedbank AB (publ),vérifié
+DANSKE,Omx Nordic Exchange Copenhagen A/S,DANSKE.CO,Danske Bank A/S,vérifié
+SEB A,Nasdaq Omx Nordic,SEB-A.ST,Skandinaviska Enskilda Banken AB (publ),vérifié
+SIKA,SIX Swiss Exchange,SIKA.SW,Sika AG,vérifié
+ORA,Nyse Euronext - Euronext Paris,ORA.PA,Orange S.A.,vérifié
+SDZ,SIX Swiss Exchange,SDZ.SW,Sandoz Group AG,vérifié
+GALD,SIX Swiss Exchange,GALD.SW,Galderma Group AG,vérifié
+ASSA B,Nasdaq Omx Nordic,ASSA-B.ST,ASSA ABLOY AB (publ),vérifié
+III,London Stock Exchange,III.L,3i Group Ord,vérifié
+ALC,SIX Swiss Exchange,ALC.SW,Alcon Inc.,vérifié
+VOD,London Stock Exchange,VOD.L,Vodafone Group Public Limited Company,vérifié
+EXPN,London Stock Exchange,EXPN.L,Experian plc,vérifié
+PRU,London Stock Exchange,PRU.L,Prudential plc,vérifié
+KBC,Nyse Euronext - Euronext Brussels,KBC.BR,KBC Group NV,vérifié
+ADYEN,Euronext Amsterdam,ADYEN.AS,Adyen N.V.,vérifié
+AD,Euronext Amsterdam,AD.AS,Koninklijke Ahold Delhaize N.V.,vérifié
+MT,Euronext Amsterdam,MT.AS,ArcelorMittal S.A.,vérifié
+STMMI,Borsa Italiana,STMMI.MI,STMicroelectronics N.V.,vérifié
+VWS,Omx Nordic Exchange Copenhagen A/S,VWS.CO,Vestas Wind Systems A/S,vérifié
+SLHN,SIX Swiss Exchange,SLHN.SW,Swiss Life Holding AG,vérifié
+ABN,Euronext Amsterdam,ABN.AS,ABN AMRO Bank N.V.,vérifié
+GIVN,SIX Swiss Exchange,GIVN.SW,Givaudan SA,vérifié
+BMPS,Borsa Italiana,BMPS.MI,Banca Monte dei Paschi di Siena S.p.A.,vérifié
+ADS,Xetra,ADS.DE,adidas AG,vérifié
+UCB,Nyse Euronext - Euronext Brussels,UCB.BR,UCB SA,vérifié
+ERIC B,Nasdaq Omx Nordic,ERIC-B.ST,Telefonaktiebolaget LM Ericsson (publ),vérifié
+AV.,London Stock Exchange,AV.L,Aviva plc,vérifié
+DNB,Oslo Bors Asa,DNB.OL,DNB Bank ASA,vérifié
+AMS,Bolsa De Madrid,AMS.MC,"Amadeus IT Group, S.A.",vérifié
+A5G,Irish Stock Exchange - All Market,A5G.IR,AIB Group plc,vérifié
+PKO,Warsaw Stock Exchange/Equities/Main Market,PKO.WA,Powszechna Kasa Oszczednosci Bank Polski Spólka Akcyjna,vérifié
+FER,Bolsa De Madrid,FER.MC,Ferrovial N.V.,vérifié
+SAMPO,Nasdaq Omx Helsinki Ltd.,SAMPO.HE,Sampo Oyj,vérifié
+HO,Nyse Euronext - Euronext Paris,HO.PA,Thales S.A.,vérifié
+PUB,Nyse Euronext - Euronext Paris,PUB.PA,Publicis Groupe S.A.,vérifié
+DTG,Xetra,DTG.DE,Daimler Truck Holding AG,vérifié
+ML,Nyse Euronext - Euronext Paris,ML.PA,Compagnie Générale des Établissements Michelin Société en commandite par actions,vérifié
+EQT,Nasdaq Omx Nordic,EQT.ST,EQT AB (publ),vérifié
+IMB,London Stock Exchange,IMB.L,Imperial Brands PLC,vérifié
+BPE,Borsa Italiana,BPE.MI,BPER Banca SpA,vérifié
+VIE,Nyse Euronext - Euronext Paris,VIE.PA,Veolia Environnement SA,vérifié
+SHB A,Nasdaq Omx Nordic,SHB-A.ST,Svenska Handelsbanken AB (publ),vérifié
+PKN,Warsaw Stock Exchange/Equities/Main Market,PKN.WA,Orlen S.A.,vérifié
+NN,Euronext Amsterdam,NN.AS,NN Group N.V.,vérifié
+BMW,Xetra,BMW.DE,Bayerische Motoren Werke Aktiengesellschaft,vérifié
+ACA,Nyse Euronext - Euronext Paris,ACA.PA,Crédit Agricole S.A.,vérifié
+HEIA,Euronext Amsterdam,HEIA.AS,Heineken N.V.,vérifié
+NSIS B,Omx Nordic Exchange Copenhagen A/S,NSIS-B.CO,Novozymes A/S,vérifié
+GEBN,SIX Swiss Exchange,GEBN.SW,Geberit AG,vérifié
+IHG,London Stock Exchange,IHG.L,InterContinental Hotels Group PLC,vérifié
+KNEBV,Nasdaq Omx Helsinki Ltd.,KNEBV.HE,KONE Oyj,vérifié
+LDO,Borsa Italiana,LDO.MI,Leonardo S.p.a.,vérifié
+LGEN,London Stock Exchange,LGEN.L,Legal & General Group Plc,vérifié
+NXT,London Stock Exchange,NXT.L,NEXT plc,vérifié
+ACS,Bolsa De Madrid,ACS.MC,"ACS, Actividades de Construcción y Servicios, S.A.",vérifié
+CBK,Xetra,CBK.DE,Commerzbank AG,vérifié
+FRE,Xetra,FRE.DE,Fresenius SE & Co. KGaA,vérifié
+GMAB,Omx Nordic Exchange Copenhagen A/S,GMAB.CO,Genmab A/S,vérifié
+MTX,Xetra,MTX.DE,MTU Aero Engines AG,vérifié
+HEI,Xetra,HEI.DE,Heidelberg Materials AG,vérifié
+BIRG,Irish Stock Exchange - All Market,BIRG.IR,Bank of Ireland Group plc,vérifié
+SCMN,SIX Swiss Exchange,SCMN.SW,Swisscom AG,vérifié
+SAB,Bolsa De Madrid,SAB.MC,"Banco de Sabadell, S.A.",vérifié
+RYA,Irish Stock Exchange - All Market,RYA.IR,Ryanair Holdings plc,vérifié
+AENA,Bolsa De Madrid,AENA.MC,"Aena S.M.E., S.A.",vérifié
+CAP,Nyse Euronext - Euronext Paris,CAP.PA,Capgemini SE,vérifié
+BAMI,Borsa Italiana,BAMI.MI,Banco BPM S.p.A.,vérifié
+HEXA B,Nasdaq Omx Nordic,HEXA-B.ST,Hexagon AB (publ),vérifié
+HBAN,SIX Swiss Exchange,HBAN.SW,Helvetia Baloise Holding AG,vérifié
+SAAB B,Nasdaq Omx Nordic,SAAB-B.ST,Saab AB (publ),vérifié
+PHIA,Euronext Amsterdam,PHIA.AS,Koninklijke Philips N.V.,vérifié
+MRK,Xetra,MRK.DE,Merck KGaA,vérifié
+SGSN,SIX Swiss Exchange,SGSN.SW,SGS SA,vérifié
+VACN,SIX Swiss Exchange,VACN.SW,VAT Group AG,vérifié
+KER,Nyse Euronext - Euronext Paris,KER.PA,Kering SA,vérifié
+UMG,Euronext Amsterdam,UMG.AS,Universal Music Group N.V.,vérifié
+ANTO,London Stock Exchange,ANTO.L,Antofagasta plc,vérifié
+VOW3,Xetra,VOW3.DE,Volkswagen AG,vérifié
+KPN,Euronext Amsterdam,KPN.AS,Koninklijke KPN N.V.,vérifié
+WKL,Euronext Amsterdam,WKL.AS,Wolters Kluwer N.V.,vérifié
+BAER,SIX Swiss Exchange,BAER.SW,Julius Bär Gruppe AG,vérifié
+DSFIR,Euronext Amsterdam,DSFIR.AS,DSM-Firmenich AG,vérifié
+DSY,Nyse Euronext - Euronext Paris,DSY.PA,Dassault Systèmes SE,vérifié
+BT.A,London Stock Exchange,BT-A.L,BT Group plc,vérifié
+HLMA,London Stock Exchange,HLMA.L,Halma plc,vérifié
+HNR1,Xetra,HNR1.DE,Hannover Rück SE,vérifié
+PGHN,SIX Swiss Exchange,PGHN.SW,Partners Group Holding AG,vérifié
+KRX,Irish Stock Exchange - All Market,KRX.IR,Kingspan Group plc,vérifié
+EPI A,Nasdaq Omx Nordic,EPI-A.ST,Epiroc AB (publ),vérifié
+SHL,Xetra,SHL.DE,Siemens Healthineers AG,vérifié
+NESTE,Nasdaq Omx Helsinki Ltd.,NESTE.HE,Neste Oyj,vérifié
+EDP,Nyse Euronext - Euronext Lisbon,EDP.LS,"EDP, S.A.",vérifié
+FBK,Borsa Italiana,FBK.MI,FinecoBank Banca Fineco S.p.A.,vérifié
+ALFA,Nasdaq Omx Nordic,ALFA.ST,Alfa Laval AB (publ),vérifié
+TEF,Bolsa De Madrid,TEF.MC,"Telefónica, S.A.",vérifié
+ELE,Bolsa De Madrid,ELE.MC,"Endesa, S.A.",vérifié
+SGRO,London Stock Exchange,SGRO.L,SEGRO Plc,vérifié
+BG,Wiener Boerse Ag,BG.VI,BAWAG Group AG,vérifié
+UPM,Nasdaq Omx Helsinki Ltd.,UPM.HE,UPM-Kymmene Oyj,vérifié
+INF,London Stock Exchange,INF.L,Informa plc,vérifié
+WRT1V,Nasdaq Omx Helsinki Ltd.,WRT1V.HE,Wärtsilä Oyj Abp,vérifié
+VNA,Xetra,VNA.DE,Vonovia SE,vérifié
+KRZ,Irish Stock Exchange - All Market,KRZ.IR,Kerry Group plc,vérifié
+BESI,Euronext Amsterdam,BESI.AS,BE Semiconductor Industries N.V.,vérifié
+TRN,Borsa Italiana,TRN.MI,Terna S.p.A.,vérifié
+ESSITY B,Nasdaq Omx Nordic,ESSITY-B.ST,Essity AB (publ),vérifié
+BOL,Nasdaq Omx Nordic,BOL.ST,Boliden AB (publ),vérifié
+TIT,Borsa Italiana,TIT.MI,Telecom Italia S.p.A.,vérifié
+KOG,Oslo Bors Asa,KOG.OL,Kongsberg Gruppen ASA,vérifié
+SOON,SIX Swiss Exchange,SOON.SW,Sonova Holding AG,vérifié
+LOGN,SIX Swiss Exchange,LOGN.SW,Logitech International S.A.,vérifié
+CLNX,Bolsa De Madrid,CLNX.MC,"Cellnex Telecom, S.A.",vérifié
+KNIN,SIX Swiss Exchange,KNIN.SW,Kuehne + Nagel International AG,vérifié
+ENX,Nyse Euronext - Euronext Paris,ENX.PA,Euronext N.V.,vérifié
+STMN,SIX Swiss Exchange,STMN.SW,Straumann Holding AG,vérifié
+SY1,Xetra,SY1.DE,Symrise AG,vérifié
+EN,Nyse Euronext - Euronext Paris,EN.PA,Bouygues SA,vérifié
+PST,Borsa Italiana,PST.MI,Poste Italiane S.p.A.,vérifié
+AGS,Nyse Euronext - Euronext Brussels,AGS.BR,ageas SA/NV,vérifié
+IAG,London Stock Exchange,IAG.L,International Consolidated Airlines Group S.A.,vérifié
+UU.,London Stock Exchange,UU.L,United Utilities Group PLC,vérifié
+RI,Nyse Euronext - Euronext Paris,RI.PA,Pernod Ricard SA,vérifié
+METSO,Nasdaq Omx Helsinki Ltd.,METSO.HE,Metso Oyj,vérifié
+ADM,London Stock Exchange,ADM.L,Admiral Group plc,vérifié
+HEN3,Xetra,HEN3.DE,Henkel AG & Co. KGaA,vérifié
+CCH,London Stock Exchange,CCH.L,Coca-Cola HBC AG,vérifié
+SCHP,SIX Swiss Exchange,SCHP.SW,Schindler Holding AG,vérifié
+PEO,Warsaw Stock Exchange/Equities/Main Market,PEO.WA,Bank Polska Kasa Opieki S.A.,vérifié
+UNI,Borsa Italiana,UNI.MI,Unipol Assicurazioni S.p.A.,vérifié
+SRG,Borsa Italiana,SRG.MI,Snam S.p.A.,vérifié
+DPLM,London Stock Exchange,DPLM.L,Diploma PLC,vérifié
+SGE,London Stock Exchange,SGE.L,The Sage Group plc,vérifié
+ITRK,London Stock Exchange,ITRK.L,Intertek Group plc,vérifié
+KGH,Warsaw Stock Exchange/Equities/Main Market,KGH.WA,KGHM Polska Miedz S.A.,vérifié
+BCP,Nyse Euronext - Euronext Lisbon,BCP.LS,"Banco Comercial Português, S.A.",vérifié
+ASRNL,Euronext Amsterdam,ASRNL.AS,ASR Nederland N.V.,vérifié
+CA,Nyse Euronext - Euronext Paris,CA.PA,Carrefour SA,vérifié
+AKRBP,Oslo Bors Asa,AKRBP.OL,Aker BP ASA,vérifié
+SPSN,SIX Swiss Exchange,SPSN.SW,Swiss Prime Site AG,vérifié
+FORTUM,Nasdaq Omx Helsinki Ltd.,FORTUM.HE,Fortum Oyj,vérifié
+NTGY,Bolsa De Madrid,NTGY.MC,"Naturgy Energy Group, S.A.",vérifié
+CARL B,Omx Nordic Exchange Copenhagen A/S,CARL-B.CO,Carlsberg A/S,vérifié
+OMV,Wiener Boerse Ag,OMV.VI,OMV Aktiengesellschaft,vérifié
+BKT,Bolsa De Madrid,BKT.MC,"Bankinter, S.A.",vérifié
+SN.,London Stock Exchange,SN.L,Smith & Nephew plc,vérifié
+EVO,Nasdaq Omx Nordic,EVO.ST,Evolution AB (publ),vérifié
+NHY,Oslo Bors Asa,NHY.OL,Norsk Hydro ASA,vérifié
+FGR,Nyse Euronext - Euronext Paris,FGR.PA,Eiffage SA,vérifié
+URW,Nyse Euronext - Euronext Paris,URW.PA,Unibail-Rodamco-Westfield SE,vérifié
+MAERSK B,Omx Nordic Exchange Copenhagen A/S,MAERSK-B.CO,A.P. Møller - Mærsk A/S,vérifié
+BVI,Nyse Euronext - Euronext Paris,BVI.PA,Bureau Veritas SA,vérifié
+ALE,Warsaw Stock Exchange/Equities/Main Market,ALE.WA,Allegro.eu S.A.,vérifié
+TELIA,Nasdaq Omx Nordic,TELIA.ST,Telia Company AB (publ),vérifié
+AGN,Euronext Amsterdam,AGN.AS,Aegon Ltd.,vérifié
+SMIN,London Stock Exchange,SMIN.L,Smiths Group plc,vérifié
+BNZL,London Stock Exchange,BNZL.L,Bunzl plc,vérifié
+AKZA,Euronext Amsterdam,AKZA.AS,Akzo Nobel N.V.,vérifié
+MONC,Borsa Italiana,MONC.MI,Moncler S.p.A.,vérifié
+G1A,Xetra,G1A.DE,GEA Group Aktiengesellschaft,vérifié
+RTO,London Stock Exchange,RTO.L,Rentokil Initial plc,vérifié
+SOBI,Nasdaq Omx Nordic,SOBI.ST,Swedish Orphan Biovitrum AB (publ),vérifié
+PZU,Warsaw Stock Exchange/Equities/Main Market,PZU.WA,Powszechny Zaklad Ubezpieczen SA,vérifié
+AC,Nyse Euronext - Euronext Paris,AC.PA,Accor SA,vérifié
+IMI,London Stock Exchange,IMI.L,IMI plc,vérifié
+BEZ,London Stock Exchange,BEZ.L,Beazley plc,vérifié
+ORNBV,Nasdaq Omx Helsinki Ltd.,ORNBV.HE,Orion Oyj,vérifié
+SDLF,London Stock Exchange,SDLF.L,Standard Life plc,vérifié
+LISP,SIX Swiss Exchange,LISP.SW,Chocoladefabriken Lindt & Sprüngli AG,vérifié
+SVT,London Stock Exchange,SVT.L,Severn Trent PLC,vérifié
+STLAM,Borsa Italiana,STLAM.MI,Stellantis N.V.,vérifié
+MNG,London Stock Exchange,MNG.L,M&G plc,vérifié
+PSON,London Stock Exchange,PSON.L,Pearson plc,vérifié
+RBI,Wiener Boerse Ag,RBI.VI,Raiffeisen Bank International AG,vérifié
+GALP,Nyse Euronext - Euronext Lisbon,GALP.LS,"Galp Energia, SGPS, S.A.",vérifié
+MKS,London Stock Exchange,MKS.L,Marks and Spencer Group plc,vérifié
+ERF,Nyse Euronext - Euronext Paris,ERF.PA,Eurofins Scientific SE,vérifié
+ORSTED,Omx Nordic Exchange Copenhagen A/S,ORSTED.CO,Ørsted A/S,vérifié
+COLO B,Omx Nordic Exchange Copenhagen A/S,COLO-B.CO,Coloplast A/S,vérifié
+CNA,London Stock Exchange,CNA.L,Centrica plc,vérifié
+INDU C,Nasdaq Omx Nordic,INDU-C.ST,AB Industrivärden (publ),vérifié
+TEL2 B,Nasdaq Omx Nordic,TEL2-B.ST,Tele2 AB (publ),vérifié
+MICC,Euronext Amsterdam,MICC.AS,The Magnum Ice Cream Company N.V.,vérifié
+WEIR,London Stock Exchange,WEIR.L,Weir PLC,vérifié
+TEL,Oslo Bors Asa,TEL.OL,Telenor ASA,vérifié
+WISE,London Stock Exchange,WISE.L,Wise Group plc,vérifié
+LI,Nyse Euronext - Euronext Paris,LI.PA,Klépierre SA,vérifié
+GTT,Nyse Euronext - Euronext Paris,GTT.PA,Gaztransport & Technigaz SA,vérifié
+MOWI,Oslo Bors Asa,MOWI.OL,Mowi ASA,vérifié
+SKA B,Nasdaq Omx Nordic,SKA-B.ST,Skanska AB (publ),vérifié
+RXL,Nyse Euronext - Euronext Paris,RXL.PA,Rexel S.A.,vérifié
+SKF B,Nasdaq Omx Nordic,SKF-B.ST,AB SKF (publ),vérifié
+BEAN,SIX Swiss Exchange,BEAN.SW,BELIMO Holding AG,vérifié
+CON,Xetra,CON.DE,Continental Aktiengesellschaft,vérifié
+TREL B,Nasdaq Omx Nordic,TREL-B.ST,Trelleborg AB (publ),vérifié
+FME,Xetra,FME.DE,Fresenius Medical Care AG,vérifié
+PNDORA,Omx Nordic Exchange Copenhagen A/S,PNDORA.CO,Pandora A/S,vérifié
+HEIO,Euronext Amsterdam,HEIO.AS,Heineken Holding N.V.,vérifié
+TEN,Borsa Italiana,TEN.MI,Tenaris S.A.,vérifié
+STB,Oslo Bors Asa,STB.OL,Storebrand ASA,vérifié
+HSX,London Stock Exchange,HSX.L,Hiscox Ltd,vérifié
+QIA,Deutsche Börse AG,QIA.DE,Qiagen N.V.,vérifié
+SPIE,Nyse Euronext - Euronext Paris,SPIE.PA,SPIE SA,vérifié
+BNR,Xetra,BNR.DE,Brenntag SE,vérifié
+TLX,Xetra,TLX.DE,Talanx AG,vérifié
+ACLN,SIX Swiss Exchange,ACLN.SW,Accelleron Industries AG,vérifié
+ADDT B,Nasdaq Omx Nordic,ADDT-B.ST,Addtech AB (publ.),vérifié
+TKA,Xetra,TKA.DE,thyssenkrupp AG,vérifié
+FRO,Oslo Bors Asa,FRO.OL,Frontline plc,vérifié
+EBP,Warsaw Stock Exchange/Equities/Main Market,EBP.WA,Erste Bank Polska S.A.,vérifié
+EXO,Euronext Amsterdam,EXO.AS,Exor N.V.,vérifié
+DHER,Xetra,DHER.DE,Delivery Hero SE,vérifié
+EDEN,Nyse Euronext - Euronext Paris,EDEN.PA,Edenred SE,vérifié
+SDR,London Stock Exchange,SDR.L,Schroders plc,vérifié
+PSPN,SIX Swiss Exchange,PSPN.SW,PSP Swiss Property AG,vérifié
+HOT,Xetra,HOT.DE,HOCHTIEF Aktiengesellschaft,vérifié
+LTMC,Borsa Italiana,LTMC.MI,Lottomatica Group S.p.A.,vérifié
+HM B,Nasdaq Omx Nordic,HM-B.ST,H & M Hennes & Mauritz AB (publ),vérifié
+YAR,Oslo Bors Asa,YAR.OL,Yara International ASA,vérifié
+SBRY,London Stock Exchange,SBRY.L,J Sainsbury plc,vérifié
+MRO,London Stock Exchange,MRO.L,Melrose Industries PLC,vérifié
+GAW,London Stock Exchange,GAW.L,Games Workshop Group PLC,vérifié
+NKT,Omx Nordic Exchange Copenhagen A/S,NKT.CO,NKT A/S,vérifié
+SECU B,Nasdaq Omx Nordic,SECU-B.ST,Securitas AB (publ),vérifié
+BEI,Xetra,BEI.DE,Beiersdorf Aktiengesellschaft,vérifié
+SUBC,Oslo Bors Asa,SUBC.OL,Subsea 7 S.A.,vérifié
+KBX,Xetra,KBX.DE,Knorr-Bremse AG,vérifié
+FRES,London Stock Exchange,FRES.L,Fresnillo plc,vérifié
+LIFCO B,Nasdaq Omx Nordic,LIFCO-B.ST,Lifco AB (publ),vérifié
+DCC,London Stock Exchange,DCC.L,DCC Energy plc,vérifié
+STJ,London Stock Exchange,STJ.L,St. James's Place plc,vérifié
+KCR,Nasdaq Omx Helsinki Ltd.,KCR.HE,Konecranes Plc,vérifié
+ALSYDB,Omx Nordic Exchange Copenhagen A/S,ALSYDB.CO,AL Sydbank A/S,vérifié
+TRYG,Omx Nordic Exchange Copenhagen A/S,TRYG.CO,Tryg A/S,vérifié
+SCA B,Nasdaq Omx Nordic,SCA-B.ST,Svenska Cellulosa Aktiebolaget SCA (publ),vérifié
+ORK,Oslo Bors Asa,ORK.OL,Orkla ASA,vérifié
+ABF,London Stock Exchange,ABF.L,Associated British Foods plc,vérifié
+ELI,Nyse Euronext - Euronext Brussels,ELI.BR,Elia Group SA/NV,vérifié
+KGF,London Stock Exchange,KGF.L,Kingfisher plc,vérifié
+LPP,Warsaw Stock Exchange/Equities/Main Market,LPP.WA,LPP SA,vérifié
+ICG,London Stock Exchange,ICG.L,ICG plc,vérifié
+IDR,Bolsa De Madrid,IDR.MC,"Indra Sistemas, S.A.",vérifié
+RILBA,Omx Nordic Exchange Copenhagen A/S,RILBA.CO,Ringkjøbing Landbobank A/S,vérifié
+STERV,Nasdaq Omx Helsinki Ltd.,STERV.HE,Stora Enso Oyj,vérifié
+ACKB,Nyse Euronext - Euronext Brussels,ACKB.BR,Ackermans & Van Haaren NV,vérifié
+AED,Nyse Euronext - Euronext Brussels,AED.BR,Aedifica NV/SA,vérifié
+KESKOB,Nasdaq Omx Helsinki Ltd.,KESKOB.HE,Kesko Oyj,vérifié
+ABVX,Nyse Euronext - Euronext Paris,ABVX.PA,ABIVAX Société Anonyme,vérifié
+JYSK,Omx Nordic Exchange Copenhagen A/S,JYSK.CO,Jyske Bank A/S,vérifié
+SPX,London Stock Exchange,SPX.L,Spirax Group plc,vérifié
+BAB,London Stock Exchange,BAB.L,Babcock International Group PLC,vérifié
+SSAB B,Nasdaq Omx Nordic,SSAB-B.ST,SSAB AB (publ),vérifié
+SRT3,Xetra,SRT3.DE,Sartorius Aktiengesellschaft,vérifié
+ELISA,Nasdaq Omx Helsinki Ltd.,ELISA.HE,Elisa Oyj,vérifié
+IPN,Nyse Euronext - Euronext Paris,IPN.PA,Ipsen S.A.,vérifié
+RNO,Nyse Euronext - Euronext Paris,RNO.PA,Renault SA,vérifié
+REC,Borsa Italiana,REC.MI,Recordati Industria Chimica e Farmaceutica S.p.A.,vérifié
+SPM,Borsa Italiana,SPM.MI,Saipem SpA,vérifié
+EMSN,SIX Swiss Exchange,EMSN.SW,EMS-CHEMIE HOLDING AG,vérifié
+G24,Xetra,G24.DE,Scout24 SE,vérifié
+INDT,Nasdaq Omx Nordic,INDT.ST,Indutrade AB (publ),vérifié
+ALO,Nyse Euronext - Euronext Paris,ALO.PA,Alstom SA,vérifié
+GBLB,Nyse Euronext - Euronext Brussels,GBLB.BR,Groupe Bruxelles Lambert SA,vérifié
+UHR,SIX Swiss Exchange,UHR.SW,The Swatch Group AG,vérifié
+SYENS,Nyse Euronext - Euronext Brussels,SYENS.BR,Syensqo SA/NV,vérifié
+IMCD,Euronext Amsterdam,IMCD.AS,IMCD N.V.,vérifié
+AMUN,Nyse Euronext - Euronext Paris,AMUN.PA,Amundi S.A.,vérifié
+AM,Nyse Euronext - Euronext Paris,AM.PA,Dassault Aviation société anonyme,vérifié
+LAND,London Stock Exchange,LAND.L,Land Securities Group Plc,vérifié
+BGEO,London Stock Exchange,BGEO.L,Lion Finance Group PLC,vérifié
+NEX,Nyse Euronext - Euronext Paris,NEX.PA,Nexans S.A.,vérifié
+DIM,Nyse Euronext - Euronext Paris,DIM.PA,Sartorius Stedim Biotech S.A.,vérifié
+GET,Nyse Euronext - Euronext Paris,GET.PA,Getlink SE,vérifié
+ISS,Omx Nordic Exchange Copenhagen A/S,ISS.CO,ISS A/S,vérifié
+NIBE B,Nasdaq Omx Nordic,NIBE-B.ST,NIBE Industrier AB (publ),vérifié
+IGG,London Stock Exchange,IGG.L,IG Group Holdings plc,vérifié
+BBY,London Stock Exchange,BBY.L,Balfour Beatty plc,vérifié
+IG,Borsa Italiana,IG.MI,Italgas S.p.A.,vérifié
+ANDR,Wiener Boerse Ag,ANDR.VI,Andritz AG,vérifié
+SAVE,Nasdaq Omx Nordic,SAVE.ST,Nordnet AB (publ),vérifié
+MRL,Bolsa De Madrid,MRL.MC,"MERLIN Properties SOCIMI, S.A.",vérifié
+VOE,Wiener Boerse Ag,VOE.VI,Voestalpine AG,vérifié
+ZAL,Xetra,ZAL.DE,Zalando SE,vérifié
+BTRW,London Stock Exchange,BTRW.L,Barratt Redrow plc,vérifié
+SCR,Nyse Euronext - Euronext Paris,SCR.PA,SCOR SE,vérifié
+LOTB,Nyse Euronext - Euronext Brussels,LOTB.BR,Lotus Bakeries NV,vérifié
+JMT,Nyse Euronext - Euronext Lisbon,JMT.LS,"Jerónimo Martins, SGPS, S.A.",vérifié
+GJF,Oslo Bors Asa,GJF.OL,Gjensidige Forsikring ASA,vérifié
+SQN,SIX Swiss Exchange,SQN.SW,Swissquote Group Holding SA,vérifié
+ANA,Bolsa De Madrid,ANA.MC,"Acciona, S.A.",vérifié
+BMED,Borsa Italiana,BMED.MI,Banca Mediolanum S.p.A.,vérifié
+AUTO,London Stock Exchange,AUTO.L,Autotrader Group plc,vérifié
+CTEC,London Stock Exchange,CTEC.L,Convatec Group PLC,vérifié
+ABDN,London Stock Exchange,ABDN.L,Aberdeen Group Plc,vérifié
+SB1NO,Oslo Bors Asa,SB1NO.OL,SpareBank 1 Sør-Norge ASA,vérifié
+BEIJ B,Nasdaq Omx Nordic,BEIJ-B.ST,Beijer Ref AB (publ),vérifié
+EVK,Xetra,EVK.DE,Evonik Industries AG,vérifié
+P911,Xetra,P911.DE,Dr. Ing. h.c. F. Porsche AG,vérifié
+SBMO,Euronext Amsterdam,SBMO.AS,SBM Offshore N.V.,vérifié
+BLND,London Stock Exchange,BLND.L,British Land Company PLC,vérifié
+PAH3,Xetra,PAH3.DE,Porsche Automobil Holding SE,vérifié
+NDX1,Xetra,NDX1.DE,Nordex SE,vérifié
+HWDN,London Stock Exchange,HWDN.L,Howden Joinery Group Plc,vérifié
+SW,Nyse Euronext - Euronext Paris,SW.PA,Sodexo S.A.,vérifié
+LHA,Xetra,LHA.DE,Deutsche Lufthansa AG,vérifié
+WTB,London Stock Exchange,WTB.L,Whitbread plc,vérifié
+LMP,London Stock Exchange,LMP.L,LondonMetric Property Plc,vérifié
+WDP,Nyse Euronext - Euronext Brussels,WDP.BR,Warehouses De Pauw SA,vérifié
+CRDA,London Stock Exchange,CRDA.L,Croda International Plc,vérifié
+GETI B,Nasdaq Omx Nordic,GETI-B.ST,Getinge AB (publ),vérifié
+TPRO,Borsa Italiana,TPRO.MI,Technoprobe S.p.A.,vérifié
+WPP,London Stock Exchange,WPP.L,WPP plc,vérifié
+UMI,Nyse Euronext - Euronext Brussels,UMI.BR,Umicore SA,vérifié
+HAG,Xetra,HAG.DE,Hensoldt AG,vérifié
+RMV,London Stock Exchange,RMV.L,Rightmove plc,vérifié
+VAR,Oslo Bors Asa,VAR.OL,Vår Energi ASA,vérifié
+MBK,Warsaw Stock Exchange/Equities/Main Market,MBK.WA,mBank S.A.,vérifié
+GALE,SIX Swiss Exchange,GALE.SW,Galenica AG,vérifié
+EMG,London Stock Exchange,EMG.L,Man Group Plc,vérifié
+AZA,Nasdaq Omx Nordic,AZA.ST,Avanza Bank Holding AB (publ),vérifié
+ROR,London Stock Exchange,ROR.L,Rotork plc,vérifié
+NDA,Xetra,NDA.DE,Aurubis AG,vérifié
+RED,Bolsa De Madrid,RED.MC,"Redeia Corporación, S.A.",vérifié
+SOF,Nyse Euronext - Euronext Brussels,SOF.BR,Sofina Société Anonyme,vérifié
+PSN,London Stock Exchange,PSN.L,Persimmon Plc,vérifié
+AVOL,SIX Swiss Exchange,AVOL.SW,Avolta AG,vérifié
+BRBY,London Stock Exchange,BRBY.L,Burberry Group plc,vérifié
+UNI,Bolsa De Madrid,UNI.MC,"Unicaja Banco, S.A.",vérifié
+VALMT,Nasdaq Omx Helsinki Ltd.,VALMT.HE,Valmet Oyj,vérifié
+FHZN,SIX Swiss Exchange,FHZN.SW,Flughafen Zürich AG,vérifié
+INVP,London Stock Exchange,INVP.L,Investec Group,vérifié
+CAST,Nasdaq Omx Nordic,CAST.ST,Castellum AB (publ),vérifié
+GF,SIX Swiss Exchange,GF.SW,Georg Fischer AG,vérifié
+DIE,Nyse Euronext - Euronext Brussels,DIE.BR,D'Ieteren Group SA,vérifié
+AZM,Borsa Italiana,AZM.MI,Azimut Holding S.p.A.,vérifié
+VER,Wiener Boerse Ag,VER.VI,VERBUND AG,vérifié
+ADEN,SIX Swiss Exchange,ADEN.SW,Adecco Group AG,vérifié
+LUND B,Nasdaq Omx Nordic,LUND-B.ST,L E Lundbergföretagen AB (publ),vérifié
+SOI,Nyse Euronext - Euronext Paris,SOI.PA,Soitec SA,vérifié
+BARN,SIX Swiss Exchange,BARN.SW,Barry Callebaut AG,vérifié
+BCVN,SIX Swiss Exchange,BCVN.SW,Banque Cantonale Vaudoise,vérifié
+MYCR,Nasdaq Omx Nordic,MYCR.ST,Mycronic AB (publ),vérifié
+AKE,Nyse Euronext - Euronext Paris,AKE.PA,Arkema S.A.,vérifié
+ZAB,Warsaw Stock Exchange/Equities/Main Market,ZAB.WA,Zabka Group S.A.,vérifié
+MAP,Bolsa De Madrid,MAP.MC,"Mapfre, S.A.",vérifié
+SIGN,SIX Swiss Exchange,SIGN.SW,SIG Group AG,vérifié
+INPST,Euronext Amsterdam,INPST.AS,InPost S.A.,vérifié
+TE,Nyse Euronext - Euronext Paris,TE.PA,Technip Energies N.V.,vérifié
+ZEG,London Stock Exchange,ZEG.L,Zegona Communications plc,vérifié
+ATS,Wiener Boerse Ag,ATS.VI,AT & S Austria Technologie & Systemtechnik Aktiengesellschaft,vérifié
+SECT B,Nasdaq Omx Nordic,SECT-B.ST,Sectra AB (publ),vérifié
+ELIS,Nyse Euronext - Euronext Paris,ELIS.PA,Elis SA,vérifié
+CCC,London Stock Exchange,CCC.L,Computacenter plc,vérifié
+GL9,Irish Stock Exchange - All Market,GL9.IR,Glanbia plc,vérifié
+BKG,London Stock Exchange,BKG.L,The Berkeley Group Holdings plc,vérifié
+EDPR,Nyse Euronext - Euronext Lisbon,EDPR.LS,"EDP Renewables, S.A.",vérifié
+DNP,Warsaw Stock Exchange/Equities/Main Market,DNP.WA,Dino Polska S.A.,vérifié
+AYV,Nyse Euronext - Euronext Paris,AYV.PA,Ayvens,vérifié
+AIXA,Xetra,AIXA.DE,AIXTRON SE,vérifié
+A2A,Borsa Italiana,A2A.MI,A2A S.p.A.,vérifié
+AALB,Euronext Amsterdam,AALB.AS,Aalberts N.V.,vérifié
+LEG,Xetra,LEG.DE,LEG Immobilien SE,vérifié
+SALM,Oslo Bors Asa,SALM.OL,SalMar ASA,vérifié
+ENG,Bolsa De Madrid,ENG.MC,"Enagás, S.A.",vérifié
+RAND,Euronext Amsterdam,RAND.AS,Randstad N.V.,vérifié
+NEM,Xetra,NEM.DE,Nemetschek SE,vérifié
+FLS,Omx Nordic Exchange Copenhagen A/S,FLS.CO,FLSmidth & Co. A/S,vérifié
+TEMN,SIX Swiss Exchange,TEMN.SW,Temenos AG,vérifié
+INCH,London Stock Exchange,INCH.L,Inchcape plc,vérifié
+BGN,Borsa Italiana,BGN.MI,Banca Generali S.p.A.,vérifié
+DEMANT,Omx Nordic Exchange Copenhagen A/S,DEMANT.CO,Demant A/S,vérifié
+MNDI,London Stock Exchange,MNDI.L,Mondi plc,vérifié
+BBOX,London Stock Exchange,BBOX.L,Tritax Big Box Ord,vérifié
+RS1,London Stock Exchange,RS1.L,RS Group plc,vérifié
+VEND,Oslo Bors Asa,VEND.OL,Vend Marketplaces ASA,vérifié
+TEP,Nyse Euronext - Euronext Paris,TEP.PA,Teleperformance SE,vérifié
+GFC,Nyse Euronext - Euronext Paris,GFC.PA,Gecina,vérifié
+TUB,Nyse Euronext - Euronext Brussels,TUB.BR,Financière de Tubize SA,vérifié
+VK,Nyse Euronext - Euronext Paris,VK.PA,Vallourec S.A.,vérifié
+LAGR B,Nasdaq Omx Nordic,LAGR-B.ST,Lagercrantz Group AB (publ),vérifié
+CDR,Warsaw Stock Exchange/Equities/Main Market,CDR.WA,CD Projekt Red S.A.,vérifié
+AKER,Oslo Bors Asa,AKER.OL,Aker ASA,vérifié
+KBCA,Nyse Euronext - Euronext Brussels,KBCA.BR,KBC Ancora SA,vérifié
+DRX,London Stock Exchange,DRX.L,Drax Group plc,vérifié
+MANTA,Nasdaq Omx Helsinki Ltd.,MANTA.HE,Mandatum Oyj,vérifié
+CPR,Borsa Italiana,CPR.MI,Davide Campari-Milano N.V.,vérifié
+ENT,London Stock Exchange,ENT.L,Entain Plc,vérifié
+BIM,Nyse Euronext - Euronext Paris,BIM.PA,bioMérieux S.A.,vérifié
+ALLN,SIX Swiss Exchange,ALLN.SW,Allreal Holding AG,vérifié
+OCTV SDB,Nasdaq Omx Nordic,OCTV-SDB.ST,Octave Intelligence plc,vérifié
+R3NK,Xetra,R3NK.DE,RENK Group AG,vérifié
+CVC,Euronext Amsterdam,CVC.AS,CVC Capital Partners plc,vérifié
+ING,Warsaw Stock Exchange/Equities/Main Market,ING.WA,ING Bank Slaski S.A.,vérifié
+EVD,Xetra,EVD.DE,CTS Eventim AG & Co. KGaA,vérifié
+SRP,London Stock Exchange,SRP.L,Serco Group plc,vérifié
+BFT,Warsaw Stock Exchange/Equities/Main Market,BFT.WA,Benefit Systems S.A.,vérifié
+ALK B,Omx Nordic Exchange Copenhagen A/S,ALK-B.CO,ALK-Abelló A/S,vérifié
+LOOMIS,Nasdaq Omx Nordic,LOOMIS.ST,Loomis AB (publ),vérifié
+JMAT,London Stock Exchange,JMAT.L,Johnson Matthey Plc,vérifié
+TW.,London Stock Exchange,TW.L,Taylor Wimpey plc,vérifié
+BZU,Borsa Italiana,BZU.MI,Buzzi S.p.A.,vérifié
+AAK,Nasdaq Omx Nordic,AAK.ST,AAK AB (publ.),vérifié
+SAGA B,Nasdaq Omx Nordic,SAGA-B.ST,AB Sagax (publ),vérifié
+ARCAD,Euronext Amsterdam,ARCAD.AS,Arcadis NV,vérifié
+FNTN,Xetra,FNTN.DE,freenet AG,vérifié
+MIL,Warsaw Stock Exchange/Equities/Main Market,MIL.WA,Bank Millennium S.A.,vérifié
+RUI,Nyse Euronext - Euronext Paris,RUI.PA,Rubis,vérifié
+FR,Nyse Euronext - Euronext Paris,FR.PA,Valeo SE,vérifié
+KGX,Xetra,KGX.DE,KION GROUP AG,vérifié
+RAA,Xetra,RAA.DE,RATIONAL Aktiengesellschaft,vérifié
+HER,Borsa Italiana,HER.MI,Hera S.p.A.,vérifié
+QQ.,London Stock Exchange,QQ.L,QinetiQ Group plc,vérifié
+ITV,London Stock Exchange,ITV.L,ITV plc,vérifié
+PIRC,Borsa Italiana,PIRC.MI,Pirelli & C. S.p.A.,vérifié
+HUH1V,Nasdaq Omx Helsinki Ltd.,HUH1V.HE,Huhtamäki Oyj,vérifié
+TCAP,London Stock Exchange,TCAP.L,TP ICAP Group PLC,vérifié
+IP,Borsa Italiana,IP.MI,Interpump Group S.p.A.,vérifié
+ACP,Warsaw Stock Exchange/Equities/Main Market,ACP.WA,Asseco Poland S.A.,vérifié
+CWK,London Stock Exchange,CWK.L,Cranswick plc,vérifié
+BALD B,Nasdaq Omx Nordic,BALD-B.ST,Fastighets AB Balder (publ),vérifié
+SFZN,SIX Swiss Exchange,SFZN.SW,Siegfried Holding AG,vérifié
+HUBN,SIX Swiss Exchange,HUBN.SW,Huber+Suhner AG,vérifié
+BC8,Xetra,BC8.DE,Bechtle AG,vérifié
+PLUS,London Stock Exchange,PLUS.L,Plus500 Ltd.,vérifié
+GRF,Bolsa De Madrid,GRF.MC,"Grifols, S.A.",vérifié
+ACX,Bolsa De Madrid,ACX.MC,"Acerinox, S.A.",vérifié
+BAMNB,Euronext Amsterdam,BAMNB.AS,Koninklijke BAM Groep nv,vérifié
+ADP,Nyse Euronext - Euronext Paris,ADP.PA,Aeroports de Paris SA,vérifié
+AAF,London Stock Exchange,AAF.L,Airtel Africa Plc,vérifié
+TUI1,Xetra,TUI1.DE,TUI AG,vérifié
+SUNN,SIX Swiss Exchange,SUNN.SW,Sunrise Communications AG,vérifié
+SBNOR,Oslo Bors Asa,SBNOR.OL,Sparebanken Norge,vérifié
+VSURE,Nasdaq Omx Nordic,VSURE.ST,Verisure plc,vérifié
+BC,Borsa Italiana,BC.MI,Brunello Cucinelli S.p.A.,vérifié
+MTO,London Stock Exchange,MTO.L,Mitie Group plc,vérifié
+HIK,London Stock Exchange,HIK.L,Hikma Pharmaceuticals PLC,vérifié
+NEXI,Borsa Italiana,NEXI.MI,Nexi S.p.A.,vérifié
+TBCG,London Stock Exchange,TBCG.L,TBC Bank Group PLC,vérifié
+TGS,Oslo Bors Asa,TGS.OL,TGS ASA,vérifié
+REY,Borsa Italiana,REY.MI,Reply S.p.A.,vérifié
+NOD,Oslo Bors Asa,NOD.OL,Nordic Semiconductor ASA,vérifié
+UTG,London Stock Exchange,UTG.L,Unite Group PLC,vérifié
+BWY,London Stock Exchange,BWY.L,Bellway p.l.c.,vérifié
+PNN,London Stock Exchange,PNN.L,Pennon Group Plc,vérifié
+BKW,SIX Swiss Exchange,BKW.SW,BKW AG,vérifié
+SDF,Xetra,SDF.DE,K+S Aktiengesellschaft,vérifié
+IFCN,SIX Swiss Exchange,IFCN.SW,INFICON Holding AG,vérifié
+BOL,Nyse Euronext - Euronext Paris,BOL.PA,Bolloré SE,vérifié
+AG1,Xetra,AG1.DE,AUTO1 Group SE,vérifié
+IVG,Borsa Italiana,IVG.MI,Iveco Group N.V.,vérifié
+VZN,SIX Swiss Exchange,VZN.SW,VZ Holding AG,vérifié
+VPK,Euronext Amsterdam,VPK.AS,Koninklijke Vopak N.V.,vérifié
+ALLFG,Euronext Amsterdam,ALLFG.AS,Allfunds Group plc,vérifié
+SUN,SIX Swiss Exchange,SUN.SW,Sulzer AG,vérifié
+DLG,Borsa Italiana,DLG.MI,De'Longhi S.p.A.,vérifié
+FDJU,Nyse Euronext - Euronext Paris,FDJU.PA,FDJ United,vérifié
+MOBN,SIX Swiss Exchange,MOBN.SW,Mobimo Holding AG,vérifié
+FPE3,Xetra,FPE3.DE,Fuchs SE,vérifié
+LATO B,Nasdaq Omx Nordic,LATO-B.ST,Investment AB Latour (publ),vérifié
+RBREW,Omx Nordic Exchange Copenhagen A/S,RBREW.CO,Royal Unibrew A/S,vérifié
+VATN,SIX Swiss Exchange,VATN.SW,Valiant Holding AG,vérifié
+COV,Nyse Euronext - Euronext Paris,COV.PA,Covivio,vérifié
+CMBN,SIX Swiss Exchange,CMBN.SW,Cembra Money Bank AG,vérifié
+FTK,Xetra,FTK.DE,flatexDEGIRO SE,vérifié
+SCYR,Bolsa De Madrid,SCYR.MC,"Sacyr, S.A.",vérifié
+COTN,SIX Swiss Exchange,COTN.SW,Comet Holding AG,vérifié
+SWEC B,Nasdaq Omx Nordic,SWEC-B.ST,Sweco AB (publ),vérifié
+KMAR,Oslo Bors Asa,KMAR.OL,Kongsberg Maritime ASA,vérifié
+HOLM B,Nasdaq Omx Nordic,HOLM-B.ST,Holmen AB (publ),vérifié
+VIS,Bolsa De Madrid,VIS.MC,"Viscofan, S.A.",vérifié
+SHC,London Stock Exchange,SHC.L,Shaftesbury Capital PLC,vérifié
+CSG,Euronext Amsterdam,CSG.AS,CSG N.V.,vérifié
+SFSN,SIX Swiss Exchange,SFSN.SW,SFS Group AG,vérifié
+GBF,Xetra,GBF.DE,Bilfinger SE,vérifié
+PHP,London Stock Exchange,PHP.L,Primary Health Properties Plc,vérifié
+QLT,London Stock Exchange,QLT.L,Quilter plc,vérifié
+TEG,Xetra,TEG.DE,TAG Immobilien AG,vérifié
+HIAB,Nasdaq Omx Helsinki Ltd.,HIAB.HE,Hiab Oyj,vérifié
+TOM,Oslo Bors Asa,TOM.OL,Tomra Systems ASA,vérifié
+PUM,Xetra,PUM.DE,PUMA SE,vérifié
+ROCK B,Omx Nordic Exchange Copenhagen A/S,ROCK-B.CO,Rockwool A/S,vérifié
+SOP,Nyse Euronext - Euronext Paris,SOP.PA,Sopra Steria Group SA,vérifié
+WIE,Wiener Boerse Ag,WIE.VI,Wienerberger AG,vérifié
+ZEAL,Omx Nordic Exchange Copenhagen A/S,ZEAL.CO,Zealand Pharma A/S,vérifié
+TPE,Warsaw Stock Exchange/Equities/Main Market,TPE.WA,TAURON Polska Energia S.A.,vérifié
+PUIG,Bolsa De Madrid,PUIG.MC,"Puig Brands, S.A.",vérifié
+DKSH,SIX Swiss Exchange,DKSH.SW,DKSH Holding AG,vérifié
+PAF,London Stock Exchange,PAF.L,Pan African Resources PLC,vérifié
+BPT,London Stock Exchange,BPT.L,Bridgepoint Group plc,vérifié
+JD.,London Stock Exchange,JD.L,JD Sports Fashion Plc,vérifié
+AXFO,Nasdaq Omx Nordic,AXFO.ST,Axfood AB (publ),vérifié
+FRA,Xetra,FRA.DE,Fraport AG,vérifié
+KTY,Warsaw Stock Exchange/Equities/Main Market,KTY.WA,Grupa Kety S.A.,vérifié
+HOC,London Stock Exchange,HOC.L,Hochschild Mining plc,vérifié
+DLN,London Stock Exchange,DLN.L,Derwent London Plc,vérifié
+KEMIRA,Nasdaq Omx Helsinki Ltd.,KEMIRA.HE,Kemira Oyj,vérifié
+LIGHT,Euronext Amsterdam,LIGHT.AS,Signify N.V.,vérifié
+THULE,Nasdaq Omx Nordic,THULE.ST,Thule Group AB (publ),vérifié
+AMV0,Xetra,AMV0.DE,Aumovio SE,vérifié
+BUCN,SIX Swiss Exchange,BUCN.SW,Bucher Industries AG,vérifié
+BAKKA,Oslo Bors Asa,BAKKA.OL,P/F Bakkafrost,vérifié
+WIHL,Nasdaq Omx Nordic,WIHL.ST,Wihlborgs Fastigheter AB (publ),vérifié
+SESG,Nyse Euronext - Euronext Paris,SESG.PA,SES S.A.,vérifié
