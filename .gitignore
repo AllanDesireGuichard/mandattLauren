@@ -8,13 +8,6 @@ outputs/*.xlsx
 outputs/*.pptx
 outputs/*.log
 
-# Le cache de prix (data/prices/) EST versionne, deliberement.
-# yfinance echoue par intermittence, ticker par ticker, et certaines series
-# ont du etre reparees (core/quality.py). Ces fichiers exacts sont ce qui
-# sous-tend les chiffres du mandat : les perdre rendrait les resultats
-# irreproductibles. 7,8 Mo, une seule fois.
-# Si un rafraichissement regulier est mis en place, les exclure a ce
-# moment-la et versionner plutot un manifeste.
 
 # Secrets. Le depot est PUBLIC (condition du deploiement gratuit Streamlit) :
 # aucune cle ne doit y entrer. En local, .streamlit/secrets.toml ; en ligne,

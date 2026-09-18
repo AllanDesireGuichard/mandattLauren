@@ -182,9 +182,8 @@ def render() -> None:
          "Le portefeuille proposé"),
         ("5 · Backtests",
          "Aurait-il tenu ?",
-         "Faire traverser au portefeuille les crises passées (2008, 2011, "
-         "2020, 2022) et mesurer ses pertes et leur durée.",
-         "La réponse : la limite de 15 % tient-elle, et à quelle fréquence "
-         "cède-t-elle ?"),
+         "Rejouer le portefeuille de 2006 à aujourd'hui, à travers les crises "
+         "de 2008, 2011, 2020 et 2022, et mesurer ses pertes et leur durée.",
+         "Ses pertes, leur durée, et ce qu'est une mauvaise année"),
     ], columns=["Étape", "Question", "Ce qu'on fait", "Ce qu'on en sort"])
     st.table(methode.set_index("Étape"))
