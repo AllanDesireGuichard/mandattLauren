@@ -144,3 +144,31 @@ def chaine(courante: int) -> None:
         )
     st.markdown(f'<div class="chaine">{"".join(blocs)}</div>',
                 unsafe_allow_html=True)
+
+
+# --------------------------------------------------------------------------
+# Un fil de causalité : des boîtes reliées par des flèches, pour montrer
+# qu'une chose en entraîne une autre. Même dessin que la chaîne des étapes.
+# --------------------------------------------------------------------------
+
+CSS_FIL = """
+<style>
+  .fil {display: flex; flex-wrap: wrap; align-items: center; gap: .3rem;
+        margin: .4rem 0 1.2rem 0;}
+  .fil-e {flex: 1 1 7.5rem; min-width: 7.5rem; padding: .45rem .65rem;
+          border-radius: 5px; background: #f1f3f6; border: 1px solid #e3e6ea;}
+  .fil-t {font-size: .84rem; font-weight: 600; color: #23262b;}
+  .fil-s {font-size: .72rem; color: #6b6f76; line-height: 1.3;
+          margin-top: .1rem;}
+  .fil-f {color: #8a8e95; font-size: 1rem;}
+</style>
+"""
+
+
+def fil(maillons: list[tuple[str, str]]) -> None:
+    """Maillons (titre, sous-titre) reliés par des flèches."""
+    st.markdown(CSS_FIL, unsafe_allow_html=True)
+    blocs = [f'<div class="fil-e"><div class="fil-t">{t}</div>'
+             f'<div class="fil-s">{s}</div></div>' for t, s in maillons]
+    st.markdown('<div class="fil">' + '<span class="fil-f">→</span>'.join(blocs)
+                + "</div>", unsafe_allow_html=True)
