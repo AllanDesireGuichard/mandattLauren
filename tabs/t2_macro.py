@@ -16,7 +16,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from core import credit, macro, marches, pedago, taux, viz
+from core import credit, macro, marches, pedago, rendements, taux, viz
 from core.ips import INFLATION_TARGET
 
 SEUIL = INFLATION_TARGET * 100          # en points de pourcentage
@@ -44,7 +44,7 @@ def render() -> None:
     _bloc_cycle()
     _bloc_credit()
     _bloc_marches()
-    _suite()
+    _bloc_rendements()
 
 
 # --------------------------------------------------------------------------
@@ -981,13 +981,189 @@ def _graphique_marches(m: dict) -> None:
 
 
 # --------------------------------------------------------------------------
-# Suite de l'onglet
+# Bloc 6 — les rendements espérés : la sortie de l'onglet
 # --------------------------------------------------------------------------
 
-def _suite() -> None:
-    st.markdown("#### La suite de cet onglet")
-    pedago.a_construire(
-        2, "Macro top-down, blocs suivants",
-        "**Les rendements espérés par classe d'actifs**, construits sur ces "
-        "observations : c'est la sortie de l'onglet.",
+NATURE = {"mesuré": "Mesuré", "estimé": "Estimé", "supposé": "Supposé"}
+COULEUR_NATURE = {"mesuré": viz.CATEGORICAL[0], "estimé": viz.CATEGORICAL[1],
+                  "supposé": viz.CATEGORICAL[3]}
+
+
+def _bloc_rendements() -> None:
+    r = rendements.charger()
+    C = r["classes"]
+    g = r["croissance"]
+    src = r["sources"]
+
+    st.markdown("#### Ce qu'on peut attendre de chaque classe d'actifs")
+    st.markdown(
+        "C'est l'aboutissement de l'onglet. Tout ce qui précède, taux, "
+        "économie, crédit, marchés, se résume ici en un chiffre par classe "
+        "d'actifs : ce qu'elle peut rapporter par an, en euros, sur dix ans, "
+        "dans le monde de l'énoncé où l'inflation est de 4 %. Ces chiffres "
+        "sont l'entrée de l'étape 4, qui décidera combien mettre dans "
+        "chaque classe."
     )
+
+    _graphique_rendements(C)
+
+    lignes = []
+    for k in rendements.ORDRE:
+        v = C[k]
+        nom = v["libelle"]
+        fourchette = ("—" if v["bas"] == v["haut"]
+                      else f"{viz.fr(v['bas'], '', 1)} à {viz.fr(v['haut'], '%', 1)}")
+        lignes.append((nom, _pct(v["central"]), fourchette,
+                       NATURE[v["etiquette"]],
+                       "—" if v["jpm"] is None else viz.fr(v["jpm"], "%", 1),
+                       v["methode"]))
+    st.table(pd.DataFrame(lignes, columns=[
+        "Classe d'actifs", "Rendement espéré", "Fourchette", "Nature",
+        "Repère J.P. Morgan*", "Comment c'est construit"]).set_index(
+            "Classe d'actifs"))
+    st.caption(
+        "Nature : **mesuré**, lu directement sur le marché ; **estimé**, "
+        "calculé à partir de mesures ; **supposé**, une hypothèse faute de "
+        "mieux. * J.P. Morgan suppose une inflation de 2 %, pas de 4 % : "
+        "pour les obligations indexées, les actions, l'or et les matières "
+        "premières, il faut ajouter environ 2 points à leur chiffre pour "
+        "comparer. Le haut rendement "
+        "figure pour mémoire, il n'entre pas dans l'allocation."
+    )
+
+    st.info(
+        f"**Trois familles dépassent nettement le seuil de 4 % : les "
+        f"actions, l'infrastructure cotée et les obligations indexées.** Les "
+        f"obligations à taux fixe sont en dessous ou au niveau du seuil ; "
+        f"le monétaire est nettement en dessous. Préserver le pouvoir "
+        f"d'achat impose donc une part importante d'actifs de croissance. "
+        f"Jusqu'où aller, c'est la limite de perte de 15 % qui le dira, à "
+        f"l'étape 4. À l'intérieur des actions, l'Europe et le Japon "
+        f"({_pct(C['europe']['central'])} et {_pct(C['japon']['central'])}) "
+        f"sont attendus au-dessus des États-Unis "
+        f"({_pct(C['us']['central'])}), parce qu'ils sont moins chers.",
+        icon=":material/lightbulb:",
+    )
+
+    us, em = C["us"]["detail"], C["equity_emerging"]["detail"]
+    pedago.explique(
+        "Comment on estime ce que rapportera une action",
+        "Une action rapporte ce que l'entreprise gagne. On le mesure de deux "
+        "façons, qui se recoupent.",
+        "<strong>Par les bénéfices.</strong> Le PER dit combien d'années de "
+        "bénéfices on paie en achetant l'action. Son inverse est le "
+        "rendement des bénéfices : à un PER de 20, on achète 5 % de "
+        "bénéfices par an. Sur longue période, c'est une bonne estimation "
+        "du rendement au-delà de l'inflation.",
+        f"<strong>Par le dividende et la croissance.</strong> On touche le "
+        f"dividende, et les bénéfices grandissent. Leur croissance au-delà "
+        f"de l'inflation a été mesurée sur les actions américaines depuis "
+        f"1900 : {viz.fr(g['central'], '%', 1)} par an en moyenne (de "
+        f"{viz.fr(g['periodes']['1900'], '', 1)} à "
+        f"{viz.fr(g['haut'], '%', 1)} selon la période de départ).",
+        "On fait la moyenne des deux, puis on ajoute l'inflation de "
+        "l'énoncé : sur longue période, les entreprises répercutent la "
+        "hausse des prix dans leurs bénéfices. Le prix payé aujourd'hui "
+        "compte donc beaucoup. Plus un marché est cher, moins il rapporte "
+        f"ensuite : c'est pourquoi les États-Unis, à un PER de "
+        f"{viz.fr(us['per_ishares'], '', 1)}, sont attendus plus bas que "
+        f"l'Europe.",
+    )
+    pedago.explique(
+        "Pourquoi certaines fourchettes sont larges",
+        "Toutes les sources ne calculent pas le PER de la même façon. Pour "
+        f"les actions émergentes, iShares l'affiche à "
+        f"{viz.fr(em['per_ishares'], '', 1)} et Yahoo à "
+        f"{viz.fr(em['per_yahoo'], '', 1)}. L'écart change le rendement "
+        "espéré de près de deux points. Plutôt que de choisir en silence, "
+        "on retient l'émetteur du fonds comme source principale et on fait "
+        "entrer l'autre valeur dans la fourchette.",
+        "La fourchette réunit donc deux incertitudes : celle de la mesure "
+        "(les sources divergent) et celle de la méthode (la croissance des "
+        "bénéfices varie selon la période observée). Une fourchette large "
+        "n'est pas un défaut : c'est l'honnêteté sur ce qu'on sait "
+        "vraiment.",
+    )
+    pedago.explique(
+        "Comparaison avec J.P. Morgan",
+        "J.P. Morgan publie chaque année ses hypothèses de rendement à long "
+        "terme, qui font référence dans la profession. Elles servent ici de "
+        "contrôle, pas de source. Elles supposent une inflation de 2 % : "
+        "pour les actions, il faut ajouter environ 2 points pour comparer "
+        "avec nos chiffres, calculés à 4 %.",
+        "Une fois cet ajustement fait, nos estimations sont à moins d'un "
+        "point des leurs. Nous sommes plus prudents sur les États-Unis, à "
+        "cause de leur valorisation, et un peu plus confiants sur l'Europe. "
+        "Pour les obligations, les chiffres concordent, à la hausse des "
+        "taux près depuis septembre 2025, date de leurs données.",
+        f"Un seul écart important : le haut rendement européen, "
+        f"{_pct(C['hy_euro']['central'])} chez nous contre "
+        f"{viz.fr(C['hy_euro']['jpm'], '%', 1)} chez eux. Nous déduisons la "
+        f"perte moyenne publiée par Moody's sur 1982-2004 "
+        f"({viz.fr(src['perte_hy'], '%', 1)} par an), une période qui "
+        f"comprend deux vagues de défauts : c'est prudent. Cette classe "
+        f"n'entre pas dans l'allocation, ce qui en limite la portée.",
+    )
+    pedago.explique(
+        "Ce que ces chiffres ne sont pas",
+        "Ce ne sont pas des promesses. Ce sont des moyennes attendues sur "
+        "dix ans, autour desquelles les années réelles s'écarteront "
+        "beaucoup : une classe attendue à 9 % peut perdre 20 % une année. "
+        "Ce risque est mesuré à l'étape 4, et testé sur les crises passées "
+        "à l'étape 5.",
+        "Ils ne tiennent pas compte des frais de gestion ni de la "
+        "fiscalité, hors du périmètre de l'exercice, ni d'une éventuelle "
+        "variation des devises sur les actions étrangères, supposée nulle "
+        "en moyenne.",
+        source=f"data/rendements.json · relevé du "
+               f"{taux.date_fr(r['releve'])} · scripts/estimer_rendements.py "
+               f"· {src['moodys']} · {src['jpm']} · {g['source']}",
+    )
+
+    st.markdown("#### Ce que l'onglet transmet à l'étape suivante")
+    st.markdown(
+        "Un rendement espéré et une fourchette pour chaque classe d'actifs, "
+        "tous exprimés dans le monde de l'énoncé. Le diagnostic qui les "
+        "accompagne : une inflation qui remonte sous l'effet de l'énergie, "
+        "des banques centrales qui resserrent, un crédit très mal payé, des "
+        "actions américaines chères. L'étape 3 choisira les supports qui "
+        "portent chaque classe ; l'étape 4 décidera des proportions."
+    )
+
+
+def _graphique_rendements(C: dict) -> None:
+    cles = [k for k in rendements.ORDRE if k != "hy_euro"]
+    cles = sorted(cles, key=lambda k: C[k]["central"])
+    noms = [C[k]["libelle"].replace("dont ", "  dont ") for k in cles]
+    fig = go.Figure()
+    for k, nom in zip(cles, noms):
+        v = C[k]
+        fig.add_trace(go.Scatter(
+            x=[v["bas"], v["haut"]], y=[nom, nom], mode="lines",
+            line={"color": viz.GRID, "width": 6}, showlegend=False,
+            hoverinfo="skip"))
+    for nature, lib in NATURE.items():
+        ks = [k for k in cles if C[k]["etiquette"] == nature]
+        fig.add_trace(go.Scatter(
+            x=[C[k]["central"] for k in ks],
+            y=[noms[cles.index(k)] for k in ks], mode="markers",
+            name=lib, marker={"size": 11, "color": COULEUR_NATURE[nature],
+                              "line": {"color": viz.SURFACE, "width": 2}},
+            customdata=[[C[k]["bas"], C[k]["haut"]] for k in ks],
+            hovertemplate="%{y} : %{x:.2f} %<br>fourchette %{customdata[0]:.1f}"
+                          " à %{customdata[1]:.1f} %<extra></extra>"))
+    fig.add_vline(x=SEUIL, line={"color": viz.INK_2, "width": 1.5,
+                                 "dash": "dash"},
+                  annotation={"text": f"Seuil : {viz.fr(SEUIL, '%', 0)}",
+                              "font": {"color": viz.INK_2, "size": 12}},
+                  annotation_position="top")
+    fig.update_layout(**viz.layout(
+        "Rendement annuel espéré sur dix ans, en euros, à 4 % d'inflation",
+        height=520,
+        xaxis={"ticksuffix": " %", "gridcolor": viz.GRID, "range": [-0.5, 11.5]},
+        yaxis={"gridcolor": "rgba(0,0,0,0)"},
+    ))
+    st.plotly_chart(fig, width="stretch")
+    st.caption("Point : estimation centrale, couleur selon sa nature. Barre "
+               "grise : fourchette. La crypto est comptée à zéro par "
+               "principe, pas par prévision.")

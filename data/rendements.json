@@ -1,0 +1,224 @@
+{
+  "releve": "2026-09-18",
+  "inflation": 4.0,
+  "croissance": {
+    "central": 1.98,
+    "bas": 1.5,
+    "haut": 2.68,
+    "periodes": {
+      "1900": 1.98,
+      "1950": 2.68,
+      "1970": 2.36
+    },
+    "fin": 2023,
+    "source": "R. Shiller, S&P 500 depuis 1871, bénéfices réels lissés sur 10 ans"
+  },
+  "sources": {
+    "moodys": "Moody's, Default and Recovery Rates of Corporate Bond Issuers 1920-2004, pertes cumulées à 5 ans (1982-2004)",
+    "jpm": "J.P. Morgan Asset Management, 2026 Long-Term Capital Market Assumptions, hypothèses en euros (p. 84), au 30/09/2025, inflation supposée 2 %",
+    "perte_ig": 0.11,
+    "perte_hy": 3.17
+  },
+  "classes": {
+    "cash": {
+      "libelle": "Monétaire",
+      "etiquette": "mesuré",
+      "central": 2.44,
+      "bas": 2.44,
+      "haut": 2.5,
+      "methode": "Taux monétaire du jour (€STR). S'il restait durablement 4 % d'inflation, ce taux monterait : ce supplément n'est pas compté.",
+      "jpm": 2.3
+    },
+    "govt_bonds_eur_short": {
+      "libelle": "États zone euro, 1-3 ans",
+      "etiquette": "mesuré",
+      "central": 3.21,
+      "bas": 3.05,
+      "haut": 3.379,
+      "methode": "Taux à l'achat, courbe de la BCE entre 1 et 3 ans.",
+      "jpm": null
+    },
+    "govt_bonds_eur": {
+      "libelle": "États zone euro, ensemble",
+      "etiquette": "mesuré",
+      "central": 3.77,
+      "bas": 3.77,
+      "haut": 3.77,
+      "methode": "Taux à l'achat moyen du marché des emprunts d'État de la zone euro. Gardé jusqu'au bout, c'est ce qu'il rapporte.",
+      "jpm": 3.4
+    },
+    "credit_ig_eur": {
+      "libelle": "Crédit euro bien noté",
+      "etiquette": "mesuré",
+      "central": 4.04,
+      "bas": 4.04,
+      "haut": 4.15,
+      "methode": "Taux à l'achat (4,15 %) moins la perte moyenne sur défauts publiée par Moody's (0,11 % par an).",
+      "jpm": 4.0
+    },
+    "hy_euro": {
+      "libelle": "Haut rendement euro (pour mémoire)",
+      "etiquette": "mesuré",
+      "central": 2.88,
+      "bas": 2.88,
+      "haut": 2.88,
+      "methode": "Taux à l'achat (6,05 %) moins la perte moyenne sur défauts publiée par Moody's (3,17 % par an).",
+      "jpm": 5.3
+    },
+    "inflation_linked": {
+      "libelle": "Obligations indexées euro",
+      "etiquette": "mesuré",
+      "central": 5.43,
+      "bas": 5.43,
+      "haut": 5.43,
+      "methode": "Taux réel mesuré (1,43 %) plus l'inflation de l'énoncé (4 %).",
+      "jpm": 3.6
+    },
+    "equity_developed": {
+      "libelle": "Actions des pays développés",
+      "etiquette": "estimé",
+      "central": 7.59,
+      "bas": 6.86,
+      "haut": 8.4,
+      "detail": {
+        "per_ishares": 26.09,
+        "per_yahoo": 22.716717,
+        "dividende": 1.36,
+        "m1_reel": 3.83,
+        "m2_reel": 3.34,
+        "date": null
+      },
+      "methode": "Moyenne de deux méthodes : rendement des bénéfices (1 / PER de 26,1, soit 3,83 %) et dividende (1,36 %) + croissance réelle des bénéfices (2,0 %), plus 4 % d'inflation.",
+      "jpm": 6.3
+    },
+    "us": {
+      "libelle": "dont États-Unis",
+      "etiquette": "estimé",
+      "central": 7.19,
+      "bas": 6.56,
+      "haut": 8.07,
+      "detail": {
+        "per_ishares": 30.01,
+        "per_yahoo": 24.568995,
+        "dividende": 1.06,
+        "m1_reel": 3.33,
+        "m2_reel": 3.04,
+        "date": null
+      },
+      "methode": "Moyenne de deux méthodes : rendement des bénéfices (1 / PER de 30,0, soit 3,33 %) et dividende (1,06 %) + croissance réelle des bénéfices (2,0 %), plus 4 % d'inflation.",
+      "jpm": 6.1
+    },
+    "europe": {
+      "libelle": "dont Europe",
+      "etiquette": "estimé",
+      "central": 9.23,
+      "bas": 8.57,
+      "haut": 9.75,
+      "detail": {
+        "per_ishares": 18.5,
+        "per_yahoo": 17.69292,
+        "dividende": 3.07,
+        "m1_reel": 5.41,
+        "m2_reel": 5.05,
+        "date": null
+      },
+      "methode": "Moyenne de deux méthodes : rendement des bénéfices (1 / PER de 18,5, soit 5,41 %) et dividende (3,07 %) + croissance réelle des bénéfices (2,0 %), plus 4 % d'inflation.",
+      "jpm": 6.4
+    },
+    "zone_euro": {
+      "libelle": "dont zone euro",
+      "etiquette": "estimé",
+      "central": 8.98,
+      "bas": 8.09,
+      "haut": 9.57,
+      "detail": {
+        "per_ishares": 18.57,
+        "per_yahoo": 17.946127,
+        "dividende": 2.59,
+        "m1_reel": 5.39,
+        "m2_reel": 4.57,
+        "date": null
+      },
+      "methode": "Moyenne de deux méthodes : rendement des bénéfices (1 / PER de 18,6, soit 5,39 %) et dividende (2,59 %) + croissance réelle des bénéfices (2,0 %), plus 4 % d'inflation.",
+      "jpm": 7.2
+    },
+    "japon": {
+      "libelle": "dont Japon",
+      "etiquette": "estimé",
+      "central": 9.44,
+      "bas": 9.13,
+      "haut": 10.34,
+      "detail": {
+        "per_ishares": 19.1,
+        "per_yahoo": 19.510363,
+        "dividende": 3.66,
+        "m1_reel": 5.24,
+        "m2_reel": 5.64,
+        "date": null
+      },
+      "methode": "Moyenne de deux méthodes : rendement des bénéfices (1 / PER de 19,1, soit 5,24 %) et dividende (3,66 %) + croissance réelle des bénéfices (2,0 %), plus 4 % d'inflation.",
+      "jpm": 8.2
+    },
+    "equity_emerging": {
+      "libelle": "Actions émergentes",
+      "etiquette": "estimé",
+      "central": 8.4,
+      "bas": 7.16,
+      "haut": 11.03,
+      "detail": {
+        "per_ishares": 19.37,
+        "per_yahoo": 14.2338,
+        "dividende": 1.66,
+        "m1_reel": 5.16,
+        "m2_reel": 3.64,
+        "date": null
+      },
+      "methode": "Moyenne de deux méthodes : rendement des bénéfices (1 / PER de 19,4, soit 5,16 %) et dividende (1,66 %) + croissance réelle des bénéfices (2,0 %), plus 4 % d'inflation.",
+      "jpm": 7.2
+    },
+    "infrastructure": {
+      "libelle": "Infrastructure cotée",
+      "etiquette": "estimé",
+      "central": 8.88,
+      "bas": 8.46,
+      "haut": 9.64,
+      "detail": {
+        "per_ishares": 20.79,
+        "per_yahoo": 19.812471,
+        "dividende": 2.96,
+        "m1_reel": 4.81,
+        "m2_reel": 4.94,
+        "date": null
+      },
+      "methode": "Moyenne de deux méthodes : rendement des bénéfices (1 / PER de 20,8, soit 4,81 %) et dividende (2,96 %) + croissance réelle des bénéfices (2,0 %), plus 4 % d'inflation.",
+      "jpm": 5.9
+    },
+    "gold": {
+      "libelle": "Or",
+      "etiquette": "supposé",
+      "central": 4.0,
+      "bas": 2.0,
+      "haut": 6.0,
+      "methode": "L'or ne verse rien : on suppose qu'il conserve son pouvoir d'achat, soit l'inflation. Fourchette de deux points de part et d'autre.",
+      "jpm": 4.9
+    },
+    "alternatives": {
+      "libelle": "Matières premières",
+      "etiquette": "supposé",
+      "central": 4.0,
+      "bas": 2.44,
+      "haut": 6.0,
+      "methode": "Aucun flux : on suppose qu'elles suivent l'inflation, dont elles sont souvent la cause. Au minimum, le taux monétaire placé en garantie.",
+      "jpm": 4.0
+    },
+    "crypto": {
+      "libelle": "Crypto",
+      "etiquette": "supposé",
+      "central": 0.0,
+      "bas": 0.0,
+      "haut": 0.0,
+      "methode": "Compté à zéro : non estimable avec une précision utile. Toute performance sera un bonus, jamais un élément du plan.",
+      "jpm": null
+    }
+  }
+}
