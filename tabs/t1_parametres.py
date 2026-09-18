@@ -1,282 +1,190 @@
 """
 Étape 1 — Paramètres d'entrée.
 
-Aucun curseur. Volontairement. Ce que cet onglet affiche, ce sont les données
-du problème : ce que le client a, ce qu'il veut, ce qu'il refuse. Un curseur
-sur l'inflation transformerait une hypothèse de mandat en variable de
-présentation, et l'expérience de la version précédente est nette là-dessus —
-un paramètre réglable finit toujours réglé pour que le résultat arrange.
+Cet onglet ne contient AUCUN résultat. Ni rendement attendu, ni volatilité,
+ni drawdown mesuré : tous dépendent d'une allocation qui n'existe qu'à
+l'étape 4, et les afficher ici revenait à présenter la conclusion avant la
+démonstration (défaut relevé par Allan le 2026-09-18 sur la première version
+de cet onglet).
+
+Il fait quatre choses : restituer l'énoncé, dire ce que chaque ligne signifie
+concrètement, en tirer un portrait du client et les questions qu'il faudrait
+lui poser, puis annoncer la méthode des quatre étapes suivantes.
 """
 from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
 
-from core import ips, pedago
-from core.viz import fr
+from core import pedago
 
 
 def render() -> None:
     pedago.chaine(1)
     pedago.etape(
         1, "Paramètres d'entrée",
-        "Tout ce qui suit est imposé, mesuré ou déjà décidé. Rien n'y est "
-        "réglable, et c'est le point de départ des quatre étapes suivantes : "
-        "la macro (2) fournit les hypothèses, l'analyse ligne à ligne (3) "
-        "fournit les supports, l'allocation (4) les combine sous ces "
-        "contraintes, et les backtests (5) vérifient que la contrainte de "
-        "perte tient.",
+        "Avant de chercher des réponses, il faut comprendre la demande. Cet "
+        "onglet ne calcule rien : il lit l'énoncé, dit ce qu'il signifie, ce "
+        "qu'il révèle du client et les questions qu'il laisse ouvertes, puis "
+        "explique comment les quatre étapes suivantes vont y répondre.",
     )
 
     # ------------------------------------------------------------------
-    st.markdown("#### Le mandat")
-
-    c = st.columns(4)
-    c[0].metric("Actifs", "100 M€")
-    c[1].metric("Besoin de liquidité", "10 M€", "sous 24 mois",
-                delta_color="off")
-    c[2].metric("Devise de référence", ips.BASE_CURRENCY)
-    c[3].metric("Horizon des hypothèses", f"{ips.HORIZON_YEARS} ans")
-
-    pedago.explique(
-        "Pourquoi aucun de ces chiffres n'est réglable",
-        "Un paramètre qu'on peut déplacer est un paramètre qu'on déplacera. "
-        "Si l'inflation devient un curseur, la question « le portefeuille "
-        "atteint-il l'objectif ? » perd son sens : il suffit de baisser le "
-        "curseur jusqu'à ce que la réponse soit oui. L'hypothèse d'inflation "
-        "de 4 % est une donnée du mandat, formulée par le client. Notre "
-        "travail est de dire si le portefeuille y répond, pas de négocier "
-        "l'énoncé.",
-        "Le besoin de liquidité de 10 M€ est un engagement daté et certain. "
-        "Il ne se gère pas comme un placement mais comme une dette à honorer : "
-        "la poche qui le finance est dimensionnée sur le calendrier de "
-        "décaissement, et sortie du calcul d'optimisation. C'est une décision "
-        "de politique, pas un arbitrage de rendement — un optimiseur à qui on "
-        "donne du monétaire dans son univers le charge massivement, parce "
-        "qu'à rendement voisin il préfère toujours moins de volatilité.",
-    )
-
-    # ------------------------------------------------------------------
-    st.markdown("#### La contrainte de risque")
-    st.caption("C'est elle qui pilote tout le dimensionnement du portefeuille. "
-               "Pas le profil de risque, pas l'appétence déclarée : cette "
-               "phrase chiffrée.")
+    st.markdown("#### L'énoncé")
 
     st.markdown(
-        f"> Une perte maximum de **{ips.MAX_DRAWDOWN:.0%}**, mesurée de pic à "
-        f"creux sur **12 mois glissants**, en **euros consolidés**, avec une "
-        f"probabilité de dépassement inférieure à "
-        f"**{ips.DD_BREACH_PROBABILITY:.0%}**."
+        "> M. Lauren, 60 ans, marié, deux enfants, résident fiscal français, "
+        "vient de céder sa startup. Il dispose de **100 M€**. Il aura besoin "
+        "de **10 M€ dans les deux ans**. Il veut **protéger le reste contre "
+        "une inflation de 4 %**, sans jamais **perdre plus de 15 %**. Il "
+        "exclut le **tabac, l'armement et le charbon**. Son fils voudrait de "
+        "la **crypto**, lui hésite. Il est **inquiet sur l'Europe comme sur "
+        "les États-Unis**."
     )
+    st.caption("La transmission aux enfants et la fiscalité font partie du "
+               "cas mais pas de cet exercice, qui porte uniquement sur la "
+               "chaîne d'investissement.")
 
-    c = st.columns(4)
-    c[0].metric("Volatilité cible", f"{ips.TARGET_VOL:.1%}")
-    c[1].metric("Drawdown P90 mesuré", f"{ips.EXPECTED_DD_P90:.1%}",
-                f"{ips.MAX_DRAWDOWN - ips.EXPECTED_DD_P90:+.1%} vs contrainte",
-                delta_color="normal")
-    c[2].metric("P(perte > 15 %)", f"{ips.DD_BREACH_MEASURED:.1%}",
-                f"tolérance {ips.DD_BREACH_PROBABILITY:.0%}",
-                delta_color="off")
-    c[3].metric("Pire cas observé (2008)", f"{ips.WORST_OBSERVED_DD:.1%}",
-                "au-delà de la contrainte", delta_color="inverse")
+    # ------------------------------------------------------------------
+    st.markdown("#### Ce que chaque ligne veut dire")
 
-    st.warning(
-        f"Les deux derniers chiffres vont ensemble ou pas du tout. Le "
-        f"portefeuille respecte la contrainte **neuf années sur dix** — c'est "
-        f"le P90 à {ips.EXPECTED_DD_P90:.1%}. La dixième, il ne la respecte "
-        f"pas : en 2008, une allocation de ce niveau de risque a perdu "
-        f"{ips.WORST_OBSERVED_DD:.1%}. Présenter le P90 seul serait "
-        f"présenter une contrainte comme une garantie.",
-        icon=":material/warning:",
-    )
+    lecture = pd.DataFrame([
+        ("100 M€",
+         "Une somme importante mais surtout liquide : tout est aujourd'hui "
+         "en cash, après la vente. On part d'une feuille blanche, sans "
+         "portefeuille existant à réaménager."),
+        ("10 M€ sous deux ans",
+         "Un décaissement quasi certain à court terme. Cet argent ne peut pas "
+         "être exposé au risque : il sera mis de côté et ne participera pas "
+         "à la recherche de rendement. On investit donc réellement 90 M€."),
+        ("Protéger contre une inflation de 4 %",
+         "L'objectif n'est pas de s'enrichir mais de ne pas s'appauvrir. Le "
+         "portefeuille doit rapporter au moins 4 % par an, sans quoi le "
+         "pouvoir d'achat du patrimoine recule. Ce 4 % est le seuil à battre."),
+        ("Ne pas perdre plus de 15 %",
+         "La limite de risque. C'est elle qui fixe la part d'actifs risqués "
+         "qu'on peut se permettre, donc le rendement qu'on peut espérer. Elle "
+         "entre en tension directe avec l'objectif précédent."),
+        ("Tabac, armement, charbon exclus",
+         "Des convictions personnelles, qui réduisent l'univers "
+         "d'investissement. Elles concernent les entreprises : un emprunt "
+         "d'État ou de l'or ne sont pas touchés."),
+        ("Crypto : le fils veut, le père hésite",
+         "Une question familiale autant que financière. Elle appelle une "
+         "réponse mesurée — une petite poche plafonnée, ou rien — plutôt "
+         "qu'un choix tranché."),
+        ("Inquiet sur l'Europe et sur les États-Unis",
+         "Pas de zone refuge évidente dans l'esprit du client. Cela plaide "
+         "pour une vraie diversification géographique et pour des actifs "
+         "qui ne dépendent d'aucune économie en particulier, comme l'or."),
+    ], columns=["L'énoncé dit", "Ce que cela signifie"])
+    st.table(lecture.set_index("L'énoncé dit"))
 
-    pedago.explique(
-        "Comment une perte maximum devient un budget de volatilité",
-        "Un client exprime son risque en perte : « je ne veux pas perdre plus "
-        "de 15 % ». Un portefeuille, lui, se construit en volatilité — c'est "
-        "la grandeur qu'une matrice de covariance sait manipuler. Il faut donc "
-        "un pont entre les deux, et ce pont est un rapport empirique entre le "
-        "drawdown qu'on observe et la volatilité annuelle.",
-        "La version initiale de ce dossier utilisait un rapport de 1,9, posé "
-        "comme règle empirique. Mesuré sur 21,8 ans de données quotidiennes en "
-        "euros, il vaut **1,35**. L'écart n'est pas anodin : l'ancienne valeur "
-        "sous-allouait le risque d'environ dix points d'actions, donc "
-        "sacrifiait du rendement pour respecter une contrainte qui n'était "
-        "jamais menacée.",
-        "Le rapport n'est d'ailleurs pas constant. Il vaut 1,81 pour un "
-        "portefeuille à 20 % d'actions et 1,33 à 80 %, parce que la poche "
-        "obligataire agit davantage sur le drawdown que sur la volatilité. "
-        "C'est pourquoi le budget retenu n'est pas déduit du rapport mais lu "
-        "directement sur l'allocation testée : on simule, on mesure, on "
-        "n'extrapole pas.",
-        source="scripts/estimate_dd_ratio.py · 21,8 ans de données "
-               "quotidiennes EUR (2004-2026)",
-    )
-    pedago.formule(
-        r"\text{volatilité cible} \;=\; "
-        r"\frac{\text{perte maximum acceptée}}{\text{rapport perte / volatilité}}"
-        r" \;=\; \frac{15\,\%}{1{,}35} \;\approx\; 11\,\%",
-        "On divise la perte que le client refuse par le rapport mesuré entre "
-        "perte et volatilité. Le résultat est le niveau d'agitation annuelle "
-        "que le portefeuille peut se permettre. Nous retenons 9,6 % et non "
-        "11 %, parce que l'estimation elle-même porte une erreur et qu'on ne "
-        "construit pas à la limite d'une mesure incertaine.",
-    )
-
-    pedago.explique(
-        "Pourquoi une contrainte chiffrée prime sur un profil de risque",
-        "Le client se décrit volontiers comme « dynamique ». Dans la plupart "
-        "des grilles maison, dynamique signifie 70 à 80 % d'actions. Or 70 % "
-        "d'actions produisent une perte à dix ans nettement supérieure à "
-        "15 %. L'adjectif et le chiffre sont incompatibles, et il faut "
-        "choisir.",
-        "Nous choisissons le chiffre, pour une raison simple : c'est le seul "
-        "des deux qui soit vérifiable. On peut mesurer si une perte dépasse "
-        "15 %, on ne peut pas mesurer si un portefeuille est dynamique. Le "
-        "profil déclaré est honoré autrement — non par le niveau de risque, "
-        "mais par sa composition : c'est la part d'actifs de croissance qui "
-        "porte l'ambition, dans la limite du budget.",
-        "Ce point est le plus important à savoir tenir à l'oral. Un client "
-        "qui s'entend dire que son profil ne sera pas suivi doit comprendre "
-        "que c'est sa propre contrainte qui l'interdit, pas une prudence de "
-        "gérant.",
+    st.info(
+        "Le cœur du problème tient en une phrase : **rapporter au moins 4 % "
+        "par an sans jamais perdre plus de 15 %.** Viser 4 % impose de "
+        "prendre du risque ; limiter la perte à 15 % en interdit trop. Tout "
+        "l'exercice consiste à vérifier qu'il existe un portefeuille qui "
+        "tient les deux à la fois.",
+        icon=":material/balance:",
     )
 
     # ------------------------------------------------------------------
-    st.markdown("#### Le seuil de rendement à franchir")
-
-    seuil = ips.required_gross_return()
-    deriv = pd.DataFrame([
-        ("Préservation du pouvoir d'achat", ips.INFLATION_TARGET,
-         "hypothèse du client, figée"),
-        ("Coût des supports (TER moyen pondéré)", ips.INSTRUMENT_TER,
-         "mesuré sur les supports retenus — étape 3"),
-        ("Seuil de rendement brut requis", seuil, ""),
-    ], columns=["Composante", "Taux", "Provenance"])
-    deriv["Taux"] = deriv["Taux"].map(lambda v: f"{v:.2%}")
-    st.dataframe(deriv, hide_index=True, width="stretch")
-
-    faisa = pd.DataFrame(
-        [(lab, f"{er:.2%}", f"{s:.2%}", f"{m:+.2%}")
-         for lab, er, s, m in ips.feasibility()],
-        columns=["Régime d'inflation", "Rendement attendu", "Seuil requis",
-                 "Marge"],
-    )
-    st.dataframe(faisa, hide_index=True, width="stretch")
-
-    st.success(
-        f"L'objectif est atteint dans les deux régimes. C'est le point de "
-        f"pitch le plus solide du dossier : *« votre hypothèse à 4 % est "
-        f"au-dessus du consensus, nous ne l'avons pas corrigée — vous êtes "
-        f"couvert dans les deux cas, donc vous ne dépendez pas du fait que "
-        f"nous ayons raison sur l'inflation »*.",
-        icon=":material/check_circle:",
-    )
+    st.markdown("#### Ce que cela dit du client")
 
     pedago.explique(
-        "Ce que ce seuil ne contient pas, et pourquoi il faut le dire",
-        "Ce seuil comprend l'inflation et le coût des supports. Il ne comprend "
-        "ni frais de gestion, ni fiscalité. C'est une décision de périmètre : "
-        "cette application documente un processus d'investissement, pas la "
-        "structuration d'un mandat.",
-        f"La conséquence doit être énoncée franchement, parce qu'elle flatte "
-        f"le résultat. Avec des frais de gestion de "
-        f"{ips.FRAIS_GESTION_REFERENCE:.2%} — un ordre de grandeur de marché "
-        f"sur un encours de cette taille — le seuil passerait de "
-        f"{seuil:.2%} à {ips.SEUIL_REFERENCE_AVEC_FRAIS:.2%} et la marge "
-        f"tomberait de "
-        f"{ips.expected_gross_return() - seuil:+.2%} à "
-        f"{ips.expected_gross_return() - ips.SEUIL_REFERENCE_AVEC_FRAIS:+.2%}. "
-        f"La marge affichée ci-dessus est donc une marge **avant frais de "
-        f"gestion**. Elle reste positive dans les deux cas, ce qui est le "
-        f"point qui compte.",
-        "Un chiffre a disparu du dossier avec ce changement de périmètre, et "
-        "il était le plus puissant : la structuration fiscale et la "
-        "transmission valaient environ 50 M€ de patrimoine net transmis, "
-        "contre 5,5 M€ pour l'ensemble de l'optimisation d'allocation. Un "
-        "facteur neuf. Ce travail existe toujours dans l'historique du "
-        "projet ; il ne fait simplement plus partie de ce qu'on démontre ici.",
-    )
-
-    pedago.explique(
-        "Pourquoi le seuil et le rendement attendu doivent être jugés dans "
-        "le même régime d'inflation",
-        "C'est la correction la plus importante de tout le projet, et la plus "
-        "facile à commettre. Les premières versions comparaient un seuil bâti "
-        "sur 4 % d'inflation à des rendements attendus bâtis implicitement sur "
-        "2 %. Le portefeuille était évalué dans un monde et jugé dans un "
-        "autre. La marge annoncée était fausse, et elle était fausse dans le "
-        "sens pessimiste.",
-        "La correction consiste à faire porter à chaque classe d'actifs un "
-        "coefficient de répercussion de l'inflation : dans quelle proportion "
-        "son rendement nominal suit une surprise d'inflation sur dix ans. Le "
-        "monétaire et les obligations indexées suivent intégralement. Le "
-        "souverain à taux fixe ne suit qu'à 45 %, parce qu'une hausse des taux "
-        "lui fait d'abord perdre du capital avant qu'il ne réinvestisse plus "
-        "cher. Les matières premières suivent à plus de 100 %, étant souvent "
-        "la cause même de la surprise.",
-        "Le tableau ci-dessus est donc lisible ligne par ligne : chaque ligne "
-        "est un monde cohérent, dans lequel le seuil et le rendement sont "
-        "calculés avec la même hypothèse d'inflation.",
-        source="core/cma.py · coefficients de répercussion par classe",
+        "Le portrait qui se dégage de l'énoncé",
+        "M. Lauren a construit sa fortune en prenant un risque très élevé : "
+        "tout son patrimoine était concentré dans une seule entreprise. Il "
+        "vient de le transformer en cash, et sa demande va dans le sens "
+        "inverse de son parcours. Il ne cherche plus à faire fortune, il "
+        "cherche à la garder. C'est typique d'un entrepreneur qui vient de "
+        "céder.",
+        "Son hypothèse d'inflation à 4 % est élevée : c'est environ le double "
+        "de l'objectif de la BCE. Elle traduit une inquiétude plus qu'une "
+        "prévision. Il craint l'érosion lente de son patrimoine davantage "
+        "qu'un krach. Sa limite de perte à 15 %, elle, est modérée : il "
+        "accepte des secousses mais pas une chute qui entame durablement le "
+        "capital.",
+        "Enfin, il est méfiant à l'égard des deux grandes économies "
+        "développées et ouvert, par l'intermédiaire de son fils, à des actifs "
+        "non conventionnels. C'est un client qui attend qu'on lui explique "
+        "pourquoi, et pas seulement quoi.",
+        ouvert=True,
     )
 
     # ------------------------------------------------------------------
-    st.markdown("#### Les exclusions")
+    st.markdown("#### Les questions que l'énoncé laisse ouvertes")
+    st.caption("Des questions qu'il faudrait poser au client. Faute de "
+               "réponse, chacune appelle une hypothèse de travail, qui sera "
+               "énoncée à l'étape où elle intervient.")
 
-    esg = pd.DataFrame([
-        ("Tabac", "Production 0 % · distribution 5 %",
-         "Exigé sur les actions et le crédit d'entreprise"),
-        ("Armement", "Controversé 0 % · conventionnel 5 %",
-         "Exigé sur les actions et le crédit d'entreprise"),
-        ("Charbon thermique", "Extraction 5 % · production électrique 5 %",
-         "Exigé sur les actions et le crédit d'entreprise"),
-    ], columns=["Exclusion", "Seuil de chiffre d'affaires", "Portée"])
-    st.dataframe(esg, hide_index=True, width="stretch")
-
-    c = st.columns(2)
-    c[0].metric("Univers", "UCITS uniquement",
-                "résident français retail, contrainte PRIIPs",
-                delta_color="off")
-    c[1].metric("Concentration maximum par ligne",
-                f"{ips.CONCENTRATION_LIMITS['single_line']:.0%}")
-
-    pedago.explique(
-        "La portée d'un filtre d'exclusion, et une erreur qu'on avait commise",
-        "Les trois exclusions visent des émetteurs d'entreprise. Il n'y a rien "
-        "à filtrer dans une obligation d'État allemande ni dans un lingot d'or "
-        "— ce ne sont pas des entreprises et elles ne produisent ni tabac ni "
-        "charbon. Une première version de ce dossier appliquait néanmoins le "
-        "filtre partout, ce qui conduisait à écarter des supports parfaitement "
-        "conformes et à en retenir de moins bons.",
-        "La règle retenue distingue trois cas : le filtre est **exigé** (les "
-        "actions et le crédit d'entreprise), **sans objet** (souverain, or, "
-        "monétaire), ou **sous condition** (les indices mixtes, où il faut "
-        "regarder la poche d'entreprises). Et quand le filtre est exigé, c'est "
-        "le support principal qui doit le porter — pas un suppléant qu'on "
-        "montre en annexe.",
-        "La contrainte UCITS, elle, n'est pas un choix : un résident français "
-        "particulier ne peut pas acheter de fonds non-UCITS depuis un compte "
-        "ordinaire, le règlement PRIIPs l'interdit. Cela écarte l'essentiel "
-        "des fonds domiciliés aux États-Unis, souvent moins chers, et c'est "
-        "une contrainte qui coûte de la performance.",
-        source="core/esg.py",
-    )
+    questions = pd.DataFrame([
+        ("La perte de 15 %",
+         "Mesurée sur quelle durée : une année, ou depuis le point le plus "
+         "haut jamais atteint ? Et est-ce une limite absolue, ou acceptable "
+         "si elle n'arrive que très rarement ? Une limite « jamais » est "
+         "impossible à garantir pour un portefeuille investi."),
+        ("L'inflation à 4 %",
+         "Est-ce une prévision du client ou un scénario de prudence ? Quelle "
+         "inflation : française, européenne ? Et que veut dire « protéger » : "
+         "maintenir le pouvoir d'achat chaque année, ou en moyenne sur dix "
+         "ans ?"),
+        ("L'horizon",
+         "Combien de temps l'argent restera-t-il investi ? À 60 ans, avec une "
+         "transmission en vue, l'horizon réel dépasse probablement celui du "
+         "client lui-même."),
+        ("Les 10 M€",
+         "Pour quoi faire, et à quelle date ? Un achat immobilier daté ne se "
+         "gère pas comme une réserve de précaution."),
+        ("L'inquiétude géographique",
+         "Qu'est-ce qui inquiète exactement : la croissance, la dette "
+         "publique, la politique ? La réponse ne sera pas la même selon le "
+         "risque redouté."),
+        ("La crypto",
+         "Qui décide, et jusqu'à quel montant ? Est-ce un placement ou un "
+         "geste envers le fils ?"),
+        ("Les supports accessibles",
+         "Un particulier résidant en France n'a accès qu'aux fonds européens "
+         "(UCITS). Avec 100 M€, M. Lauren pourrait demander à être traité en "
+         "client professionnel, ce qui élargirait l'univers. Le souhaite-t-il ?"),
+    ], columns=["Sujet", "Question"])
+    st.table(questions.set_index("Sujet"))
 
     # ------------------------------------------------------------------
-    st.markdown("#### Ce que ces paramètres ne disent pas")
+    st.markdown("#### Comment nous allons procéder")
 
     st.markdown(
-        "- **L'hypothèse d'inflation de 4 % n'est pas une prévision.** "
-        "L'étape 2 mesure ce que le marché anticipe réellement. Les deux "
-        "chiffres diffèrent sensiblement, et c'est un point de conversation, "
-        "pas un problème.\n"
-        "- **La contrainte de perte est probabiliste, pas absolue.** "
-        "« Moins d'une année sur dix » signifie qu'il y aura des années "
-        "au-delà de 15 %.\n"
-        "- **Le rendement attendu est une hypothèse, pas un engagement.** "
-        "Son mode de construction, classe par classe, est exposé à l'étape 2.\n"
-        "- **La durée d'une perte compte autant que sa profondeur.** "
-        "2022 fut moins profond que 2020 mais trois fois plus long à "
-        "récupérer. L'étape 5 mesure le temps passé sous l'eau."
+        "La démarche suit le processus d'un fonds multi-actifs "
+        "institutionnel. Elle part du plus général — l'état de l'économie — "
+        "et descend jusqu'au détail — le choix de chaque support —, avant de "
+        "vérifier le résultat sur le passé. Chaque étape utilise ce que la "
+        "précédente a produit."
     )
+
+    methode = pd.DataFrame([
+        ("2 · Macro",
+         "Où en est l'économie ?",
+         "Lire les taux d'intérêt, l'inflation anticipée par les marchés et "
+         "le cycle économique, zone par zone. Confronter l'hypothèse de 4 % "
+         "du client à ce que le marché anticipe.",
+         "Un rendement espéré pour chaque grande classe d'actifs"),
+        ("3 · Ligne à ligne",
+         "Dans quoi peut-on investir ?",
+         "Noter les actions européennes sur quatre critères (valorisation, "
+         "croissance, dynamique, qualité), évaluer les obligations à partir "
+         "des courbes de taux, appliquer les exclusions.",
+         "La liste des supports retenus"),
+        ("4 · Allocation",
+         "Combien mettre dans chaque ?",
+         "Chercher la répartition qui rapporte au moins 4 % tout en "
+         "respectant la limite de perte de 15 %.",
+         "Le portefeuille proposé"),
+        ("5 · Backtests",
+         "Aurait-il tenu ?",
+         "Faire traverser au portefeuille les crises passées (2008, 2011, "
+         "2020, 2022) et mesurer ses pertes et leur durée.",
+         "La réponse : la limite de 15 % tient-elle, et à quelle fréquence "
+         "cède-t-elle ?"),
+    ], columns=["Étape", "Question", "Ce qu'on fait", "Ce qu'on en sort"])
+    st.table(methode.set_index("Étape"))
