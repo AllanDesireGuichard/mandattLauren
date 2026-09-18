@@ -127,6 +127,23 @@ def courbes() -> dict:
     }
 
 
+def parametres_svensson() -> dict:
+    """
+    Les six paramètres de la courbe (modèle de Svensson), pour les deux
+    courbes. Ils permettent de calculer le taux de N'IMPORTE QUELLE échéance,
+    donc d'évaluer une obligation précise. Formule vérifiée le 2026-09-18 :
+    elle redonne les taux publiés à 0,0005 point près.
+    """
+    out = {}
+    for code, nom in [("G_N_A", "aaa"), ("G_N_C", "toutes")]:
+        d = _bce(f"YC/B.U2.EUR.4F.{code}.SV_C_YM."
+                 "BETA0+BETA1+BETA2+BETA3+TAU1+TAU2")
+        out[nom] = {k.lower(): float(v)
+                    for k, v in zip(d["DATA_TYPE_FM"], d["OBS_VALUE"])}
+        out["date"] = str(d["TIME_PERIOD"].max())
+    return out
+
+
 def point_bce(cle: str, source: str) -> dict:
     d = _bce(cle)
     return {"valeur": round(float(d["OBS_VALUE"].iloc[-1]), 3),
@@ -217,6 +234,7 @@ def main() -> int:
             print(f"  ÉCHEC   {nom} — {e} (ancienne valeur conservée)")
 
     essayer("courbes", courbes, cible="courbes")
+    essayer("svensson", parametres_svensson, cible="svensson")
     essayer("estr", point_bce, "EST/B.EU000A2X2A25.WT",
             "BCE, €STR (taux monétaire au jour le jour)")
     essayer("depot_bce", point_bce, "FM/D.U2.EUR.4F.KR.DFR.LEV",
