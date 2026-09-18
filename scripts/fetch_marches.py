@@ -103,12 +103,13 @@ def prix(ticker: str) -> pd.Series:
     return s
 
 
-def retirer_allers_retours(s: pd.Series) -> tuple[pd.Series, list[str]]:
+def retirer_allers_retours(s: pd.Series, retour_max: float = RETOUR_MAX
+                           ) -> tuple[pd.Series, list[str]]:
     r = s.pct_change()
     veille, lendemain = s.shift(1), s.shift(-1)
     faux = ((r.abs() > PIC_MIN)
             & (r * r.shift(-1) < 0)
-            & ((lendemain / veille - 1).abs() < RETOUR_MAX))
+            & ((lendemain / veille - 1).abs() < retour_max))
     return s[~faux], [d.date().isoformat() for d in s.index[faux]]
 
 

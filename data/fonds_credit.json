@@ -1,0 +1,105 @@
+{
+ "releve": "2026-09-18",
+ "taille_min": 1000.0,
+ "duree_max": 3.0,
+ "retenu": "QDVL.DE",
+ "fonds": {
+  "QDVL.DE": {
+   "isin": "IE00BYZTVV78",
+   "nom": "iShares € Corp Bond 0-3yr ESG SRI UCITS ETF EUR (Dist)",
+   "filtre": "ESG SRI",
+   "exclusions": "conforme",
+   "rendement": 3.5,
+   "duree": 1.4,
+   "maturite": 1.59,
+   "frais": 0.12,
+   "taille": 4219,
+   "indice": "Bloomberg MSCI Euro Corporate 0-3 ESG SRI Index",
+   "date": "2026-09-17",
+   "pires_baisses": {
+    "2020": -3.5,
+    "2022": -4.4
+   },
+   "verdict": "retenu"
+  },
+  "EUNS.DE": {
+   "isin": "IE00B4L5ZY03",
+   "nom": "iShares € Corp Bond ex-Financials 1-5yr ESG SRI UCITS ETF EUR (Dist)",
+   "filtre": "ESG SRI",
+   "exclusions": "conforme",
+   "rendement": 3.82,
+   "duree": 2.73,
+   "maturite": 2.95,
+   "frais": 0.2,
+   "taille": 1328,
+   "indice": "Bloomberg MSCI Euro Corporate ex-Financials 1-5 Year ESG SRI Bond Index (EU",
+   "date": "2026-09-16",
+   "pires_baisses": {
+    "2020": -5.1,
+    "2022": -8.3
+   },
+   "verdict": "plus cher qu'un candidat équivalent"
+  },
+  "EUNT.DE": {
+   "isin": "IE00B4L60045",
+   "nom": "iShares € Corp Bond 1-5yr UCITS ETF EUR (Dist)",
+   "filtre": "aucun",
+   "exclusions": "non filtré",
+   "rendement": 3.94,
+   "duree": 2.7,
+   "maturite": 3.03,
+   "frais": 0.2,
+   "taille": 4240,
+   "indice": "BBG Euro Corp 1-5 Yrs",
+   "date": "2026-09-16",
+   "pires_baisses": {
+    "2020": -6.3,
+    "2022": -9.1
+   },
+   "verdict": "aucun filtre d'exclusion"
+  },
+  "SUOE.L": {
+   "isin": "IE00BYZTVT56",
+   "nom": "iShares € Corp Bond ESG SRI UCITS ETF EUR (Dist)",
+   "filtre": "ESG SRI",
+   "exclusions": "conforme",
+   "rendement": 4.12,
+   "duree": 4.33,
+   "maturite": 5.14,
+   "frais": 0.14,
+   "taille": 5836,
+   "indice": "Bloomberg MSCI Euro Corporate ESG SRI Index",
+   "date": "2026-09-16",
+   "pires_baisses": {
+    "2020": -8.3,
+    "2022": -15.3
+   },
+   "verdict": "durée supérieure à 3 ans"
+  },
+  "EUN5.DE": {
+   "isin": "IE00B3F81R35",
+   "nom": "iShares Core € Corp Bond UCITS ETF EUR (Dist)",
+   "filtre": "aucun",
+   "exclusions": "non filtré",
+   "rendement": 4.14,
+   "duree": 4.35,
+   "maturite": 5.17,
+   "frais": 0.09,
+   "taille": 13227,
+   "indice": "BBG Euro Corporate Index",
+   "date": "2026-09-17",
+   "pires_baisses": {
+    "2020": -8.7,
+    "2022": -15.4
+   },
+   "verdict": "aucun filtre d'exclusion"
+  }
+ },
+ "repere_etat": {
+  "ticker": "MTA.PA",
+  "pires_baisses": {
+   "2020": -1.1,
+   "2022": -5.0
+  }
+ }
+}

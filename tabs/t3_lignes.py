@@ -3,7 +3,9 @@
 
 Construit bloc par bloc, comme l'onglet 2. Blocs 1 et 2 (2026-09-18) :
 l'entonnoir et les exclusions, puis la notation des actions européennes et
-la sélection des 30 titres.
+la sélection des 30 titres. Bloc 3 : les emprunts d'État en direct. Bloc 4
+(tabs/t3_fonds.py) : les fonds et ETF des autres classes. Bloc 5
+(tabs/t3_credit.py) : le crédit.
 
 Décisions validées avec Allan : 30 titres ; grandes capitalisations
 (10 Md€ et plus) ; cinq piliers à poids égaux, dont « Résistance » ;
@@ -16,6 +18,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from core import actions, obligations, pedago, scoring, taux, viz
+from tabs import t3_credit, t3_fonds
 
 
 @st.cache_data(show_spinner="Notation des 600 titres…")
@@ -37,6 +40,8 @@ def render() -> None:
     _bloc_entonnoir(d)
     _bloc_notation(d)
     _bloc_souverains()
+    t3_fonds.bloc()
+    t3_credit.bloc()
     _suite()
 
 
@@ -589,11 +594,32 @@ def _graphique_souverains(aaa: dict, zone: dict, estr: float) -> None:
 # --------------------------------------------------------------------------
 
 def _suite() -> None:
-    st.markdown("#### La suite de cet onglet")
-    pedago.a_construire(
-        3, "Analyse ligne à ligne, blocs suivants",
-        "**Fonds et ETF** pour les autres classes d'actifs : frais, écart de "
-        "suivi, taille, liquidité, conformité aux exclusions.",
-        "**Crédit** : des fonds bien notés et de durée courte, le crédit "
-        "étant aujourd'hui mal payé (étape 2).",
-    )
+    """Sortie de l'étape 3 : un support par classe, rien de plus."""
+    import json
+    from pathlib import Path
+    from core import fonds
+    racine = Path(__file__).resolve().parents[1] / "data"
+    cl = fonds.charger()["classes"]
+    cr = json.loads((racine / "fonds_credit.json").read_text(encoding="utf-8"))
+    st.markdown("#### Ce que l'étape 3 transmet à l'étape 4")
+    lignes = [
+        ("Actions européennes", "30 titres en direct", "blocs 1 et 2"),
+        ("Emprunts d'État, 10 M€ à décaisser",
+         "Échelle AAA en direct, 6 à 24 mois", "bloc 3"),
+        ("Emprunts d'État, poche longue",
+         "Échelle zone euro en direct, 2 à 10 ans", "bloc 3"),
+    ]
+    for k in fonds.ORDRE:
+        c = cl[k]
+        lignes.append((c["libelle"],
+                       f"{c['retenu']} · {c['candidats'][c['retenu']]['nom']}",
+                       "bloc 4"))
+    lignes.append(("Crédit euro bien noté, court",
+                   f"{cr['retenu']} · {cr['fonds'][cr['retenu']]['nom']}",
+                   "bloc 5"))
+    lignes.append(("Infrastructure", "retirée : aucun fonds conforme",
+                   "bloc 4"))
+    st.table(pd.DataFrame(lignes, columns=["Classe", "Support", "Où"])
+             .set_index("Classe"))
+    st.caption("L'étape 4 décidera combien placer sur chacun, sous la "
+               "limite de perte de 15 %.")
