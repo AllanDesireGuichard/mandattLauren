@@ -1,0 +1,77 @@
+{
+  "releve": "2026-09-18",
+  "points": {
+    "estr": {
+      "valeur": 2.44,
+      "date": "2026-09-17",
+      "source": "BCE, €STR (taux monétaire au jour le jour)"
+    },
+    "depot_bce": {
+      "valeur": 2.5,
+      "date": "2026-09-18",
+      "source": "BCE, taux de la facilité de dépôt"
+    },
+    "etat_euro": {
+      "valeur": 3.77,
+      "duration": 6.7,
+      "date": "2026-09-16",
+      "source": "iShares Core € Govt Bond (SEGA), rendement moyen à l'échéance du portefeuille"
+    },
+    "credit_ig_euro": {
+      "valeur": 4.15,
+      "duration": 4.34,
+      "date": "2026-09-16",
+      "source": "iShares Core € Corp Bond (IEAC), rendement moyen à l'échéance du portefeuille"
+    },
+    "indexees_nominal": {
+      "valeur": 3.87,
+      "duration": 7.18,
+      "date": "2026-09-16",
+      "source": "iShares € Inflation Linked Govt Bond (IBCI), rendement moyen à l'échéance du portefeuille"
+    },
+    "indexees_reel": {
+      "valeur": 1.43,
+      "duration": 7.37,
+      "nominal_meme_date": 3.47,
+      "date": "2026-07-31",
+      "source": "iShares € Inflation Linked Govt Bond (IBCI), fiche mensuelle, taux réel (« Yield to Worst »)"
+    }
+  },
+  "courbes": {
+    "date": "2026-09-16",
+    "source": "BCE, courbe zéro-coupon des emprunts d'État de la zone euro",
+    "maturites": [
+      1,
+      2,
+      3,
+      5,
+      7,
+      10,
+      15,
+      20,
+      30
+    ],
+    "aaa": [
+      2.967,
+      3.166,
+      3.218,
+      3.276,
+      3.37,
+      3.533,
+      3.738,
+      3.83,
+      3.786
+    ],
+    "toutes": [
+      3.05,
+      3.273,
+      3.379,
+      3.554,
+      3.739,
+      3.991,
+      4.279,
+      4.414,
+      4.404
+    ]
+  }
+}
