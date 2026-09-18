@@ -1,0 +1,74 @@
+{
+  "releve": "2026-09-18",
+  "lien_us_europe": {
+    "niveaux": 0.89,
+    "variations_hebdo": 0.67,
+    "debut": "2023-09-18"
+  },
+  "series": {
+    "BAA10Y": {
+      "nom": "Entreprises notées Baa (Moody's), États-Unis",
+      "valeur": 1.43,
+      "date": "2026-09-16",
+      "debut": "1986-01-02",
+      "mediane": 2.13,
+      "rang": 2,
+      "pics": {
+        "2008": 6.16,
+        "2020": 4.31,
+        "2022": 2.42
+      }
+    },
+    "BAMLC0A0CM": {
+      "nom": "Entreprises bien notées, États-Unis (ICE)",
+      "valeur": 0.78,
+      "date": "2026-09-16",
+      "debut": "2023-09-18",
+      "mediane": 0.85,
+      "rang": 13,
+      "pics": {}
+    },
+    "BAMLC0A4CBBB": {
+      "nom": "Entreprises notées BBB, États-Unis (ICE)",
+      "valeur": 0.96,
+      "date": "2026-09-16",
+      "debut": "2010-01-04",
+      "mediane": 1.67,
+      "rang": 1,
+      "pics": {
+        "2020": 4.88,
+        "2022": 2.1
+      }
+    },
+    "BAMLH0A0HYM2": {
+      "nom": "Haut rendement, États-Unis (ICE)",
+      "valeur": 2.7,
+      "date": "2026-09-16",
+      "debut": "2010-01-04",
+      "mediane": 4.23,
+      "rang": 2,
+      "pics": {
+        "2020": 10.87,
+        "2022": 5.99
+      }
+    },
+    "BAMLHE00EHYIOAS": {
+      "nom": "Haut rendement, zone euro (ICE)",
+      "valeur": 2.74,
+      "date": "2026-09-16",
+      "debut": "2023-09-18",
+      "mediane": 3.13,
+      "rang": 22,
+      "pics": {}
+    },
+    "BAMLEMCBPIOAS": {
+      "nom": "Entreprises émergentes, en dollars (ICE)",
+      "valeur": 1.34,
+      "date": "2026-09-16",
+      "debut": "2023-09-18",
+      "mediane": 1.71,
+      "rang": 0,
+      "pics": {}
+    }
+  }
+}

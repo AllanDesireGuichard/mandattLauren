@@ -16,7 +16,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from core import macro, pedago, taux, viz
+from core import credit, macro, pedago, taux, viz
 from core.ips import INFLATION_TARGET
 
 SEUIL = INFLATION_TARGET * 100          # en points de pourcentage
@@ -42,6 +42,7 @@ def render() -> None:
     _bloc_taux()
     _bloc_etranger()
     _bloc_cycle()
+    _bloc_credit()
     _suite()
 
 
@@ -675,6 +676,153 @@ def _tableau_emergents(em: dict) -> None:
 
 
 # --------------------------------------------------------------------------
+# Bloc 4 — les primes de crédit, comparées à leur histoire
+# --------------------------------------------------------------------------
+
+def _bloc_credit() -> None:
+    c = credit.charger()
+    s = c["series"]
+    lien = c["lien_us_europe"]
+    baa, hy = s["BAA10Y"], s["BAMLH0A0HYM2"]
+    photo = taux.charger()["points"]
+    ig_eur = photo["credit_ig_euro"]
+
+    st.markdown("#### Le crédit est-il bien payé ?")
+    st.markdown(
+        "Une entreprise emprunte plus cher qu'un État, parce qu'elle peut "
+        "faire défaut. Cet écart s'appelle la prime de crédit : c'est ce que "
+        "l'investisseur reçoit pour porter ce risque. Il varie beaucoup dans "
+        "le temps, faible quand tout va bien, très élevé en crise. Le "
+        "comparer à son histoire dit si l'on est aujourd'hui bien ou mal "
+        "payé pour prêter aux entreprises."
+    )
+
+    ordre = ["BAA10Y", "BAMLC0A4CBBB", "BAMLH0A0HYM2", "BAMLC0A0CM",
+             "BAMLHE00EHYIOAS", "BAMLEMCBPIOAS"]
+    lignes = []
+    for k in ordre:
+        d = s[k]
+        pics = ", ".join(f"{a} : {_pct(v)}" for a, v in d["pics"].items()) or "—"
+        lignes.append((d["nom"], _pct(d["valeur"]),
+                       f"{_pct(d['mediane'])} (depuis {d['debut'][:4]})",
+                       f"{d['rang']} % du temps", pics))
+    st.table(pd.DataFrame(lignes, columns=[
+        "Prime de crédit", "Aujourd'hui", "Médiane historique",
+        "Plus basse qu'aujourd'hui", "Pic en crise"]).set_index(
+            "Prime de crédit"))
+    st.caption(
+        "« Plus basse qu'aujourd'hui » : la part des jours, sur tout "
+        "l'historique disponible, où la prime était inférieure à son niveau "
+        "actuel. Les trois dernières lignes n'ont que trois ans d'historique "
+        "(voir l'encadré sur les limites) : leur rang est peu significatif."
+    )
+
+    _graphique_credit()
+
+    st.info(
+        f"**Le crédit n'a presque jamais été aussi mal payé.** Sur quarante "
+        f"ans, la prime des entreprises moyennement notées n'a été plus "
+        f"basse qu'aujourd'hui que {baa['rang']} % du temps ; celle du haut "
+        f"rendement américain, {hy['rang']} % du temps depuis 2010. Une "
+        f"prime basse n'annonce pas une crise. Mais elle laisse très peu de "
+        f"marge : si elle revient vers sa médiane, le prix des obligations "
+        f"baisse, et en crise elle peut être multipliée par trois ou quatre. Le risque est asymétrique, "
+        f"peu à gagner et beaucoup à perdre. Pour l'allocation, le crédit ne "
+        f"mérite pas d'être surpondéré : la qualité et les durées courtes "
+        f"sont préférables.",
+        icon=":material/lightbulb:",
+    )
+
+    perte_1pt = ig_eur["duration"]
+    pedago.explique(
+        "Pourquoi une prime basse est un risque",
+        "Quand la prime de crédit monte, les obligations d'entreprises déjà "
+        "émises valent moins : les nouvelles rapportent davantage, et il "
+        "faut baisser le prix des anciennes pour qu'elles restent "
+        "attractives. La règle d'approximation est simple : le prix baisse "
+        "d'environ la durée de l'obligation multipliée par la hausse de la "
+        "prime.",
+        f"Exemple concret avec le crédit européen bien noté vu plus haut : "
+        f"durée moyenne de {viz.fr(perte_1pt, 'ans', 1)}, rendement de "
+        f"{_pct(ig_eur['valeur'])}. Si la prime remonte d'un seul point, le "
+        f"prix baisse d'environ {viz.fr(perte_1pt, '%', 1)}, soit plus d'une "
+        f"année entière de rendement. En 2008, la prime des entreprises "
+        f"moyennement notées est montée jusqu'à "
+        f"{_pct(baa['pics'].get('2008', 0))}.",
+        "Quand la prime est haute, c'est l'inverse : elle a plus de chances "
+        "de baisser que de monter, et le prix des obligations avec. C'est "
+        "pour cela qu'on achète le crédit quand il est cher à emprunter, pas "
+        "quand il est bon marché.",
+    )
+    pedago.explique(
+        "Les limites de ces chiffres",
+        "Depuis 2023, les indices de crédit d'ICE, qui font référence, ne "
+        "sont plus diffusés gratuitement que sur trois ans. Trois ans ne "
+        "contiennent aucune crise, et un rang calculé sur trois ans ne dit "
+        "presque rien. On a donc conservé dans le projet l'historique "
+        "américain depuis 2010, téléchargé avant cette coupure, et on "
+        "s'appuie sur la série de Moody's, disponible depuis 1986.",
+        f"Il n'existe pas de série longue gratuite pour l'Europe. Sur les "
+        f"trois ans communs, la prime du haut rendement européen suit de "
+        f"près l'américaine : corrélation de "
+        f"{viz.fr(lien['niveaux'], '', 2)} en niveau et de "
+        f"{viz.fr(lien['variations_hebdo'], '', 2)} semaine par semaine. Le "
+        f"cycle du crédit est largement mondial, ce qui autorise à lire "
+        f"l'historique américain comme un repère pour l'Europe, sans en "
+        f"faire une mesure.",
+        "Enfin, ces primes sont des écarts, pas des rendements : elles "
+        "s'ajoutent au taux de l'État correspondant. Les rendements complets "
+        "sont ceux des blocs précédents.",
+        source=f"data/credit.json et data/credit_histo.csv · relevé du "
+               f"{taux.date_fr(c['releve'])} · scripts/fetch_credit.py · FRED "
+               f"(BAA10Y de Moody's, indices ICE BofA)",
+    )
+
+
+def _graphique_credit() -> None:
+    h = credit.histo()
+    m = h[["BAA10Y", "BAMLH0A0HYM2"]].resample("ME").mean()
+    c = credit.charger()["series"]
+    fig = go.Figure()
+    for cle, nom, couleur in [
+            ("BAMLH0A0HYM2", "Haut rendement, États-Unis", viz.CATEGORICAL[1]),
+            ("BAA10Y", "Entreprises notées Baa, États-Unis",
+             viz.CATEGORICAL[0])]:
+        x = m[cle].dropna()
+        fig.add_trace(go.Scatter(
+            x=x.index, y=x, name=nom, mode="lines",
+            line={"color": couleur, "width": 2},
+            hovertemplate=f"{nom}<br>%{{x|%b %Y}} : %{{y:.2f}} %<extra></extra>",
+        ))
+        fig.add_trace(go.Scatter(
+            x=[pd.Timestamp(c[cle]["date"])], y=[c[cle]["valeur"]],
+            mode="markers+text", showlegend=False,
+            marker={"size": 9, "color": couleur,
+                    "line": {"color": viz.SURFACE, "width": 2}},
+            text=[f"aujourd'hui : {_pct(c[cle]['valeur'])}"],
+            textposition="middle left", textfont={"color": viz.INK_2},
+            hoverinfo="skip",
+        ))
+    for annee, (x, y) in {"2008": ("2008-12-01", 6.3),
+                          "2020": ("2020-03-01", 10.9)}.items():
+        fig.add_annotation(x=x, y=y, text=annee, showarrow=False,
+                           yshift=10, font={"color": viz.INK_2, "size": 11})
+    fig.update_layout(**viz.layout(
+        "Primes de crédit américaines, en points au-dessus de l'État",
+        height=420, hovermode="x unified",
+        yaxis={"ticksuffix": " %", "gridcolor": viz.GRID,
+               "rangemode": "tozero"},
+        xaxis={"gridcolor": viz.GRID},
+    ))
+    st.plotly_chart(fig, width="stretch")
+    st.caption(
+        "Moyennes mensuelles. Les pics correspondent aux crises : 2002, "
+        "2008, 2012, 2016, 2020. Les deux courbes sont aujourd'hui proches "
+        "du plus bas de leur histoire."
+    )
+
+
+# --------------------------------------------------------------------------
 # Suite de l'onglet
 # --------------------------------------------------------------------------
 
@@ -682,9 +830,6 @@ def _suite() -> None:
     st.markdown("#### La suite de cet onglet")
     pedago.a_construire(
         2, "Macro top-down, blocs suivants",
-        "**Les primes de crédit** : ce que les entreprises paient en plus "
-        "des États, comparé à leur histoire, et ce que cela dit du risque "
-        "perçu.",
         "**La dynamique des marchés actions** sur plusieurs horizons, zone "
         "par zone et secteur par secteur.",
         "**Les rendements espérés par classe d'actifs**, construits sur ces "
