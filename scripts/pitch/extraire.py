@@ -2,7 +2,9 @@
 Chiffres du pitch oral -> scripts/pitch/data.json
 
 Lancer :  PYTHONPATH=. python3 scripts/pitch/extraire.py
-Puis   :  cd scripts/pitch && npm install && node build.js ../../outputs/Mandat_Lauren_pitch.pptx
+Puis   :  cd scripts/pitch && npm install && npm run build
+          -> outputs/Mandat_Lauren_pitch_genere.pptx (jamais sur la version
+             retouchée à la main, outputs/Mandat_Lauren_pitch.pptx)
 
 POURQUOI. Le deck ne recalcule rien : il lit les mêmes modules que l'app
 (core/*), si bien que ses chiffres sont ceux affichés dans les onglets. Après

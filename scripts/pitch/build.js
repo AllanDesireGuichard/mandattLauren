@@ -1,9 +1,12 @@
 // Pitch oral du mandat Lauren — 36 slides, speech client dans les notes.
 // Lit data.json (PYTHONPATH=. python3 scripts/pitch/extraire.py), puis :
 //   cd scripts/pitch && npm install && npm run build
+// Sortie : outputs/Mandat_Lauren_pitch_genere.pptx. Ne jamais écrire sur
+// Mandat_Lauren_pitch.pptx : c'est la version retouchée à la main par Allan.
 const pptxgen = require("pptxgenjs");
 const D = require("./data.json");
-const OUT = process.argv[2] || "Mandat_Lauren_pitch.pptx";
+const OUT = process.argv[2] || "Mandat_Lauren_pitch_genere.pptx";
+if (/Mandat_Lauren_pitch\.pptx$/.test(OUT)) throw new Error("refus : Mandat_Lauren_pitch.pptx est la version retouchée à la main");
 
 const pres = new pptxgen();
 pres.layout = "LAYOUT_WIDE"; // 13.333 x 7.5
