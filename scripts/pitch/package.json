@@ -1,0 +1,11 @@
+{
+  "name": "mandat-lauren-pitch",
+  "private": true,
+  "description": "Pitch oral du mandat Lauren, généré depuis data.json (extraire.py)",
+  "scripts": {
+    "build": "node build.js ../../outputs/Mandat_Lauren_pitch.pptx"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

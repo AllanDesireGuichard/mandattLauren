@@ -13,3 +13,8 @@ outputs/*.log
 # aucune cle ne doit y entrer. En local, .streamlit/secrets.toml ; en ligne,
 # le panneau Secrets du tableau de bord Streamlit Cloud.
 .streamlit/secrets.toml
+
+# Pitch : dépendances et données régénérables
+scripts/pitch/node_modules/
+scripts/pitch/package-lock.json
+scripts/pitch/data.json
