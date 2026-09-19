@@ -27,16 +27,15 @@ def _pct(v: float) -> str:
     return viz.fr(v, "%", 2)
 
 
+
 def render() -> None:
     pedago.chaine(4)
     pedago.etape(
         4, "Allocation",
-        "Combien placer sur chacun des supports retenus à l'étape 3, avec "
-        "les rendements espérés de l'étape 2, pour rapporter au moins 4 % par "
-        "an sans jamais perdre plus de 15 %. On avance en cinq temps : ce qui "
-        "entre dans le calcul, le risque de chaque support, ce que "
-        "proposerait un calcul sans garde-fou, les garde-fous un par un et "
-        "leur coût, puis le portefeuille retenu, en millions d'euros.",
+        "Combien placer sur chaque support pour rapporter au moins 4 % par an "
+        "sans jamais perdre plus de 15 %. Cinq temps : les ingrédients, le "
+        "risque de chaque support, un calcul sans garde-fou, les garde-fous "
+        "et leur coût, puis le portefeuille en millions d'euros.",
     )
     _bloc_entrees()
     _bloc_risque()
@@ -49,188 +48,72 @@ def render() -> None:
 def _bloc_entrees() -> None:
     e = allocation.entrees()
     m = allocation.meta()
+    ctl = e["controle"]
 
     st.markdown("#### Ce qui entre dans le calcul")
     st.markdown(
-        "Un calcul d'allocation a besoin de trois choses : une règle à "
-        "respecter, ce que chaque support doit rapporter, et la façon dont "
-        "chaque support se comporte quand les marchés baissent. Les deux "
-        "premières viennent des étapes précédentes ; la troisième demande "
-        "de remonter loin dans le passé, et c'est là que se trouve la "
-        "principale difficulté de cet onglet."
+        "**La règle.** L'étape 1 laissait les 15 % à préciser ; on retient "
+        "la lecture la plus exigeante : une perte mesurée **depuis le plus "
+        "haut**, sur **les 100 M€ ensemble**, qui ne dépasse jamais 15 % "
+        "dans **les crises de 2008, 2011, 2020 et 2022**. Pas de crypto : "
+        "elle ne rapporte rien (étape 2) et baisse avec les actions."
     )
 
-    # --- 1. la règle ---------------------------------------------------
-    st.markdown("**1. La règle de perte : l'hypothèse de travail**")
-    st.markdown(
-        "L'étape 1 avait laissé ouverte la définition exacte des 15 %. Faute "
-        "de réponse du client, on retient la lecture la plus exigeante."
-    )
-    st.table(pd.DataFrame([
-        ("Perte mesurée comment ?",
-         "Depuis le plus haut jamais atteint, sans limite de durée",
-         "C'est ce que le client verra : l'écart entre ce qu'il a eu et ce "
-         "qu'il a. Une mesure sur douze mois glissants oublierait une partie "
-         "des baisses longues : en 2008, les actions européennes ont baissé "
-         "vingt mois d'affilée, de juillet 2007 à mars 2009."),
-        ("Sur quel montant ?",
-         "Les 100 M€ ensemble, en euros",
-         "Le client raisonne sur son patrimoine, pas poche par poche. Les "
-         "10 M€ à décaisser en font partie."),
-        ("Avec quelle tolérance ?",
-         "Jamais au-delà de 15 % dans les crises passées : 2008, 2011, "
-         "2020, 2022",
-         "Facile à expliquer et à vérifier. Si aucun portefeuille ne tient "
-         "en rapportant 4 %, on passera à une limite en probabilité "
-         "(dépassée moins d'une fois sur vingt)."),
-        ("Et la crypto ?",
-         "Aucune",
-         "Son rendement espéré est nul (étape 2) et elle baisse avec les "
-         "actions (bloc 2) : elle consommerait de la place sous la limite "
-         "de 15 % sans rien rapporter. Elle reste mesurée ci-dessous, pour "
-         "montrer pourquoi."),
-    ], columns=["Question laissée ouverte", "Hypothèse retenue", "Pourquoi"])
-        .set_index("Question laissée ouverte"))
-
-    # --- 2. les rendements --------------------------------------------
-    st.markdown("**2. Ce que chaque support doit rapporter**")
-    st.markdown(
-        "Les rendements espérés de l'étape 2, corrigés là où l'étape 3 a "
-        "appris quelque chose en choisissant les supports. Les emprunts "
-        "d'État sont achetés en direct : ils rapportent le taux de l'échelle "
-        "retenue, pas celui du marché entier. Le crédit passe par un fonds "
-        "court, qui rapporte moins que l'indice toutes durées."
-    )
-    lignes = [(r.classe, r.support, _pct(r.rendement), r.origine)
-              for r in e.itertuples()]
-    st.table(pd.DataFrame(lignes, columns=[
-        "Classe", "Support (étape 3)", "Rendement espéré par an",
-        "D'où vient ce chiffre"]).set_index("Classe"))
+    st.markdown("**Ce que chaque support doit rapporter.**")
+    _graphique_rendements(e)
     calc = e[~e["hors_calcul"]]
-    bat = calc[calc["rendement"] > 4]["classe"].tolist()
+    bat = calc[calc["rendement"] > 4]
     st.markdown(
-        f"**Lecture.** Seules {len(bat)} classes sur {len(calc)} rapportent "
-        f"plus que les 4 % à battre : "
-        + ", ".join(c.lower() for c in bat[:-1]) + f" et {bat[-1].lower()}. "
-        "Tout le reste rapporte moins : chaque euro placé en obligations ou "
-        "en or devra être compensé par des actions. C'est, en "
-        "chiffres, la tension annoncée à l'étape 1 entre les 4 % et les 15 %."
-    )
-    st.caption(
-        "Actions européennes : on garde le rendement espéré de l'indice. Le "
-        "panier des 30 titres n'est pas supposé battre son marché ; le "
-        "supposer serait compter deux fois la sélection."
-    )
-
-    # --- 3. les séries longues ----------------------------------------
-    st.markdown("**3. Mesurer le risque sur vingt ans : les séries de "
-                "remplacement**")
-    st.markdown(
-        "Pour savoir si le portefeuille aurait tenu en 2008, il faut savoir "
-        "comment chaque support s'est comporté en 2008. Or la plupart des "
-        "supports retenus sont récents : les fonds américain et japonais "
-        "datent de 2018, le fonds émergent de 2019, le fonds bitcoin de "
-        "2025. On utilise donc **le vrai support dès qu'il existe, et avant "
-        "lui un remplaçant** qui suit le même marché : un fonds plus ancien "
-        "sur le même indice, converti en euros, ou, pour les emprunts "
-        "d'État détenus en direct, une obligation reconstituée à partir de "
-        "la courbe des taux de la BCE."
-    )
-    lignes = []
-    for r in e.itertuples():
-        c = r.controle
-        if isinstance(r.raccord, str):
-            propre = pd.Timestamp(r.raccord).strftime("%m/%Y")
-        elif r.Index == "actions_europe":
-            propre = "non utilisé (voir plus bas)"
-        else:
-            propre = "reconstitué sur toute la période"
-        lignes.append((
-            r.classe, propre, r.source,
-            viz.fr(c["correlation"], "", 2),
-            f"{viz.fr(c['baisse_remplacant'], '%', 0)} / "
-            f"{viz.fr(c['baisse_support'], '%', 0)}",
-            f"{viz.fr(c['annees'], 'ans', 0)}"))
-    st.table(pd.DataFrame(lignes, columns=[
-        "Classe", "Vrai support utilisé depuis", "Remplaçant, avant",
-        "Ressemblance*", "Pire baisse : remplaçant / support**",
-        "Comparés sur"]).set_index("Classe"))
-    st.caption(
-        "* Corrélation des variations hebdomadaires sur la période où les "
-        "deux existent : 1 = ils bougent exactement ensemble, 0 = aucun "
-        "lien. ** Sur cette même période commune. Pour les emprunts d'État "
-        "reconstitués, la comparaison se fait avec un fonds voisin (IBGS "
-        "pour l'échelle courte, EUNH pour la longue), dont la durée diffère : "
-        "c'est un ordre de grandeur, pas un contrôle exact. Toutes les "
-        f"séries commencent en octobre 2006, sauf le bitcoin (septembre "
-        f"2014). Relevé du {pd.Timestamp(m['releve']).strftime('%d/%m/%Y')}."
+        f"**Lecture.** Seules {len(bat)} lignes sur {len(calc)} dépassent les "
+        f"4 % : les quatre zones d'actions et les obligations indexées. "
+        f"Chaque euro placé ailleurs devra être compensé par des actions : "
+        f"c'est la tension entre les 4 % et les 15 %."
     )
 
     st.markdown(
-        "**Lecture.** Les remplaçants d'actions, d'or et de matières "
-        "premières suivent bien leur support (ressemblance de 0,83 à 0,95). "
-        "Quatre limites sont à connaître :"
+        "**L'historique.** Pour savoir si un portefeuille aurait tenu en "
+        "2008, il faut l'historique de chaque support. Or la plupart des "
+        "fonds retenus datent de 2018-2019. On prend donc **le vrai support "
+        "dès qu'il existe, et avant lui un remplaçant** qui suit le même "
+        "marché : un fonds plus ancien converti en euros, ou, pour les "
+        "emprunts d'État, une obligation recalculée sur la courbe des taux "
+        "de la BCE. Toutes les séries partent d'octobre 2006, avant le "
+        "sommet des actions de juillet 2007."
     )
-    ctl = e["controle"]
-    st.table(pd.DataFrame([
-        ("Actions émergentes et japonaises",
-         f"Les fonds retenus, filtrés ESG, ont davantage baissé que leur "
-         f"remplaçant ({viz.fr(ctl['emergents']['baisse_support'], '%', 0)} "
-         f"contre {viz.fr(ctl['emergents']['baisse_remplacant'], '%', 0)} "
-         f"pour les émergents). Le remplaçant n'est utilisé qu'avant 2018-"
-         f"2019 : le risque de 2008 et 2011 est peut-être un peu sous-"
-         f"estimé sur ces deux lignes."),
-        ("Obligations indexées",
-         "Avant janvier 2009, on utilise un emprunt d'État classique à "
-         "7 ans. En 2008, les indexées ont moins bien tenu que les emprunts "
-         "classiques (l'inflation attendue s'est effondrée) : le remplaçant "
-         "flatte cette ligne pendant la crise de 2008."),
-        ("Crédit court",
-         f"La prime de crédit est reconstituée avant 2016 à partir des "
-         f"écarts de crédit américains, avec une sensibilité mesurée sur le "
-         f"vrai fonds ({viz.fr(-m['credit']['sensibilite'], '%', 2)} par "
-         f"point d'écart). Le lien est faible (ressemblance "
-         f"{viz.fr(ctl['credit_court']['correlation'], '', 2)}) : cette "
-         f"ligne est la moins bien mesurée en 2008 et 2011."),
-        ("Actions européennes",
-         "On mesure le risque sur l'indice européen, pas sur le panier des "
-         "30 titres. Le panier est choisi avec les données d'aujourd'hui : "
-         f"son passé est flatteur par construction "
-         f"({viz.fr(ctl['actions_europe']['perf_support'], '%', 1)} par an "
-         f"depuis 2019 contre "
-         f"{viz.fr(ctl['actions_europe']['perf_remplacant'], '%', 1)} pour "
-         f"l'indice). Son risque, lui, est proche de celui de l'indice "
-         f"(étape 3)."),
-    ], columns=["Ligne", "Ce qu'il faut savoir"]).set_index("Ligne"))
-
     pedago.explique(
-        "Pourquoi commencer en octobre 2006, et pas en 2008",
-        "Les actions européennes ont atteint leur plus haut en juillet 2007. "
-        "Une série qui commencerait en janvier 2008 ne verrait la baisse de "
-        "2008 qu'à partir d'un point déjà plus bas, et la sous-estimerait. "
-        "Comme on mesure les pertes depuis le plus haut, il faut que le plus "
-        "haut soit dans les données.",
-        "Les cotations européennes gratuites (Yahoo) ne remontent pas avant "
-        "2008. D'où le recours à des fonds cotés à New York, plus anciens, "
-        "dont on convertit chaque jour le prix en euros au cours du dollar : "
-        "c'est bien ce qu'aurait vécu un investisseur européen.",
-        "Pour les emprunts d'État, on fait mieux qu'un remplaçant : la BCE "
-        "publie chaque jour depuis 2004 les paramètres de sa courbe des "
-        "taux. On en déduit, jour après jour, le prix d'une obligation de "
-        "2, 3, 5, 7 ou 10 ans, et donc ce qu'aurait rapporté l'échelle "
-        "retenue à l'étape 3.",
-        source="Yahoo Finance (fonds et change) ; BCE, paramètres de la "
-               "courbe des emprunts d'État de la zone euro ; FRED, écarts de "
-               "crédit ICE BofA. Script : scripts/fetch_indices.py.",
+        "Les limites de ces remplaçants",
+        "<strong>Actions, or, matières premières</strong> : les remplaçants "
+        "suivent bien leur support (corrélation de 0,83 à 0,95). Les fonds "
+        "émergents et japonais filtrés ESG ont toutefois un peu plus baissé "
+        f"que leur remplaçant "
+        f"({viz.fr(ctl['emergents']['baisse_support'], '%', 0)} contre "
+        f"{viz.fr(ctl['emergents']['baisse_remplacant'], '%', 0)} pour les "
+        f"émergents) : 2008 et 2011 sont peut-être un peu sous-estimés sur "
+        f"ces deux lignes.",
+        "<strong>Obligations indexées</strong> : avant 2009, le remplaçant "
+        "est un emprunt d'État classique, qui a mieux tenu en 2008 que les "
+        "vraies indexées. Cette ligne est flattée.",
+        f"<strong>Crédit</strong> : la prime est reconstituée avant 2016 à "
+        f"partir des écarts de crédit américains. Le lien est faible "
+        f"(corrélation {viz.fr(ctl['credit_court']['correlation'], '', 2)}) : "
+        f"c'est la ligne la moins bien mesurée.",
+        f"<strong>Actions européennes</strong> : risque mesuré sur l'indice, "
+        f"pas sur les 30 titres. Choisis avec les données d'aujourd'hui, ils "
+        f"ont un passé flatteur par construction "
+        f"({viz.fr(ctl['actions_europe']['perf_support'], '%', 1)} par an "
+        f"depuis 2019, contre "
+        f"{viz.fr(ctl['actions_europe']['perf_remplacant'], '%', 1)} pour "
+        f"l'indice).",
+        source="Yahoo Finance (fonds et change) ; BCE, courbe des emprunts "
+               "d'État de la zone euro ; FRED, écarts de crédit ICE BofA. "
+               "Script : scripts/fetch_indices.py. Relevé du "
+               f"{pd.Timestamp(m['releve']).strftime('%d/%m/%Y')}.",
     )
 
-    st.markdown("#### Ce que le bloc 1 transmet au bloc 2")
     st.markdown(
-        f"Dix supports retenus (le bitcoin, mesuré, n'est pas retenu), chacun avec un "
-        f"rendement espéré et une série quotidienne en euros depuis octobre "
-        f"2006, qui traverse les quatre crises de référence. Le bloc 2 "
-        f"mesure ce que chacun y a perdu, et surtout s'ils ont perdu en même "
-        f"temps."
+        "**➜ Dix supports, vingt ans d'historique.** Chacun a un rendement "
+        "espéré et une série en euros qui traverse les quatre crises. "
+        "Reste à savoir ce qu'ils y ont perdu, et s'ils ont perdu ensemble."
     )
 
 
@@ -250,187 +133,66 @@ def _v(x: float, signe: bool = False) -> str:
     return ("+" if signe and x > 0 else "") + viz.fr(x, "%", 0)
 
 
+
 @st.cache_data(show_spinner="Calcul des pertes dans chaque crise…")
 def _risque() -> dict:
     s = allocation.series_risque()
     pendant, dates = allocation.pendant_la_baisse(s)
     return {"s": s, "pertes": allocation.pertes_crises(s),
-            "vol": allocation.volatilite(s), "pendant": pendant,
-            "dates": dates, "corr": allocation.correlations(s)}
+            "pendant": pendant, "dates": dates}
 
 
 def _bloc_risque() -> None:
     e = allocation.entrees()
     r = _risque()
-    pertes, vol = r["pertes"], r["vol"]
+    pertes, p = r["pertes"], r["pendant"]
     crises = allocation.CRISES
 
     st.markdown("#### Le risque de chaque support")
     st.markdown(
-        "Pour tenir la limite de 15 %, il faut savoir deux choses sur chaque "
-        "support : combien il a perdu dans les crises passées, et s'il a "
-        "perdu **en même temps** que les autres. Un support qui baisse "
-        "beaucoup mais à contretemps protège le portefeuille ; un support "
-        "qui baisse peu mais toujours avec les actions ne le protège pas. "
-        "Les actions entrent désormais dans le calcul comme **une seule "
-        "poche**, répartie entre les zones selon la clé fixée à l'avance "
-        "(Europe 40 %, États-Unis 35 %, Japon 10 %, émergents 15 %)."
+        "Deux questions : combien chaque support a perdu dans les crises, et "
+        "s'il a perdu **en même temps** que les actions. Les actions forment "
+        "désormais **une seule poche**, répartie selon une clé fixée à "
+        "l'avance : Europe 40 %, États-Unis 35 %, Japon 10 %, émergents 15 %."
     )
-
-    # --- 1. les pertes ------------------------------------------------
-    st.markdown("**1. Ce que chaque support a perdu, depuis son plus haut**")
-    st.markdown(
-        "Quatre crises, choisies à l'avance par leurs dates. Pour chacune, "
-        "la pire baisse depuis le plus haut atteint auparavant — la mesure "
-        "de la limite de 15 %."
-    )
-    lignes = []
-    for k in pertes.index:
-        lignes.append([_nom(k, e), viz.fr(vol[k], "%", 1)]
-                      + [_v(pertes.loc[k, c]) for c in crises])
-    cols = ["Support", "Volatilité annuelle*"] + [
-        f"{c} · {lib}" for c, (_, _, lib) in crises.items()]
-    st.table(pd.DataFrame(lignes, columns=cols).set_index("Support"))
-    st.caption(
-        "* Volatilité : l'amplitude habituelle des variations sur un an, "
-        "calculée sur les variations hebdomadaires d'octobre 2006 à "
-        "aujourd'hui. Elle décrit les jours ordinaires ; les colonnes de "
-        "crise décrivent les pires. En 2011, les actions n'avaient pas "
-        "retrouvé leur plus haut de 2007 : la perte comptée part de 2007, "
-        "c'est la règle. Même chose pour les matières premières, qui n'ont "
-        "jamais retrouvé leur sommet de 2008. Bitcoin : cotations depuis "
-        "2014 seulement."
-    )
+    lignes = [[_nom(k, e)] + [_v(pertes.loc[k, c]) for c in crises]
+              for k in pertes.index if k not in allocation.MIX_ACTIONS]
+    st.table(pd.DataFrame(lignes, columns=["Pire baisse depuis le plus haut"]
+                          + [f"{c} · {lib}" for c, (_, _, lib) in crises.items()])
+             .set_index("Pire baisse depuis le plus haut"))
+    st.caption("En 2011, la perte des actions part encore du sommet de 2007 : "
+               "c'est la règle. Bitcoin : cotations depuis 2014.")
     pa = pertes.loc["poche_actions", "2008"]
     st.markdown(
-        f"**Lecture.** Les actions perdent entre "
-        f"{viz.fr(-pertes.loc['poche_actions'].max(), '%', 0)} et "
-        f"{viz.fr(-pa, '%', 0)} dans ces crises, les emprunts d'État à "
-        f"court terme presque rien. Une règle simple en découle : si rien "
-        f"d'autre n'amortissait, une perte de {viz.fr(-pa, '%', 0)} sur les "
-        f"actions ne laisserait pas y placer plus de "
-        f"{viz.fr(15 / -pa * 100, '%', 0)} du patrimoine (15 ÷ "
-        f"{viz.fr(-pa, '', 0)}). Tout ce qui dépasse ce chiffre doit être "
-        f"payé par des supports qui montent quand les actions baissent. "
-        f"D'où la question suivante."
+        f"**Lecture.** Les actions perdent jusqu'à {viz.fr(-pa, '%', 0)}. "
+        f"Sans amortisseur, on ne pourrait donc pas en détenir plus de "
+        f"{viz.fr(15 / -pa * 100, '%', 0)} (15 ÷ {viz.fr(-pa, '', 0)}). Pour "
+        f"aller au-delà, il faut des supports qui tiennent quand elles "
+        f"baissent :"
     )
-
-    # --- 2. pendant la baisse ----------------------------------------
-    st.markdown("**2. Que faisaient les autres pendant que les actions "
-                "baissaient ?**")
-    pendant, dates = r["pendant"], r["dates"]
-    lignes = []
-    for k in pendant.index:
-        if k in allocation.MIX_ACTIONS:
-            continue
-        lignes.append([_nom(k, e)] + [_v(pendant.loc[k, c], True)
-                                      for c in crises])
-    cols = ["Support"] + [
-        f"{c} : du {a.strftime('%d/%m/%y')} au {b.strftime('%d/%m/%y')}"
-        for c, (a, b) in dates.items()]
-    st.table(pd.DataFrame(lignes, columns=cols).set_index("Support"))
-    st.caption(
-        "Pour chaque crise, du sommet au creux de la poche actions ; la "
-        "première ligne rappelle sa baisse. Sommet cherché dans la crise "
-        "elle-même, pour mesurer la crise et non les années qui la "
-        "précèdent."
-    )
-    p = pendant
-    st.table(pd.DataFrame([
-        ("2008 et 2011 : les emprunts d'État amortissent",
-         f"Les actions perdent {_v(-p.loc['poche_actions', '2008'])}, "
-         f"l'échelle d'États à 2-10 ans gagne "
-         f"{_v(p.loc['etats_longs', '2008'], True)} et l'or "
-         f"{_v(p.loc['or', '2008'], True)}. C'est le cas d'école : quand "
-         f"l'économie s'effondre, les banques centrales baissent leurs taux "
-         f"et les obligations montent."),
-        ("2022 : plus d'amortisseur",
-         f"Les actions perdent {_v(-p.loc['poche_actions', '2022'])}, et les "
-         f"emprunts d'État aussi ({_v(p.loc['etats_longs', '2022'])}), comme "
-         f"les indexées ({_v(p.loc['indexees', '2022'])}). Quand la baisse "
-         f"vient de l'inflation, les banques centrales montent leurs taux : "
-         f"actions et obligations baissent ensemble. C'est le régime que "
-         f"décrit l'étape 2 aujourd'hui."),
-        ("L'or : le seul qui tient dans les quatre crises",
-         f"Hausse en 2008, 2011 et 2022, léger recul en 2020 "
-         f"({_v(p.loc['or', '2020'], True)}). Mais il a sa propre baisse de "
-         f"{_v(-pertes.loc['or', '2008'])} depuis son plus haut en 2008 : "
-         f"il protège contre les actions, pas contre lui-même."),
-        ("Matières premières et bitcoin : ils baissent avec les actions",
-         f"Les matières premières perdent "
-         f"{_v(-p.loc['matieres', '2008'])} en 2008 et "
-         f"{_v(-p.loc['matieres', '2020'])} en 2020 ; le bitcoin "
-         f"{_v(-p.loc['crypto', '2022'])} en 2022. Aucun amortisseur à en "
-         f"attendre."),
-        ("Obligations indexées : attention à 2008",
-         "Leur hausse de 2008 vient du remplaçant (un emprunt d'État "
-         "classique, bloc 1). Les vraies indexées ont moins bien tenu "
-         "cette année-là : cette ligne est flattée."),
-    ], columns=["Constat", "Détail"]).set_index("Constat"))
-
-    _graphique_baisses(r["s"])
-
-    # --- 3. corrélations ---------------------------------------------
-    st.markdown("**3. Bouger ensemble : le lien avec les actions**")
-    c = r["corr"]
-
-    def lien(x: float) -> str:
-        if x >= .6:
-            return "suit les actions"
-        if x >= .3:
-            return "les suit en partie"
-        if x > -.1:
-            return "sans lien"
-        return "va à contretemps"
-
-    lignes = []
-    for k in c.index:
-        if k in allocation.MIX_ACTIONS or k == "poche_actions":
-            continue
-        lignes.append((_nom(k, e),
-                       viz.fr(round(c.loc[k, "hors_crise"], 2) + 0.0, "", 2),
-                       viz.fr(round(c.loc[k, "en_crise"], 2) + 0.0, "", 2),
-                       lien(c.loc[k, "en_crise"])))
-    st.table(pd.DataFrame(lignes, columns=[
-        "Support", "Hors crise", "Pendant les quatre crises",
-        "En crise, il…"]).set_index("Support"))
-    st.caption(
-        "Corrélation des variations hebdomadaires avec la poche actions : "
-        "1 = mêmes mouvements, 0 = aucun lien, négatif = mouvements "
-        "opposés. Moyenne sur les quatre crises réunies : elle mélange "
-        "2008 (États à contretemps) et 2022 (États avec les actions), "
-        "d'où un chiffre proche de zéro qui ne dit pas que les États "
-        "n'ont servi à rien — il dit qu'ils ont servi une fois sur deux."
-    )
-
-    pedago.explique(
-        "Pourquoi la corrélation ne suffit pas, et ce que le calcul utilisera",
-        "La corrélation résume en un chiffre une relation qui change selon "
-        "la crise. Les emprunts d'État ont une corrélation proche de zéro "
-        "avec les actions sur l'ensemble des crises : c'est la moyenne "
-        "d'un très bon amortisseur (2008) et d'un amortisseur absent "
-        "(2022). Un modèle qui ne verrait que ce chiffre moyen se "
-        "tromperait dans les deux cas.",
-        "C'est pourquoi le calcul du bloc 3 ne s'appuie pas sur la "
-        "corrélation pour tenir la limite de perte : il fait traverser à "
-        "chaque portefeuille candidat les vingt années de données, jour "
-        "après jour, avec un rééquilibrage chaque mois, et mesure "
-        "directement sa pire baisse depuis le plus haut. Les crises de "
-        "2008 et de 2022 sont donc prises telles qu'elles ont eu lieu, "
-        "chacune avec son propre comportement.",
-        source="Séries du bloc 1 (scripts/fetch_indices.py). Crises "
-               "définies à l'avance dans core/allocation.py (CRISES).",
-    )
-
-    st.markdown("#### Ce que le bloc 2 transmet au bloc 3")
     st.markdown(
-        "Une poche actions qui perd jusqu'à "
-        f"{viz.fr(-pa, '%', 0)} ; des emprunts d'État qui amortissent les "
-        "crises de récession mais pas celles d'inflation ; un or qui tient "
-        "dans les quatre ; des matières premières et un bitcoin qui "
-        "n'amortissent rien. Le bloc 3 cherche la répartition qui rapporte "
-        "le plus, en exigeant qu'elle ne perde jamais plus de 15 % sur les "
-        "vingt années de données."
+        f"- **2008 et 2011, crises de récession** : les emprunts d'État "
+        f"montent ({_v(p.loc['etats_longs', '2008'], True)} en 2008), l'or "
+        f"aussi ({_v(p.loc['or', '2008'], True)}).\n"
+        f"- **2022, crise d'inflation** : plus d'amortisseur. États "
+        f"{_v(p.loc['etats_longs', '2022'])}, indexées "
+        f"{_v(p.loc['indexees', '2022'])}, avec les actions. C'est le régime "
+        f"décrit à l'étape 2.\n"
+        f"- **L'or** est le seul à tenir dans les quatre crises.\n"
+        f"- **Matières premières et bitcoin** baissent avec les actions."
+    )
+    _graphique_baisses(r["s"])
+    st.markdown(
+        "Comme ce lien change d'une crise à l'autre, le calcul ne s'appuie "
+        "pas sur une corrélation moyenne. Il fait traverser à chaque "
+        "portefeuille candidat les vingt années, jour après jour, et mesure "
+        "directement sa pire baisse."
+    )
+
+    st.markdown(
+        "**➜ Les États amortissent les récessions, pas l'inflation ; l'or "
+        "tient partout.** Reste à trouver la répartition qui rapporte le plus "
+        "sans jamais perdre plus de 15 %."
     )
 
 
@@ -481,159 +243,191 @@ def _poids(x: float) -> str:
     return "—" if x < 0.005 else viz.fr(x * 100, "%", 0)
 
 
+# Quatre familles, une couleur chacune, dans le même ordre sur tous les
+# graphiques de répartition de l'onglet.
+FAMILLES = {
+    "Actions": ("actions_europe", "usa", "japon", "emergents"),
+    "Emprunts d'État": ("etats_courts", "etats_longs"),
+    "Obligations indexées": ("indexees",),
+    "Or et autres": ("or", "credit_court", "matieres"),
+}
+COULEUR = dict(zip(FAMILLES, viz.CATEGORICAL))
+
+
+def _graphique_supports(poids: dict, titre: str, montant: float | None = None
+                        ) -> None:
+    """Une barre par support, couleur = famille. Étiquette : % (et M€)."""
+    fig = go.Figure()
+    for fam, ks in FAMILLES.items():
+        ks = [k for k in ks if poids.get(k, 0) >= 0.005]
+        if not ks:
+            continue
+        noms = [COURTS[k][0].upper() + COURTS[k][1:] for k in ks]
+        x = [poids[k] * 100 for k in ks]
+        txt = [viz.fr(v, "%", 0) + (f" · {viz.fr(v * montant / 100 / 1e6, 'M€', 1)}"
+                                    if montant else "") for v in x]
+        fig.add_trace(go.Bar(
+            y=noms, x=x, name=fam, orientation="h", text=txt,
+            textposition="outside", cliponaxis=False,
+            textfont={"color": viz.INK_2},
+            marker={"color": COULEUR[fam], "cornerradius": 4},
+            hovertemplate="%{y} : %{text}<extra>" + fam + "</extra>"))
+    n = sum(1 for k in poids if poids[k] >= 0.005)
+    fig.update_layout(**viz.layout(
+        titre, height=90 + 34 * n, bargap=.25, showlegend=True,
+        xaxis={"visible": False, "range": [0, max(poids.values()) * 125]},
+        yaxis={"autorange": "reversed", "gridcolor": "rgba(0,0,0,0)",
+               "categoryorder": "array",
+               "categoryarray": [COURTS[k][0].upper() + COURTS[k][1:]
+                                 for ks in FAMILLES.values() for k in ks]}))
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+
+def _graphique_familles(poids: dict, titre: str) -> None:
+    """Anneau des quatre familles : la répartition en un coup d'œil."""
+    fam = {f: sum(poids.get(k, 0) for k in ks) for f, ks in FAMILLES.items()}
+    fam = {f: v for f, v in fam.items() if v >= 0.005}
+    fig = go.Figure(go.Pie(
+        labels=list(fam), values=[v * 100 for v in fam.values()], hole=.55,
+        sort=False, direction="clockwise",
+        marker={"colors": [COULEUR[f] for f in fam],
+                "line": {"color": "#ffffff", "width": 2}},
+        texttemplate="%{value:.0f} %", textfont={"color": "#ffffff"},
+        hovertemplate="%{label} : %{value:.1f} %<extra></extra>"))
+    fig.update_layout(**viz.layout(titre, height=340))
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+
+def _graphique_etapes(cols: dict, noms: dict) -> None:
+    """Barres empilées à 100 % : la répartition par famille, règle après règle."""
+    fig = go.Figure()
+    etapes = [noms[n] for n in cols]
+    for fam, ks in FAMILLES.items():
+        x = [sum(c.get(k, 0) for k in ks) * 100 for c in cols.values()]
+        if max(x) < 0.5:
+            continue
+        fig.add_trace(go.Bar(
+            y=etapes, x=x, name=fam, orientation="h",
+            text=[viz.fr(v, "%", 0) if v >= 4 else "" for v in x],
+            textposition="inside", insidetextanchor="middle",
+            textfont={"color": "#ffffff"},
+            marker={"color": COULEUR[fam],
+                    "line": {"color": "#ffffff", "width": 2}},
+            hovertemplate="%{y} · " + fam + " : %{x:.1f} %<extra></extra>"))
+    fig.update_layout(**viz.layout(
+        "La répartition, règle après règle", height=330, barmode="stack",
+        bargap=.3,
+        xaxis={"visible": False, "range": [0, 100]},
+        yaxis={"autorange": "reversed", "gridcolor": "rgba(0,0,0,0)"}))
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+
+def _graphique_compte(serie: pd.Series, titre: str, par_titre: float) -> None:
+    """Nombre de titres par catégorie, une seule couleur (une seule série)."""
+    v = serie.value_counts().sort_values(ascending=False)
+    fig = go.Figure(go.Bar(
+        y=v.index, x=v.values, orientation="h",
+        text=[f"{n} · {viz.fr(n * par_titre / 1e6, 'M€', 1)}" for n in v.values],
+        textposition="outside", cliponaxis=False,
+        textfont={"color": viz.INK_2},
+        marker={"color": viz.CATEGORICAL[0], "cornerradius": 4},
+        hovertemplate="%{y} : %{x} titres<extra></extra>"))
+    fig.update_layout(**viz.layout(
+        titre, height=90 + 28 * len(v), bargap=.3,
+        xaxis={"visible": False, "range": [0, v.max() * 1.45]},
+        yaxis={"autorange": "reversed", "gridcolor": "rgba(0,0,0,0)"}))
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+
+
+def _graphique_rendements(e: pd.DataFrame) -> None:
+    """Rendement espéré par support, couleur = famille, repère à 4 %."""
+    calc = e[~e["hors_calcul"]]
+    fig = go.Figure()
+    for fam, ks in FAMILLES.items():
+        ks = [k for k in ks if k in calc.index]
+        v = [calc.loc[k, "rendement"] for k in ks]
+        fig.add_trace(go.Bar(
+            y=[COURTS[k][0].upper() + COURTS[k][1:] for k in ks], x=v,
+            name=fam, orientation="h", text=[viz.fr(x, "%", 2) for x in v],
+            textposition="outside", cliponaxis=False,
+            textfont={"color": viz.INK_2},
+            marker={"color": COULEUR[fam], "cornerradius": 4},
+            hovertemplate="%{y} : %{text}<extra>" + fam + "</extra>"))
+    fig.add_vline(x=4, line={"color": viz.INK_2, "width": 1, "dash": "dot"},
+                  annotation={"text": "4 % à battre",
+                              "font": {"color": viz.INK_2, "size": 11}},
+                  annotation_position="top")
+    fig.update_layout(**viz.layout(
+        "Rendement espéré par an", height=90 + 34 * len(calc), bargap=.25,
+        xaxis={"visible": False, "range": [0, calc["rendement"].max() * 1.2]},
+        yaxis={"autorange": "reversed", "gridcolor": "rgba(0,0,0,0)"}))
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+
 def _bloc_libre() -> None:
-    e = allocation.entrees()
     res = allocation.resultats()
-    sc, cles = res["scenarios"], res["cles"]
+    sc = res["scenarios"]
     lib = sc["libre"]
     p = lib["poids"]
 
     st.markdown("#### Ce que propose un calcul sans garde-fou")
     st.markdown(
-        "On demande au calcul la répartition qui rapporte le plus, avec une "
-        "seule exigence : que le portefeuille ne perde jamais plus de 15 % "
-        "depuis son plus haut sur les vingt années de données. Aucune autre "
-        "règle — pas même les 10 M€ à décaisser. Ce résultat n'est pas une "
-        "proposition : il sert à voir ce que le calcul fait des données "
-        "quand on le laisse seul, avant de lui ajouter des règles."
+        "On demande la répartition qui rapporte le plus, avec une seule "
+        "exigence : jamais plus de 15 % de baisse entre 2006 et aujourd'hui "
+        "(portefeuille remis à ses poids chaque mois). Aucune autre règle, "
+        "pas même les 10 M€. Ce n'est pas une proposition : c'est pour voir "
+        "ce que fait le calcul quand on le laisse seul."
     )
-    st.table(pd.DataFrame([
-        ("On cherche", "La répartition au rendement espéré le plus élevé"),
-        ("Sous l'exigence", "Jamais plus de 15 % de baisse depuis le plus "
-         f"haut, d'octobre 2006 au {pd.Timestamp(res['fenetre'][1]).strftime('%d/%m/%Y')}"),
-        ("Comment le portefeuille vit",
-         "Remis à ses poids le premier jour de chaque mois"),
-        ("Supports", "Les dix du bloc 1, sans le bitcoin ; chaque zone "
-         "d'actions séparément, sans la clé 40/35/10/15"),
-    ], columns=["", "Réglage"]).set_index(""))
-
-    lignes = [(e.loc[k, "classe"], _pct(e.loc[k, "rendement"]), _poids(p[k]))
-              for k in cles]
     c1, c2 = st.columns([3, 2])
     with c1:
-        st.table(pd.DataFrame(lignes, columns=[
-            "Support", "Rendement espéré", "Poids"]).set_index("Support"))
+        _graphique_supports(p, "Le portefeuille du calcul libre")
     with c2:
         st.metric("Rendement espéré", _pct(lib["rendement_espere"]))
         st.metric("Pire baisse depuis le plus haut",
                   viz.fr(lib["pire_baisse"], "%", 1))
-        st.caption("Baisse la plus forte dans chaque crise : " + " · ".join(
-            f"{c} : {viz.fr(v, '%', 1)}" for c, v in lib["crises"].items()))
 
     top = sorted(p, key=p.get, reverse=True)[:2]
-    jp = allocation.pendant_la_baisse(allocation.series_risque())[0]
     st.markdown(
         f"**Lecture.** Deux supports font "
         f"{viz.fr((p[top[0]] + p[top[1]]) * 100, '%', 0)} du portefeuille : "
-        f"les obligations indexées ({_poids(p['indexees'])}) et les actions "
-        f"japonaises ({_poids(p['japon'])}). Les 10 M€ à décaisser ne sont "
-        f"couverts qu'à {_poids(p['etats_courts'])}. Le portefeuille respecte "
-        f"la limite, et rapporte sur le papier "
-        f"{_pct(lib['rendement_espere'])} ; il est pourtant inutilisable."
+        f"les obligations indexées et les actions japonaises. La limite est "
+        f"respectée, le rendement est élevé, et pourtant ce portefeuille est "
+        f"inutilisable."
     )
 
-    # --- pourquoi ces deux-là ----------------------------------------
-    st.markdown("**Pourquoi ces deux supports ?**")
+    mj, ju = sc["moins_japon"], sc["japon_egal_usa"]
+    jp = _risque()["pendant"]
     st.markdown(
-        "On pourrait croire que le calcul choisit le Japon parce que son "
-        "rendement espéré est le plus élevé des actions. On l'a vérifié en "
-        "le baissant : ce n'est pas la raison."
+        f"**Pourquoi ces deux-là ?** Pas pour leur rendement. Ramené à "
+        f"{_pct(mj['variante']['rendement'])}, sous l'Europe, le Japon reste "
+        f"à {_poids(mj['poids']['japon'])} ; il ne tombe à "
+        f"{_poids(ju['poids']['japon'])} qu'au niveau des États-Unis. Le "
+        f"calcul le garde pour sa **tenue en crise** "
+        f"({_v(jp.loc['japon', '2020'])} en 2020, contre "
+        f"{_v(jp.loc['actions_europe', '2020'])} pour l'Europe), en partie "
+        # yen / euro : EURJPY=X (Yahoo), du sommet au creux des actions,
+        # relevé le 2026-09-18 : +35 % en 2008, −8 % en 2022
+        f"grâce au yen, +35 % contre l'euro en 2008 mais −8 % en 2022. Les "
+        f"indexées sont les seules obligations au-dessus de 4 %, et leur "
+        f"2008 est flatté par le remplaçant. Le calcul a **appris le passé "
+        f"par cœur**."
     )
-    lignes = []
-    for n in ("libre", "moins_japon", "japon_egal_usa", "moins_indexees"):
-        x = sc[n]
-        v = x.get("variante")
-        if v is None:
-            quoi = "Rendements espérés du bloc 1"
-        else:
-            quoi = (f"{e.loc[v['cle'], 'classe']} ramenées à "
-                    f"{_pct(v['rendement'])}"
-                    + (" (le niveau des États-Unis)"
-                       if n == "japon_egal_usa" else ""))
-        autres = [f"{COURTS[k]} {_poids(w)}"
-                  for k, w in sorted(x["poids"].items(), key=lambda kv: -kv[1])
-                  if k not in ("japon", "indexees") and w >= .005]
-        lignes.append((quoi, _poids(x["poids"]["japon"]),
-                       _poids(x["poids"]["indexees"]),
-                       ", ".join(autres) or "—",
-                       _pct(x["rendement_espere"])))
-    st.table(pd.DataFrame(lignes, columns=[
-        "Si l'on suppose", "Japon", "Indexées", "Le reste",
-        "Rendement espéré"]).set_index("Si l'on suppose"))
-    st.caption(
-        "Chaque ligne est un nouveau calcul complet, avec la même limite de "
-        "15 %. Un demi-point est dans la marge d'erreur des estimations de "
-        "l'étape 2."
-    )
-    st.table(pd.DataFrame([
-        ("Les actions japonaises",
-         f"Même à un rendement espéré inférieur à celui de l'Europe, le "
-         f"calcul les garde. Il ne les lâche qu'au niveau des États-Unis. "
-         f"Ce qu'il retient, c'est leur tenue en crise : "
-         f"{_v(jp.loc['japon', '2020'])} pendant le krach de 2020, contre "
-         # yen / euro : EURJPY=X (Yahoo), du sommet au creux des actions,
-         # relevé le 2026-09-18 : +35 % en 2008, −8 % en 2022
-         f"{_v(jp.loc['actions_europe', '2020'])} pour l'Europe. En partie "
-         f"grâce au yen, monnaie refuge, qui a pris 35 % contre l'euro "
-         f"en 2008. Rien ne garantit que le yen jouera ce rôle la prochaine "
-         f"fois : en 2022, il a perdu 8 % contre l'euro."),
-        ("Les obligations indexées",
-         "Ce sont les seules obligations qui rapportent plus que 4 %, "
-         "puisque leur rendement suit l'inflation de l'énoncé. Et elles "
-         "ont bien traversé 2008 — mais cette tenue est celle de leur "
-         "remplaçant, un emprunt d'État classique (bloc 1). Le calcul "
-         "s'appuie sur la ligne la moins bien mesurée."),
-    ], columns=["Support", "Ce que le calcul a retenu"]).set_index("Support"))
     st.markdown(
-        "Le calcul a **appris le passé par cœur** : il a trouvé les deux "
-        "supports qui ont le mieux traversé ces quatre crises précises, et "
-        "il a tout misé dessus. Changer les rendements espérés n'y change "
-        "presque rien ; c'est l'historique qui décide."
+        f"**Ce qu'il ignore.**\n"
+        f"- Le besoin de 10 M€ : {_poids(p['etats_courts'])} seulement sur "
+        f"l'échelle AAA.\n"
+        f"- La diversification : deux supports pour près de 90 %.\n"
+        f"- La qualité des données : il charge la ligne la moins bien "
+        f"mesurée en 2008.\n"
+        f"- La clé des actions : l'Europe à zéro, alors que c'est la poche "
+        f"construite titre par titre à l'étape 3."
     )
 
-    # --- ce que le calcul ignore -------------------------------------
-    st.markdown("**Ce que le calcul ignore**")
-    st.table(pd.DataFrame([
-        ("Le besoin de 10 M€ sous deux ans",
-         f"Il ne place que {_poids(p['etats_courts'])} sur l'échelle AAA. Le "
-         f"besoin du client n'est pas dans les données de marché : il faut "
-         f"le lui imposer."),
-        ("La diversification",
-         "Deux supports pour près de 90 % du patrimoine : si l'un des deux "
-         "se comporte autrement qu'entre 2006 et 2026, rien ne compense."),
-        ("La qualité des données",
-         "Il ne distingue pas une série réelle d'un remplaçant. Il a chargé "
-         "la ligne dont la mesure de 2008 est la plus fragile."),
-        ("La répartition des actions",
-         "Il ignore la clé 40/35/10/15 et laisse l'Europe à zéro, alors que "
-         "c'est la poche que l'étape 3 a construite titre par titre."),
-    ], columns=["Ce qu'il ignore", "Conséquence"]).set_index(
-        "Ce qu'il ignore"))
-
-    pedago.explique(
-        "Pourquoi montrer un résultat qu'on ne retiendra pas",
-        "Parce que c'est lui qui justifie les règles du bloc 4. Chaque "
-        "règle ajoutée ensuite corrige un défaut visible ici, et on pourra "
-        "en chiffrer le coût : l'écart de rendement espéré entre ce "
-        "portefeuille libre et le portefeuille retenu est le prix payé pour "
-        "ne pas miser sur un passé appris par cœur.",
-        "C'est un phénomène général, pas un défaut de ce calcul en "
-        "particulier : tout calcul d'optimisation pousse vers les supports "
-        "dont les chiffres sont les plus favorables, y compris quand ces "
-        "chiffres sont les moins fiables.",
-        source=f"scripts/optimiser.py : {res['departs']} points de départ "
-               f"tirés au hasard (graine fixe), meilleur résultat qui "
-               f"respecte la limite. Relevé du "
-               f"{pd.Timestamp(res['releve']).strftime('%d/%m/%Y')}.",
-    )
-
-    st.markdown("#### Ce que le bloc 3 transmet au bloc 4")
     st.markdown(
-        f"Un plafond de rendement espéré, {_pct(lib['rendement_espere'])}, "
-        "que la limite de 15 % permet au mieux sur ces données ; et quatre "
-        "défauts à corriger par des règles : les 10 M€, la clé des actions, "
-        "la concentration, et la ligne des indexées mal mesurée en 2008. Le "
-        "bloc 4 les ajoute une par une et mesure ce que chacune coûte."
+        f"**➜ {_pct(lib['rendement_espere'])} sur le papier, mais "
+        f"inutilisable.** Les quatre défauts se corrigent par des règles, une "
+        f"à une, en chiffrant ce que chacune coûte."
     )
 
 
@@ -648,6 +442,7 @@ def _par_ligne(poids: dict) -> dict:
     return out
 
 
+
 def _bloc_regles() -> None:
     e = allocation.entrees()
     res = allocation.resultats()
@@ -656,103 +451,63 @@ def _bloc_regles() -> None:
 
     st.markdown("#### Les règles, une par une, et ce qu'elles coûtent")
     st.markdown(
-        "On reprend le calcul libre et on lui ajoute les règles l'une après "
-        "l'autre ; chaque ligne garde les règles des lignes précédentes. "
-        "Chaque règle corrige un défaut vu au bloc 3, et coûte du rendement "
-        "espéré : c'est le prix payé pour ne pas miser sur un passé appris "
-        "par cœur."
+        "On reprend le calcul libre et on ajoute les règles l'une après "
+        "l'autre, chaque ligne gardant les précédentes."
     )
-    encode = {
-        "r1_aaa": ("Au moins 10 % sur l'échelle AAA",
-                   "Le besoin de 10 M€ sous deux ans, qui n'est pas dans les "
-                   "données de marché"),
-        "r2_cle": ("Actions réparties Europe 40 / États-Unis 35 / Japon 10 "
-                   "/ émergents 15",
-                   "On ne parie pas sur une zone pour sa tenue passée (le "
-                   "yen refuge)"),
-        "r3_plafonds": ("Indexées 15 % au plus ; or 10 % ; matières "
-                        "premières 5 % ; crédit 20 %",
-                        "Pas de concentration, et peu de poids sur la ligne "
-                        "mal mesurée en 2008"),
-        "r4_marge": ("Pire baisse visée : 14 % au lieu de 15 %",
-                     "Une marge pour les remplaçants qui flattent 2008 "
-                     "(émergents, Japon, indexées)"),
+    regles = {
+        "r1_aaa": ("Au moins 10 % sur l'échelle AAA", "Les 10 M€ à décaisser"),
+        "r2_cle": ("Actions 40 / 35 / 10 / 15", "Pas de pari sur le yen"),
+        "r3_plafonds": ("Indexées ≤ 15 %, or ≤ 10 %, matières premières "
+                        "≤ 5 %, crédit ≤ 20 %", "Pas de concentration"),
+        "r4_marge": ("Pire baisse visée : 14 %", "Marge pour les remplaçants"),
     }
     lignes, prec = [], None
     for n in ordre:
         x = sc[n]
-        regle, pourquoi = encode.get(n, ("Seule la limite de 15 %", "—"))
-        cout = ("—" if prec is None else
-                viz.fr(x["rendement_espere"] - prec, "pt", 2))
-        pires = [c for c, v in x["crises"].items()
-                 if v <= x["pire_baisse"] + 0.5]
-        lignes.append((x["nom"] if n != "libre" else "Calcul libre (bloc 3)",
-                       regle, pourquoi, _pct(x["rendement_espere"]), cout,
-                       viz.fr(x["pire_baisse"], "%", 1),
-                       " et ".join(pires)))
+        regle, pourquoi = regles.get(n, ("Seule la limite de 15 %", "—"))
+        lignes.append((regle, pourquoi, _pct(x["rendement_espere"]),
+                       "—" if prec is None else
+                       viz.fr(x["rendement_espere"] - prec, "pt", 2),
+                       viz.fr(x["pire_baisse"], "%", 1)))
         prec = x["rendement_espere"]
     st.table(pd.DataFrame(lignes, columns=[
-        "Étape", "Règle ajoutée", "Ce qu'elle encode", "Rendement espéré",
-        "Coût", "Pire baisse", "Crise qui fixe la limite"]).set_index("Étape"))
+        "Règle ajoutée", "Pourquoi", "Rendement espéré", "Coût",
+        "Pire baisse"]).set_index("Règle ajoutée"))
 
-    # --- les poids, étape par étape -----------------------------------
-    st.markdown("**Ce que chaque règle change dans le portefeuille**")
     cols = {n: _par_ligne(sc[n]["poids"]) for n in ordre}
     noms = {"libre": "Libre", "r1_aaa": "+ AAA", "r2_cle": "+ clé",
             "r3_plafonds": "+ plafonds", "r4_marge": "+ marge"}
-    lignes = []
-    tot = {n: sum(cols[n].get(k, 0) for k in allocation.MIX_ACTIONS)
-           for n in ordre}
-    lignes.append(["Actions, total"] + [_poids(tot[n]) for n in ordre])
-    for k in allocation.ORDRE:
-        if k in allocation.HORS_CALCUL:
-            continue
-        nom = NOMS.get(k, e.loc[k, "classe"]).replace(" (40 %)", "").replace(
-            " (35 %)", "").replace(" (10 %)", "").replace(" (15 %)", "")
-        lignes.append([nom] + [_poids(cols[n].get(k, 0)) for n in ordre])
-    st.table(pd.DataFrame(lignes, columns=["Support"] + [
-        noms[n] for n in ordre]).set_index("Support"))
+    _graphique_etapes(cols, noms)
 
     r1, r2, r3, r4 = (sc[n] for n in res["etapes"])
-    c2 = _par_ligne(r2["poids"])
-    c3 = _par_ligne(r3["poids"])
+    c2, c3 = cols["r2_cle"], cols["r3_plafonds"]
     t2 = sum(c2[k] for k in allocation.MIX_ACTIONS)
     t3 = sum(c3[k] for k in allocation.MIX_ACTIONS)
-    jp = allocation.pendant_la_baisse(allocation.series_risque())[0]
-    st.table(pd.DataFrame([
-        ("Les 10 M€ en AAA",
-         f"Presque gratuit ({viz.fr(r1['rendement_espere'] - sc['libre']['rendement_espere'], 'pt', 2)}) : "
-         f"l'échelle courte prend la place d'emprunts d'État et de crédit "
-         f"qui rapportaient à peine plus. Le besoin du client ne coûte rien."),
-        ("La clé des actions",
-         f"La règle la plus chère "
-         f"({viz.fr(r2['rendement_espere'] - r1['rendement_espere'], 'pt', 2)}). "
-         f"Privé du Japon, le calcul se replie sur les indexées "
-         f"({_poids(c2['indexees'])}) et réduit les actions à "
-         f"{_poids(t2)}. C'est le prix du renoncement au pari sur le yen."),
-        ("Les plafonds",
-         f"Coût {viz.fr(r3['rendement_espere'] - r2['rendement_espere'], 'pt', 2)}. "
-         f"Les indexées passent de {_poids(c2['indexees'])} à "
-         f"{_poids(c3['indexees'])}, remplacées par les emprunts d'État à "
-         f"2-10 ans ({_poids(c3['etats_longs'])}). Et les actions "
-         f"remontent, de {_poids(t2)} à {_poids(t3)} : en 2020, qui "
-         f"fixait la limite, les indexées avaient baissé avec les actions "
-         f"({_v(jp.loc['indexees', '2020'])}), les États presque pas "
-         f"({_v(jp.loc['etats_longs', '2020'])}). Des États à la place des "
-         f"indexées libèrent de la place pour les actions."),
-        ("La marge de sécurité",
-         f"Coût {viz.fr(r4['rendement_espere'] - r3['rendement_espere'], 'pt', 2)}"
-         f" pour un point de perte en moins : les actions passent de "
-         f"{_poids(t3)} à "
-         f"{_poids(sum(_par_ligne(r4['poids'])[k] for k in allocation.MIX_ACTIONS))}."),
-    ], columns=["Règle", "Ce qu'on observe"]).set_index("Règle"))
-    st.caption(
-        "Le crédit et les matières premières restent à zéro dans toutes les "
-        "étapes. Le crédit court rapporte moins que l'échelle d'États "
+    t4 = sum(cols["r4_marge"][k] for k in allocation.MIX_ACTIONS)
+    jp = _risque()["pendant"]
+
+    def cout(a: dict, b: dict) -> str:
+        return viz.fr(a["rendement_espere"] - b["rendement_espere"], "pt", 2)
+
+    st.markdown(
+        f"**Lecture.**\n"
+        f"- **Les 10 M€ en AAA** ne coûtent presque rien ({cout(r1, sc['libre'])}).\n"
+        f"- **La clé des actions** est la règle la plus chère "
+        f"({cout(r2, r1)}) : privé du Japon, le calcul se replie sur les "
+        f"indexées ({_poids(c2['indexees'])}) et réduit les actions à "
+        f"{_poids(t2)}.\n"
+        f"- **Les plafonds** ({cout(r3, r2)}) remplacent les indexées par "
+        f"des États à 2-10 ans, et les actions **remontent** à {_poids(t3)} : "
+        f"en 2020, les indexées avaient baissé avec les actions "
+        f"({_v(jp.loc['indexees', '2020'])}), les États presque pas "
+        f"({_v(jp.loc['etats_longs', '2020'])}).\n"
+        f"- **La marge** ({cout(r4, r3)}) retire un point de perte ; les "
+        f"actions passent à {_poids(t4)}.\n\n"
+        f"Crédit et matières premières restent à zéro partout : le crédit "
+        f"court rapporte moins que les États "
         f"({_pct(e.loc['credit_court', 'rendement'])} contre "
-        f"{_pct(e.loc['etats_longs', 'rendement'])}) et a davantage baissé "
-        "en 2020 ; les matières premières rapportent autant que l'or et "
-        "baissent avec les actions. Le calcul a raison de les écarter."
+        f"{_pct(e.loc['etats_longs', 'rendement'])}), les matières premières "
+        f"baissent avec les actions."
     )
 
     total = r4["rendement_espere"] - sc["libre"]["rendement_espere"]
@@ -763,15 +518,10 @@ def _bloc_regles() -> None:
     c[2].metric("Coût total des règles", viz.fr(total, "pt", 2))
     c[3].metric("Pire baisse, 2006-2026", viz.fr(r4["pire_baisse"], "%", 1))
 
-    st.markdown("#### Ce que le bloc 4 transmet au bloc 5")
     st.markdown(
-        f"Une répartition en pourcentages qui rapporte "
-        f"{_pct(r4['rendement_espere'])} espérés, "
-        f"{viz.fr(r4['rendement_espere'] - 4, 'point', 2)} au-dessus de "
-        f"l'inflation de l'énoncé, et qui aurait perdu au plus "
-        f"{viz.fr(-r4['pire_baisse'], '%', 1)} depuis son plus haut entre "
-        f"2006 et aujourd'hui. Le bloc 5 la traduit en millions d'euros, "
-        f"support par support."
+        f"**➜ Les règles coûtent {viz.fr(-total, 'point', 2)} et laissent "
+        f"{viz.fr(r4['rendement_espere'] - 4, 'point', 2)} au-dessus des "
+        f"4 %.** Reste à passer des pourcentages aux millions d'euros."
     )
 
 
@@ -785,6 +535,7 @@ def _trente() -> pd.DataFrame:
     return actions.selection(actions.univers())
 
 
+
 def _bloc_retenu() -> None:
     e = allocation.entrees()
     res = allocation.resultats()
@@ -792,123 +543,75 @@ def _bloc_retenu() -> None:
     w = allocation.poids_retenus()
     M = allocation.MONTANT
     cl = fonds.charger()["classes"]
-    fonds_de = {"usa": "usa", "japon": "japon", "emergents": "emergents",
-                "indexees": "indexees", "or": "or", "matieres": "matieres"}
+    fonds_de = ("usa", "japon", "emergents", "indexees", "or", "matieres")
 
     st.markdown("#### Le portefeuille retenu, en millions d'euros")
-    st.markdown(
-        "La répartition du bloc 4, appliquée aux 100 M€ du client et "
-        "déclinée support par support : les supports choisis à l'étape 3, "
-        "les montants fixés ici."
-    )
+    g1, g2 = st.columns([2, 3])
+    with g1:
+        _graphique_familles(w, "Par grande famille")
+    with g2:
+        _graphique_supports(w, "Par support, en % et en M€", montant=M)
 
-    # --- 1. vue d'ensemble -------------------------------------------
     lignes, contrib = [], 0.0
     for k, x in w.items():
         if x < 0.0005:
             continue
         sup = e.loc[k, "support"]
         if k in fonds_de:
-            c = cl[fonds_de[k]]
+            c = cl[k]
             sup = f"{c['retenu'].split('.')[0]} · {c['candidats'][c['retenu']]['nom']}"
         ct = x * e.loc[k, "rendement"]
         contrib += ct
-        lignes.append((e.loc[k, "classe"], sup, viz.fr(x * 100, "%", 1),
-                       _me(x * M, 1),
-                       _pct(e.loc[k, "rendement"]), viz.fr(ct, "pt", 2)))
-    lignes.append(("Total", "", "100 %", _me(M, 1), "",
-                   viz.fr(contrib, "pt", 2)))
+        lignes.append((e.loc[k, "classe"], sup, _me(x * M, 1),
+                       _pct(e.loc[k, "rendement"])))
     st.table(pd.DataFrame(lignes, columns=[
-        "Classe", "Support", "Poids", "Montant", "Rendement espéré",
-        "Contribution*"]).set_index("Classe"))
-    st.caption(
-        "* Poids × rendement espéré : ce que chaque ligne apporte au "
-        "rendement du portefeuille. Crédit et matières premières : zéro "
-        "(bloc 4). Pas de crypto (décision du client)."
-    )
+        "Classe", "Support", "Montant", "Rendement espéré"]).set_index("Classe"))
+
     part_act = sum(w[k] for k in allocation.MIX_ACTIONS)
     oblig = w["etats_courts"] + w["etats_longs"] + w["indexees"]
     st.markdown(
-        f"**Lecture.** {viz.fr(part_act * 100, '%', 1)} d'actions, "
-        f"{viz.fr(oblig * 100, '%', 1)} d'obligations d'État (dont les "
-        f"indexées), {viz.fr(w['or'] * 100, '%', 1)} d'or. Les actions font "
-        f"{_poids(part_act)} du patrimoine mais "
+        f"**Lecture.** Les actions font {_poids(part_act)} du patrimoine mais "
         f"{_poids(sum(w[k] * e.loc[k, 'rendement'] for k in allocation.MIX_ACTIONS) / contrib)} "
-        f"du rendement espéré : ce sont elles qui portent l'objectif de 4 %, "
-        f"les obligations qui tiennent la limite de 15 %."
+        f"du rendement espéré : elles portent l'objectif de 4 %, les "
+        f"obligations tiennent la limite de 15 %."
     )
 
-    # --- 2. les actions européennes ----------------------------------
-    st.markdown("**Les 30 actions européennes, à parts égales**")
+    # --- les 30 actions européennes ----------------------------------
     sel = _trente()
     par_titre = w["actions_europe"] * M / len(sel)
     st.markdown(
-        f"{_me(w['actions_europe'] * M, 1)} répartis également entre les "
-        f"{len(sel)} titres de l'étape 3, soit **{_me(par_titre)} par "
-        f"titre**. Parts égales, comme dans la mesure de risque du panier à "
-        f"l'étape 3."
+        f"**Les 30 actions européennes** : {_me(w['actions_europe'] * M, 1)} "
+        f"à parts égales, soit {_me(par_titre)} par titre."
     )
-    t = sel.sort_values(["secteur", "nom"])
-    st.table(pd.DataFrame({
-        "Société": t["nom"].str.title(), "Pays": t["pays"],
-        "Secteur": t["secteur"], "Montant": _me(par_titre),
-    }).set_index("Société"))
+    g1, g2 = st.columns(2)
+    with g1:
+        _graphique_compte(sel["secteur"], "Par secteur (titres · M€)", par_titre)
+    with g2:
+        _graphique_compte(sel["pays"], "Par pays (titres · M€)", par_titre)
 
-    # --- 3. les emprunts d'État --------------------------------------
-    st.markdown("**Les emprunts d'État en direct**")
+    # --- en direct et en fonds ---------------------------------------
     sv = taux.charger()["svensson"]
     ech = obligations.echelle(allocation.TRANCHES, sv["aaa"])
     investi = w["etats_courts"] * M
-    cout = sum(x["cout"] for x in ech)
-    f = investi / cout
-    lignes = [(f"Dans {int(x['echeance'] * 12)} mois", "AAA",
-               _me(x["cout"] * f), _me(x["montant"] * f), _pct(x["taux"]))
-              for x in ech]
+    f = investi / sum(x["cout"] for x in ech)
     par_marche = w["etats_longs"] * M / len(allocation.ECHELLE_LONGUE)
-    for m in allocation.ECHELLE_LONGUE:
-        a = obligations.analyse(m, sv["toutes"])
-        lignes.append((f"{m} ans", "Zone euro", _me(par_marche), "—",
-                       _pct(a["rendement"])))
-    st.table(pd.DataFrame(lignes, columns=[
-        "Échéance", "Émetteurs", "Investi", "Remboursé à l'échéance",
-        "Rendement"]).set_index("Échéance"))
-    st.caption(
-        f"Échelle AAA : l'étape 3 chiffrait à {_me(cout)} le coût des "
-        f"10 M€ à recevoir ; le plancher de 10 % du bloc 4 y place "
-        f"{_me(investi)}, qui rendront {_me(sum(x['montant'] for x in ech) * f)}. "
-        f"Le besoin est couvert avec une petite réserve. Échelle longue : "
-        f"cinq échéances à parts égales, réinvesties à 10 ans à chaque "
-        f"remboursement."
+    frais = sum(w[k] * M * cl[k]["candidats"][cl[k]["retenu"]]["frais"] / 100
+                for k in fonds_de if w[k] >= 0.0005)
+    part_max = max(w[k] * M / (cl[k]["candidats"][cl[k]["retenu"]]["taille"] * 1e6)
+                   for k in fonds_de if w[k] >= 0.0005)
+    st.markdown(
+        f"**Les emprunts d'État en direct** : {_me(investi)} sur l'échelle "
+        f"AAA, en {len(ech)} tranches de 6 à 24 mois, qui rendront "
+        f"{_me(sum(x['montant'] for x in ech) * f)} ; les 10 M€ sont couverts. "
+        f"Puis {len(allocation.ECHELLE_LONGUE)} × {_me(par_marche)} sur "
+        f"l'échelle zone euro de 2 à 10 ans.\n\n"
+        f"**Les fonds** : aucune ligne ne dépasse "
+        f"{viz.fr(part_max * 100, '%', 2)} de son fonds, on entre et sort "
+        f"sans peser sur les prix. Frais : {viz.fr(frais / 1e3, 'k€', 0)} "
+        f"par an ({viz.fr(frais / M * 100, '%', 2)} du patrimoine), non "
+        f"déduits du rendement espéré."
     )
 
-    # --- 4. les fonds -------------------------------------------------
-    st.markdown("**Les fonds**")
-    lignes, frais = [], 0.0
-    for k, fk in fonds_de.items():
-        if w[k] < 0.0005:
-            continue
-        c = cl[fk]["candidats"][cl[fk]["retenu"]]
-        montant = w[k] * M
-        frais += montant * c["frais"] / 100
-        lignes.append((e.loc[k, "classe"], cl[fk]["retenu"].split(".")[0],
-                       c["isin"], _me(montant, 1),
-                       viz.fr(c["taille"] / 1000, "Md€", 1),
-                       viz.fr(montant / (c["taille"] * 1e6) * 100, "%", 2),
-                       viz.fr(c["frais"], "%", 2)))
-    st.table(pd.DataFrame(lignes, columns=[
-        "Classe", "Fonds", "ISIN", "Montant", "Taille du fonds",
-        "Part du fonds", "Frais courants"]).set_index("Classe"))
-    st.caption(
-        f"Aucune ligne ne dépasse 1 % de son fonds : on peut entrer et "
-        f"sortir sans peser sur les prix. Frais des fonds : "
-        f"{viz.fr(frais / 1e3, 'k€', 0)} par an, soit "
-        f"{viz.fr(frais / M * 100, '%', 3)} du patrimoine ; ils ne sont pas "
-        f"déduits du rendement espéré (étape 1). Actions européennes et "
-        f"emprunts d'État en direct : pas de frais de gestion, seulement "
-        f"des frais de transaction."
-    )
-
-    # --- synthèse -----------------------------------------------------
     c = st.columns(4)
     c[0].metric("Rendement espéré", _pct(r4["rendement_espere"]))
     c[1].metric("Au-dessus des 4 %", viz.fr(r4["rendement_espere"] - 4,
@@ -917,22 +620,18 @@ def _bloc_retenu() -> None:
     c[3].metric("Rendement obtenu, 2006-2026*",
                 viz.fr(r4["realise"], "%", 2) + " / an")
     st.caption(
-        "* Ce qu'aurait rapporté cette répartition, rééquilibrée chaque "
-        "mois, d'octobre 2006 à aujourd'hui, sur les séries du bloc 1. Il "
-        "ne se compare pas au rendement espéré : le passé comptait dix ans "
-        "de taux négatifs, l'avenir part de taux à 3 %."
+        "* Rééquilibré chaque mois sur les séries du bloc 1. Ne se compare "
+        "pas au rendement espéré : le passé comptait dix ans de taux "
+        "négatifs, l'avenir part de taux à 3 %."
     )
 
-    st.markdown("#### Ce que l'étape 4 transmet à l'étape 5")
+    st.markdown("#### Conclusion de l'étape 4")
     st.markdown(
-        f"Un portefeuille de 100 M€ : {_poids(part_act)} d'actions en quatre "
-        f"zones, dont 30 titres européens en direct ; {_poids(oblig)} "
-        f"d'obligations d'État, dont deux échelles en direct ; "
-        f"{_poids(w['or'])} d'or. Rendement espéré "
-        f"{_pct(r4['rendement_espere'])}, pire baisse "
-        f"{viz.fr(r4['pire_baisse'], '%', 1)} sur les données qui ont servi "
-        f"à le construire. L'étape 5 le fera traverser les crises une à une "
-        f"et mesurera combien de temps il reste sous son plus haut — la "
-        f"question que le calcul, qui ne regarde que la profondeur des "
-        f"baisses, ne s'est pas posée."
+        f"100 M€ : {_poids(part_act)} d'actions en quatre zones, dont 30 "
+        f"titres européens en direct ; {_poids(oblig)} d'obligations d'État, "
+        f"dont deux échelles en direct ; {_poids(w['or'])} d'or. Rendement "
+        f"espéré {_pct(r4['rendement_espere'])}, pire baisse "
+        f"{viz.fr(r4['pire_baisse'], '%', 1)}. Question que le calcul ne "
+        f"s'est pas posée : combien de temps reste-t-il sous son plus haut ? "
+        f"C'est l'étape 5."
     )
