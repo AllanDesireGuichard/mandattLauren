@@ -1,0 +1,104 @@
+{
+ "date": "2026-09-21",
+ "limite": 0.15,
+ "niveau": 0.95,
+ "fenetre": 12,
+ "n_fenetres": 228,
+ "debut": "2006-10-30",
+ "fin": "2026-09-18",
+ "portefeuilles": {
+  "croissance": {
+   "nom": "Portefeuille croissance",
+   "note": "VaR 95 % à un an ≥ −15 %, aucune autre règle : le pendant du calcul libre de l'étape 4.",
+   "poids": {
+    "actions_europe": 0.509,
+    "usa": 0.0,
+    "japon": 0.0379,
+    "emergents": 0.3535,
+    "etats_courts": 0.0,
+    "etats_longs": 0.0,
+    "credit_court": 0.0,
+    "indexees": 0.0,
+    "or": 0.0996,
+    "matieres": 0.0
+   },
+   "rendement_espere": 8.423,
+   "var95": -15.0,
+   "cvar95": -29.52,
+   "pire_baisse": -51.53,
+   "pire_12m": -39.49,
+   "annees_en_perte": 26.8,
+   "annees_sous_4": 39.5,
+   "temps_sous_10": 31.3,
+   "realise": 6.45,
+   "crises": {
+    "2008": -51.5,
+    "2011": -23.5,
+    "2020": -31.5,
+    "2022": -19.6
+   }
+  },
+  "croissance_10me": {
+   "nom": "Croissance, 10 M€ sécurisés",
+   "note": "La même, plus l'échelle AAA à 10% : le besoin de liquidité du client.",
+   "poids": {
+    "actions_europe": 0.5168,
+    "usa": 0.0,
+    "japon": 0.0,
+    "emergents": 0.3501,
+    "etats_courts": 0.1,
+    "etats_longs": 0.0,
+    "credit_court": 0.0,
+    "indexees": 0.0,
+    "or": 0.0331,
+    "matieres": 0.0
+   },
+   "rendement_espere": 8.146,
+   "var95": -15.0,
+   "cvar95": -28.97,
+   "pire_baisse": -51.01,
+   "pire_12m": -38.74,
+   "annees_en_perte": 28.9,
+   "annees_sous_4": 39.9,
+   "temps_sous_10": 33.1,
+   "realise": 5.64,
+   "crises": {
+    "2008": -51.0,
+    "2011": -26.2,
+    "2020": -30.5,
+    "2022": -19.4
+   }
+  },
+  "retenu": {
+   "nom": "Portefeuille retenu (étape 4)",
+   "note": "Celui du mandat, mesuré ici sur la VaR et la CVaR pour être comparable.",
+   "poids": {
+    "actions_europe": 0.1216,
+    "usa": 0.1064,
+    "japon": 0.0304,
+    "emergents": 0.0456,
+    "etats_courts": 0.1,
+    "etats_longs": 0.4129,
+    "credit_court": 0.0,
+    "indexees": 0.15,
+    "or": 0.033,
+    "matieres": 0.0
+   },
+   "rendement_espere": 5.306,
+   "var95": -6.47,
+   "cvar95": -8.46,
+   "pire_baisse": -14.0,
+   "pire_12m": -11.43,
+   "annees_en_perte": 18.4,
+   "annees_sous_4": 40.8,
+   "temps_sous_10": 3.7,
+   "realise": 4.47,
+   "crises": {
+    "2008": -14.0,
+    "2011": -7.2,
+    "2020": -14.0,
+    "2022": -13.4
+   }
+  }
+ }
+}

@@ -13,6 +13,12 @@ juxtaposait neuf onglets sans ordre lisible.
     4. Allocation             combien de chaque
     5. Backtests              ce que la contrainte donne
 
+En marge de la chaine, un SIXIEME onglet qui n'en fait pas partie : une
+variante qui reprend l'etape 4 en changeant la seule lecture de la limite
+de 15 % (pire cas -> une annee sur vingt), pour chiffrer ce que couterait
+un objectif de 4 % AU-DESSUS de l'inflation. Reserve de pitch, pas une
+proposition.
+
 PRINCIPE DE CALCUL. L'application LIT les resultats calcules (data/*.csv)
 plutot que de les recalculer : l'optimisation prend une dizaine de minutes.
 Ce qui se recalcule en direct le fait sur des formules fermees, donc
@@ -27,7 +33,7 @@ st.set_page_config(page_title="Mandat Lauren", page_icon="📐",
 
 from core import version                                        # noqa: E402
 from tabs import (t1_parametres, t2_macro, t3_lignes,            # noqa: E402
-                  t4_allocation, t5_backtests)
+                  t4_allocation, t5_backtests, t6_croissance)
 
 st.markdown("""
 <style>
@@ -54,6 +60,7 @@ ONGLETS = [
     ("3 · Analyse ligne à ligne", t3_lignes.render),
     ("4 · Allocation",            t4_allocation.render),
     ("5 · Backtests",             t5_backtests.render),
+    ("6 · Variante croissance",   t6_croissance.render),
 ]
 
 for onglet, (_, rendre) in zip(st.tabs([t for t, _ in ONGLETS]), ONGLETS):
