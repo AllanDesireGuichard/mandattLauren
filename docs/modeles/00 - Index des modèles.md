@@ -6,14 +6,22 @@ maj: 2026-09-21
 
 # Modèles du mandat Lauren
 
-Les six modèles qui produisent un chiffre dans le dossier. Pour chacun : la
-formule telle qu'elle est écrite dans le code, ce que chaque terme fait,
-pourquoi ce modèle plutôt qu'un autre, et ce qu'il ne sait pas faire.
+Les six modèles qui produisent un chiffre dans le dossier. Pour chacun :
+**ce qu'il fait et pourquoi**, expliqué en français, puis ce qu'il ne sait
+pas faire.
 
-> [!info] Convention
-> Chaque note indique son fichier source. Les formules sont celles du code,
-> pas une reconstitution : quand le code s'écarte de la version canonique du
-> modèle, c'est signalé.
+> [!info] Comment ces notes sont écrites
+> **L'idée d'abord, la formule seulement si elle apprend quelque chose.**
+> Il n'en reste qu'une sur les six notes, celle de Svensson, et chacun de
+> ses symboles y est nommé.
+>
+> C'est la règle que le code s'impose déjà à lui-même : `pedago.formule()`
+> lève une exception si la traduction en français manque — « une formule
+> sans traduction n'a rien à faire dans cette application ».
+>
+> Chaque note commence par un **« En une phrase »**, indique son fichier
+> source, et finit par ses limites. Quand le code s'écarte de la version
+> canonique du modèle, c'est signalé.
 
 ## La carte
 
@@ -30,7 +38,7 @@ pourquoi ce modèle plutôt qu'un autre, et ce qu'il ne sait pas faire.
 
 ```
 BCE (6 paramètres)
-    └─> [1] Svensson : r(m) pour tout m
+    └─> [1] Svensson : le taux pour n'importe quelle durée
             └─> [2] Prix, duration, rendement d'une obligation
                     └─> [3] Rendement espéré obligataire ─┐
 iShares / Yahoo / Shiller                                 │
