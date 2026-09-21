@@ -24,3 +24,6 @@ scripts/pitch/data.json
 node_modules/
 package.json
 package-lock.json
+
+# Fichiers de verrouillage Word/PowerPoint (un document ouvert)
+~$*

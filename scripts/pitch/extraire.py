@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from core import (actions, allocation, backtests, credit, fonds, macro,
+from core import (actions, allocation, backtests, credit, fonds, ips, macro,
                   marches, obligations, rendements, taux)
 
 RACINE = Path(__file__).resolve().parents[2]
@@ -181,7 +181,28 @@ def main() -> None:
         for k in ("usa", "japon", "emergents", "indexees", "or", "matieres")
         if w[k] >= 0.0005)
 
+    # --- du brut au net (correction du 2026-09-21) -----------------------
+    # L'objectif du client est NET : ce qui doit battre l'inflation, c'est ce
+    # qui lui reste. Le deck comparait un rendement brut à un seuil net.
+    out["frais_inst"] = out["frais_total"] / allocation.MONTANT * 100
+    out["frais_mandat"] = ips.FRAIS_MANDAT * 100
+    out["net"] = ips.rendement_net(
+        res["scenarios"][allocation.RETENU]["rendement_espere"],
+        out["frais_inst"])
+    out["seuil"] = ips.INFLATION_TARGET * 100
+
     # --- étape 5 : backtests --------------------------------------------
+    # L'inflation RÉELLEMENT constatée sur la fenêtre du rejeu : c'est elle
+    # qui juge le rendement réalisé, pas les 4 % de l'énoncé, qui décrivent
+    # un régime que la période n'a pas connu.
+    _infl = json.loads((allocation.DATA / "inflation_realisee.json").read_text(
+        encoding="utf-8"))
+    out["inflation"] = {
+        "annuel": _infl["backtest"]["annuel"],
+        "cumul": _infl["backtest"]["cumul"],
+        "annees": _infl["backtest"]["annees"],
+        "cinq_ans": _infl["fenetres"]["5 ans"]["annuel"],
+    }
     v = backtests.valeur()
     ep = backtests.episodes(v)
     t = backtests.temps_sous(v)
@@ -194,6 +215,8 @@ def main() -> None:
     out["bt"] = {
         "final": v.iloc[-1] / 1e6,
         "cagr": ((v.iloc[-1] / v.iloc[0]) ** (1 / ans) - 1) * 100,
+        "reel": ((v.iloc[-1] / v.iloc[0]) ** (1 / ans) - 1) * 100
+                - _infl["backtest"]["annuel"],
         "pire": t["pire"], "sous": t["sous"], "s5": t["5"], "s10": t["10"],
         "episodes": [(x.sommet.strftime("%m/%Y"), x.creux.strftime("%m/%Y"),
                       x.perte * 100, backtests.mois(x.sommet, x.creux),
@@ -203,6 +226,7 @@ def main() -> None:
         "var95": backtests.var_cvar(r, .95), "var99": backtests.var_cvar(r, .99),
         "rmin": r.min(), "rmax": r.max(), "n": len(r),
         "neg": (r < 0).mean() * 100, "sous4": (r < 4).mean() * 100,
+        "sous_infl": (r < _infl["backtest"]["annuel"]).mean() * 100,
         "serie": {"dates": [d_.strftime("%Y-%m") for d_ in vm.index],
                   "valeur": [round(x, 2) for x in vm],
                   "dd": [round(x, 2) for x in dd]},

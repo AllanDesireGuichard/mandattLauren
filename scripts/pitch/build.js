@@ -532,16 +532,16 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
   const fams = [["Actions", partAct, FAM.act], ["Emprunts d'État", W4.etats_courts + W4.etats_longs, FAM.eta], ["Obligations indexées", W4.indexees, FAM.idx], ["Or", W4.or, FAM.or]];
   s.addChart(pres.charts.DOUGHNUT, [{ name: "Familles", labels: fams.map((f) => f[0]), values: fams.map((f) => f[1] * 100) }],
     { x: M, y: 1.5, w: 5.2, h: 5.35, holeSize: 55, chartColors: fams.map((f) => f[2]), showValue: false, showPercent: true, dataLabelColor: WHITE, dataLabelFontSize: 13, dataLabelFontBold: true, showLegend: true, legendPos: "b", legendFontSize: 12, legendFontFace: BF, dataBorder: { pt: 2, color: WHITE } });
-  stat(s, 6.3, 1.6, 3.1, pct(R4.rdt, 2), "de rendement espéré par an", FAM.idx, 40);
-  stat(s, 9.6, 1.6, 3.1, "+" + fr(R4.rdt - 4, 2) + " pt", "au-dessus des 4 % d'inflation", INK, 40);
+  stat(s, 6.3, 1.6, 3.1, pct(D.net, 2), "de rendement espéré NET de frais", FAM.idx, 40);
+  stat(s, 9.6, 1.6, 3.1, "+" + fr(D.net - D.seuil, 2) + " pt", "au-dessus des 4 % d'inflation", INK, 40);
   stat(s, 6.3, 3.2, 3.1, pct(R4.pire), "de pire baisse depuis le plus haut (2008 et 2020)", NEG, 40);
   stat(s, 9.6, 3.2, 3.1, pct(contribAct / contrib * 100, 0), `du rendement vient des actions, qui ne font que ${pct(partAct * 100, 0)} du patrimoine`, FAM.act, 40);
-  callout(s, 6.3, 4.95, 6.43, 1.85, "Les deux exigences du client sont tenues : **plus de 4 % espérés**, et **jamais plus de 14 % de baisse** dans les crises des vingt dernières années.", INK, 15);
-  s.addNotes(`Voici le portefeuille retenu : environ ${pct(partAct * 100, 0)} d'actions, ${pct((W4.etats_courts + W4.etats_longs) * 100, 0)} d'emprunts d'État, 15 % d'obligations indexées et ${pct(W4.or * 100, 0)} d'or. Rendement espéré : ${pct(R4.rdt, 2)} par an, soit ${fr(R4.rdt - 4, 2)} point au-dessus de l'inflation de l'énoncé. Pire baisse sur vingt ans : ${pct(-R4.pire)}. La répartition des rôles est claire : les actions ne font que 30 % du patrimoine mais apportent près de la moitié du rendement ; les obligations tiennent la limite de perte.`);
+  callout(s, 6.3, 4.95, 6.43, 1.85, `Les deux exigences du client sont tenues : **${pct(D.net, 2)} nets espérés** contre 4 % à battre, et **jamais plus de 14 % de baisse** dans les crises des vingt dernières années.`, INK, 15);
+  s.addNotes(`Voici le portefeuille retenu : environ ${pct(partAct * 100, 0)} d'actions, ${pct((W4.etats_courts + W4.etats_longs) * 100, 0)} d'emprunts d'État, 15 % d'obligations indexées et ${pct(W4.or * 100, 0)} d'or. Un point de méthode important : le rendement brut est de ${pct(R4.rdt, 2)}, mais l'objectif du client est un objectif NET — ce qui doit battre l'inflation, c'est ce qui lui reste. On retire donc les frais des fonds, ${fr(D.frais_inst, 2)} point, et nos frais de mandat, ${fr(D.frais_mandat, 2)} point : il reste ${pct(D.net, 2)} nets, soit ${fr(D.net - D.seuil, 2)} point au-dessus de l'inflation de l'énoncé. Si on me demande la fiscalité : elle est hors périmètre de cet exercice et retirerait encore environ 0,30 point. Pire baisse sur vingt ans : ${pct(-R4.pire)}. Les actions ne font que 30 % du patrimoine mais apportent près de la moitié du rendement ; les obligations tiennent la limite de perte.`);
 }
 
 {
-  const s = base(4, "Le portefeuille en millions d'euros", { kicker: "100 M€, support par support", source: `Frais des fonds : ${fr(D.frais_total / 1e3, 0)} k€ par an (${pct(D.frais_total / 1e8 * 100, 2)} du patrimoine), non déduits · aucune ligne ne dépasse 1 % de son fonds` });
+  const s = base(4, "Le portefeuille en millions d'euros", { kicker: "100 M€, support par support", source: `Frais des fonds : ${fr(D.frais_total / 1e3, 0)} k€ par an (${pct(D.frais_inst, 2)} du patrimoine) · frais de mandat ${pct(D.frais_mandat, 2)} · aucune ligne ne dépasse 1 % de son fonds` });
   const nm = { actions_europe: "Actions européennes", usa: "Actions américaines", japon: "Actions japonaises", emergents: "Actions émergentes", etats_courts: "Échelle AAA, 6 à 24 mois", etats_longs: "Échelle zone euro, 2 à 10 ans", indexees: "Obligations indexées", or: "Or" };
   const sup = { actions_europe: "30 titres en direct", etats_courts: "4 obligations en direct", etats_longs: "5 obligations en direct" };
   const fc = { actions_europe: FAM.act, usa: FAM.act, japon: FAM.act, emergents: FAM.act, etats_courts: FAM.eta, etats_longs: FAM.eta, indexees: FAM.idx, or: FAM.or };
@@ -557,6 +557,7 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
     `**Échelle 2-10 ans** : 5 × ${me(W4.etats_longs * 1e8 / 5, 2)}`,
     "**Fonds** : XZMU, XZMJ, XZEM, IBCI, Xetra-Gold",
     `Réalisé 2006-2026 : **${pct(D.realise, 2)} par an** (dix ans de taux négatifs inclus)`,
+    `Rendement espéré **net de frais : ${pct(D.net, 2)}**`,
   ]), 13, { paraSpaceAfter: 9 });
   s.addNotes("Concrètement, en millions d'euros. Environ 12 millions sur les 30 actions européennes, à 400 000 euros chacune ; 10 millions sur l'échelle AAA, qui rendront un peu plus que les 10 millions à décaisser ; 41 millions sur l'échelle d'emprunts d'État de 2 à 10 ans ; 15 millions en obligations indexées ; le reste en fonds d'actions américaines, japonaises et émergentes, et 3 millions en or. Les frais des fonds représentent environ 47 000 euros par an. Sur 2006-2026, ce portefeuille aurait rapporté 4,5 % par an ; ce n'est pas comparable au rendement espéré, parce que le passé comptait dix ans de taux négatifs alors que l'avenir part de taux autour de 3 %.");
 }
@@ -566,14 +567,15 @@ dark("Backtests", "Le portefeuille rejoué de 2006 à aujourd'hui : combien de t
   .addNotes("Dernière étape : rejouer le portefeuille sur vingt ans.");
 
 {
-  const s = base(5, `100 M€ en 2006 : ${fr(BT.final, 0)} M€ aujourd'hui`, { kicker: "Le portefeuille retenu, rééquilibré chaque mois, d'octobre 2006 à septembre 2026", source: "Séries de l'étape 4 · la limite de −14 % a été imposée sur ces mêmes données : sa tenue est acquise d'avance" });
+  const s = base(5, `100 M€ en 2006 : ${fr(BT.final, 0)} M€ aujourd'hui`, { kicker: "Le portefeuille retenu, rééquilibré chaque mois, d'octobre 2006 à septembre 2026", source: `Séries de l'étape 4 · la limite de −14 % a été imposée sur ces mêmes données : sa tenue est acquise d'avance · inflation zone euro constatée : FRED, IPCH, ${pct(D.inflation.cumul, 1)} cumulés sur la période` });
   const ser = BT.serie;
   s.addChart(pres.charts.LINE, [{ name: "Valeur (M€)", labels: ser.dates.map((d) => d.slice(0, 4)), values: ser.valeur }],
     { ...chartBase("Valeur du portefeuille, en M€"), x: M, y: 1.55, w: 8.3, h: 5.3, chartColors: [FAM.act], lineSize: 2, lineDataSymbol: "none", catAxisLabelFrequency: 24, valAxisMinVal: 80, valAxisLabelFormatCode: "0", showLegend: false });
   stat(s, 9.2, 1.7, 3.5, pct(BT.cagr, 2), "par an sur vingt ans", FAM.idx, 38);
-  stat(s, 9.2, 3.2, 3.5, pct(BT.pire), "de pire baisse (2008 et 2020)", NEG, 38);
-  callout(s, 9.2, 4.75, 3.53, 2.05, "Ce rejeu ne **prouve pas** la limite : il mesure ce que le calcul n'a pas regardé, **la durée des baisses**.", INK, 13.5);
-  s.addNotes(`100 millions investis en octobre 2006 en vaudraient ${fr(BT.final, 0)} aujourd'hui, soit ${pct(BT.cagr, 2)} par an. Je dois être honnête sur ce que ce rejeu prouve : rien sur la limite de perte, puisqu'on a construit le portefeuille pour qu'il ne perde jamais plus de 14 % sur ces mêmes données. Ce que le rejeu apporte, c'est ce que le calcul n'a pas regardé : combien de temps le client reste sous son plus haut, et à quoi ressemble une mauvaise année.`);
+  stat(s, 9.2, 3.1, 3.5, "+" + fr(BT.reel, 2) + " pt", `par an AU-DELÀ de l'inflation, qui a fait ${pct(D.inflation.annuel, 2)} sur la période`, FAM.act, 38);
+  stat(s, 9.2, 4.6, 3.5, pct(BT.pire), "de pire baisse (2008 et 2020)", NEG, 38);
+  callout(s, 9.2, 6.0, 3.53, 0.85, "Ce rejeu ne **prouve pas** la limite.", INK, 13.5);
+  s.addNotes(`100 millions investis en octobre 2006 en vaudraient ${fr(BT.final, 0)} aujourd'hui, soit ${pct(BT.cagr, 2)} par an. Ce chiffre-là, il ne faut pas le comparer aux 4 % de l'énoncé : ces 4 % décrivent un monde à 4 % d'inflation, or la zone euro en a connu ${pct(D.inflation.annuel, 2)} par an sur cette période, ${pct(D.inflation.cumul, 1)} cumulés. Jugé contre l'inflation réellement constatée, le portefeuille a donc dégagé ${fr(BT.reel, 2)} point de rendement réel par an. L'objectif du client a été tenu, et largement. Je dois être honnête en revanche sur ce que ce rejeu prouve : rien sur la limite de perte, puisqu'on a construit le portefeuille pour qu'il ne perde jamais plus de 14 % sur ces mêmes données. Ce que le rejeu apporte, c'est ce que le calcul n'a pas regardé : combien de temps le client reste sous son plus haut, et à quoi ressemble une mauvaise année.`);
 }
 
 {
@@ -599,22 +601,22 @@ dark("Backtests", "Le portefeuille rejoué de 2006 à aujourd'hui : combien de t
   stat(s, 8.6, 1.6, 2.0, pct(BT.var95[0]), "VaR 95 % à un an", FAM.eta, 30);
   stat(s, 10.7, 1.6, 2.0, pct(BT.var95[1]), "CVaR 95 %", NEG, 30);
   stat(s, 8.6, 3.0, 2.0, pct(BT.rmin), "pire année", NEG, 30);
-  stat(s, 10.7, 3.0, 2.0, pct(BT.neg, 0), "des années en perte", INK, 30);
-  callout(s, 8.6, 4.55, 4.13, 2.25, `Sur un an, jamais plus de **${pct(-BT.rmin)}** de perte, alors que la pire baisse atteint **14 %** : les baisses s'étalent sur plus d'un an. **D'où la mesure depuis le plus haut.**`, INK, 13.5);
-  s.addNotes(`Deuxième question : une mauvaise année. Une année sur vingt, le portefeuille a perdu plus de ${pct(-BT.var95[0])} ; ces années-là, ${pct(-BT.var95[1])} en moyenne. La pire année : ${pct(BT.rmin)}. Remarquez l'écart avec la pire baisse de 14 % : les baisses s'accumulent sur plus d'un an, en 2008 comme en 2022. C'est pour cela que nous avons mesuré la limite depuis le plus haut : une limite sur un an aurait laissé passer ces baisses. Précaution : vingt ans ne contiennent qu'une vingtaine d'années indépendantes ; ces chiffres reposent sur une poignée d'épisodes.`);
+  stat(s, 10.7, 3.0, 2.0, pct(BT.sous_infl, 0), "des années n'ont pas battu l'inflation", INK, 30);
+  callout(s, 8.6, 4.55, 4.13, 2.25, `Sur un an, jamais plus de **${pct(-BT.rmin)}** de perte, alors que la pire baisse atteint **14 %** : les baisses s'étalent sur plus d'un an. Et préserver le pouvoir d'achat est **un objectif de moyenne longue, pas une garantie annuelle.**`, INK, 13.5);
+  s.addNotes(`Deuxième question : une mauvaise année. Une année sur vingt, le portefeuille a perdu plus de ${pct(-BT.var95[0])} ; ces années-là, ${pct(-BT.var95[1])} en moyenne. La pire année : ${pct(BT.rmin)}. Remarquez l'écart avec la pire baisse de 14 % : les baisses s'accumulent sur plus d'un an, en 2008 comme en 2022. C'est pour cela que nous avons mesuré la limite depuis le plus haut : une limite sur un an aurait laissé passer ces baisses. Un chiffre que je préfère donner moi-même plutôt qu'on me le sorte : ${pct(BT.sous_infl, 0)} des années glissantes n'ont pas battu l'inflation de leur époque. C'est normal, et c'est important à dire : préserver le pouvoir d'achat est un objectif de moyenne longue, aucun portefeuille tenu à 15 % de perte maximum ne peut le garantir chaque année. Précaution enfin : vingt ans ne contiennent qu'une vingtaine d'années indépendantes ; ces chiffres reposent sur une poignée d'épisodes.`);
 }
 
 // ================================================================ Clôture
 {
   const s = dark("Notre proposition", null);
-  const items = [[pct(R4.rdt, 2), "de rendement espéré par an"], [pct(R4.pire), "de pire baisse sur vingt ans"], [pct(partAct * 100, 0), "d'actions, dont 30 titres en direct"], ["10 M€", "sécurisés en AAA, à taux garantis"]];
+  const items = [[pct(D.net, 2), "de rendement espéré net de frais"], [pct(R4.pire), "de pire baisse sur vingt ans"], [pct(partAct * 100, 0), "d'actions, dont 30 titres en direct"], ["10 M€", "sécurisés en AAA, à taux garantis"]];
   items.forEach(([v, l], i) => {
     const x = M + i * 3.1;
     s.addText(v, { x, y: 3.5, w: 2.95, h: 0.9, fontFace: HF, fontSize: 40, bold: true, color: "F5C969", margin: 0, isTextBox: true });
     s.addText(l, { x, y: 4.45, w: 2.8, h: 0.8, fontFace: BF, fontSize: 15, color: WHITE, margin: 0, valign: "top", isTextBox: true });
   });
   s.addText("Un portefeuille diversifié, sans pari sur une zone, qui préserve le pouvoir d'achat en respectant la limite de perte dans toutes les crises récentes.", { x: M, y: 5.7, w: W - 2 * M, h: 0.9, fontFace: BF, fontSize: 17, italic: true, color: "CADCFC", margin: 0, isTextBox: true });
-  s.addNotes(`Pour conclure. Nous proposons à M. Lauren un portefeuille qui rapporte ${pct(R4.rdt, 2)} espérés par an, au-dessus des 4 % d'inflation, et qui n'aurait jamais perdu plus de 14 % dans les crises des vingt dernières années. Environ 30 % d'actions réparties sur quatre zones, sans pari sur l'une d'elles ; une large poche d'emprunts d'État et d'indexées ; un peu d'or. Les 10 millions dont il a besoin sont sécurisés, à taux garantis.`);
+  s.addNotes(`Pour conclure. Nous proposons à M. Lauren un portefeuille qui rapporte ${pct(D.net, 2)} espérés par an NETS de tous frais, soit ${fr(D.net - D.seuil, 2)} point au-dessus des 4 % d'inflation, et qui n'aurait jamais perdu plus de 14 % dans les crises des vingt dernières années. Environ 30 % d'actions réparties sur quatre zones, sans pari sur l'une d'elles ; une large poche d'emprunts d'État et d'indexées ; un peu d'or. Les 10 millions dont il a besoin sont sécurisés, à taux garantis.`);
 }
 
 {
