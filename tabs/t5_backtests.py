@@ -15,11 +15,13 @@ Limite dite d'emblée dans l'onglet : ces données sont celles qui ont servi
 """
 from __future__ import annotations
 
+import json
+
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import allocation, backtests, pedago, viz
+from core import allocation, backtests, ips, pedago, viz
 
 
 def _pct(v: float, dec: int = 1) -> str:
@@ -34,7 +36,14 @@ def _mois(v: float) -> str:
 def _donnees() -> dict:
     v = backtests.valeur()
     return {"v": v, "ep": backtests.episodes(v), "t": backtests.temps_sous(v),
-            "r": backtests.un_an(v)}
+            "r": backtests.un_an(v), "infl": _inflation()}
+
+
+@st.cache_data(show_spinner=False)
+def _inflation() -> dict:
+    """Inflation zone euro RÉELLEMENT constatée sur la fenêtre du rejeu."""
+    return json.loads((allocation.DATA / "inflation_realisee.json").read_text(
+        encoding="utf-8"))
 
 
 def render() -> None:
@@ -76,6 +85,7 @@ def _bloc_parcours(d: dict) -> None:
                 _mois(max(backtests.mois(a, r) for a, r in
                           zip(ep["sommet"], ep["retour"]) if pd.notna(r))))
 
+    _bloc_seuil(d, cagr)
     _graphique_parcours(v)
 
     lignes = []
@@ -120,6 +130,59 @@ def _bloc_parcours(d: dict) -> None:
         "sur six environ, il en est à plus de 5 % ; les pertes proches de "
         "la limite sont rares et brèves."
     )
+
+# ----------------------------------------------------------------------
+def _bloc_seuil(d: dict, cagr: float) -> None:
+    """
+    Le rejeu jugé contre la BONNE inflation.
+
+    CORRECTION DU 2026-09-21. Le rendement réalisé était comparé au seuil de
+    4 % de l'énoncé. Or ce 4 % décrit un monde à 4 % d'inflation, tandis que
+    la période rejouée en a vécu une autre. Juger un résultat d'un régime
+    avec l'exigence d'un autre est exactement le piège que la première
+    version du dossier avait identifié comme sa correction la plus
+    importante (archive/docs/02_ips.md, § 4.4) — et ici il jouait EN
+    DÉFAVEUR du portefeuille.
+    """
+    inf = d["infl"]
+    bt = inf["backtest"]
+    reel = cagr - bt["annuel"]
+    enonce = ips.INFLATION_TARGET * 100
+
+    st.markdown("**Le rendement réalisé, jugé contre la bonne inflation**")
+    st.table(pd.DataFrame([
+        ("Rendement du portefeuille", _pct(cagr, 2),
+         "Rejeu, rééquilibré chaque mois"),
+        ("Inflation zone euro constatée", _pct(bt["annuel"], 2),
+         f"{_pct(bt['cumul'], 1)} cumulés sur {bt['annees']:.0f} ans"),
+        ("**Rendement réel obtenu**", "**" + _pct(reel, 2) + "**",
+         "**Ce que le pouvoir d'achat a réellement gagné**"),
+    ], columns=["", "Par an", "D'où il vient"]).set_index(""))
+
+    st.success(
+        f"**L'objectif du client a été tenu, et largement.** Sur ces vingt "
+        f"années, le portefeuille a rapporté {_pct(reel, 2)} par an "
+        f"**au-delà de l'inflation**. Comparer ses {_pct(cagr, 2)} au seuil "
+        f"de {_pct(enonce, 0)} de l'énoncé n'aurait aucun sens : ce seuil "
+        f"décrit un monde à {_pct(enonce, 0)} d'inflation, la période en a "
+        f"vécu {_pct(bt['annuel'], 2)}. Le bon seuil pour juger le passé est "
+        f"l'inflation du passé.",
+        icon=":material/check_circle:",
+    )
+
+    c5 = inf["fenetres"]["5 ans"]["annuel"]
+    st.markdown(
+        f"**Et l'hypothèse du client n'est pas absurde.** L'étape 1 notait "
+        f"que {_pct(enonce, 0)} valait le double de la cible de la BCE. "
+        f"C'est vrai sur longue période — {_pct(bt['annuel'], 2)} par an "
+        f"depuis 2006 — mais **sur les cinq dernières années la zone euro a "
+        f"vécu {_pct(c5, 2)} d'inflation par an**. M. Lauren ne projette pas "
+        f"une crainte : il extrapole ce qu'il vient de vivre."
+    )
+    st.caption(f"Source : {inf['source']}, dernier point "
+               f"{pd.Timestamp(inf['dernier_point']).strftime('%m/%Y')}. "
+               f"Taux composé entre les deux bornes, pas une moyenne de "
+               f"glissements annuels.")
 
 
 def _graphique_parcours(v: pd.Series) -> None:
@@ -173,6 +236,9 @@ def _bloc_var(d: dict) -> None:
 
     _graphique_annees(r, v95, c95)
 
+    infl = d["infl"]["backtest"]["annuel"]
+    enonce = ips.INFLATION_TARGET * 100
+
     st.table(pd.DataFrame([
         ("Une année sur vingt", f"perte de plus de {_pct(-v95)}",
          f"en moyenne {_pct(-c95)}"),
@@ -180,9 +246,27 @@ def _bloc_var(d: dict) -> None:
          f"en moyenne {_pct(-c99)}"),
         ("Années en perte", _pct((r < 0).mean() * 100, 0) + " des années",
          ""),
-        ("Années sous 4 %", _pct((r < 4).mean() * 100, 0) + " des années",
-         "sur le passé, taux négatifs compris"),
+        ("Années sous l'inflation constatée",
+         _pct((r < infl).mean() * 100, 0) + " des années",
+         f"l'inflation a fait {_pct(infl, 2)} par an"),
+        ("Années sous les 4 % de l'énoncé",
+         _pct((r < enonce).mean() * 100, 0) + " des années",
+         "seuil d'un régime d'inflation qui n'a pas eu lieu"),
     ], columns=["", "Sur un an", "Dans ces années-là"]).set_index(""))
+
+    st.warning(
+        f"**Le chiffre qu'il vaut mieux donner soi-même.** Une année "
+        f"glissante sur {round(100 / max((r < infl).mean() * 100, 1e-9))} "
+        f"environ — {_pct((r < infl).mean() * 100, 0)} d'entre elles — n'a "
+        f"pas battu l'inflation de son époque. **Préserver le pouvoir "
+        f"d'achat est un objectif de moyenne longue, pas une garantie "
+        f"annuelle**, et aucun portefeuille tenu à 15 % de perte maximum ne "
+        f"peut promettre le contraire. Le dire avant qu'on le demande est "
+        f"plus solide que de l'omettre : le chiffre est calculable par "
+        f"n'importe qui à partir des données du dossier.",
+        icon=":material/info:",
+    )
+
     st.markdown(
         f"**Lecture.** Sur un an, le portefeuille n'a jamais perdu plus de "
         f"{_pct(-r.min())}, alors que sa pire baisse depuis le plus haut "

@@ -20,7 +20,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import actions, allocation, fonds, obligations, pedago, taux, viz
+from core import (actions, allocation, fonds, ips, obligations, pedago,
+                  taux, viz)
 
 
 def _pct(v: float) -> str:
@@ -608,21 +609,49 @@ def _bloc_retenu() -> None:
         f"**Les fonds** : aucune ligne ne dépasse "
         f"{viz.fr(part_max * 100, '%', 2)} de son fonds, on entre et sort "
         f"sans peser sur les prix. Frais : {viz.fr(frais / 1e3, 'k€', 0)} "
-        f"par an ({viz.fr(frais / M * 100, '%', 2)} du patrimoine), non "
-        f"déduits du rendement espéré."
+        f"par an, soit {viz.fr(frais / M * 100, '%', 2)} du patrimoine."
+    )
+
+    # --- brut, puis net : l'objectif du client est un objectif NET --------
+    f_inst = frais / M * 100
+    f_mandat = ips.FRAIS_MANDAT * 100
+    net = ips.rendement_net(r4["rendement_espere"], f_inst)
+    seuil = ips.INFLATION_TARGET * 100
+
+    st.markdown("**Du rendement brut à ce qui reste au client.**")
+    st.table(pd.DataFrame([
+        ("Rendement espéré, brut", _pct(r4["rendement_espere"]),
+         "Somme des rendements de chaque ligne, pondérée"),
+        ("− Frais des instruments", "− " + viz.fr(f_inst, "pt", 2),
+         f"{viz.fr(frais / 1e3, 'k€', 0)} par an, ETF uniquement"),
+        ("− Frais de mandat", "− " + viz.fr(f_mandat, "pt", 2),
+         "Négocié sur la taille d'actifs"),
+        ("**Rendement net**", "**" + _pct(net) + "**",
+         "**C'est lui qui doit battre l'inflation**"),
+    ], columns=["", "Taux", "D'où il vient"]).set_index(""))
+
+    st.markdown(
+        f"**Pourquoi ce détour.** L'objectif du client n'est pas de produire "
+        f"{_pct(seuil)} bruts, c'est de **conserver** son pouvoir d'achat : "
+        f"ce qui doit battre l'inflation, c'est ce qui reste dans sa poche. "
+        f"Comparer un rendement brut à un seuil net surévalue la marge de "
+        f"{viz.fr(f_inst + f_mandat, 'point', 2)}. La fiscalité, hors "
+        f"périmètre de cet exercice, en retirerait encore environ 0,30."
     )
 
     c = st.columns(4)
-    c[0].metric("Rendement espéré", _pct(r4["rendement_espere"]))
-    c[1].metric("Au-dessus des 4 %", viz.fr(r4["rendement_espere"] - 4,
-                                           "pt", 2))
+    c[0].metric("Rendement espéré, brut", _pct(r4["rendement_espere"]))
+    c[1].metric("Rendement net", _pct(net),
+                delta=viz.fr(net - seuil, "pt", 2) + " vs inflation")
     c[2].metric("Pire baisse, 2006-2026", viz.fr(r4["pire_baisse"], "%", 1))
     c[3].metric("Rendement obtenu, 2006-2026*",
                 viz.fr(r4["realise"], "%", 2) + " / an")
     st.caption(
         "* Rééquilibré chaque mois sur les séries du bloc 1. Ne se compare "
         "pas au rendement espéré : le passé comptait dix ans de taux "
-        "négatifs, l'avenir part de taux à 3 %."
+        "négatifs, l'avenir part de taux à 3 %. Et il s'est déroulé sous une "
+        "autre inflation que les 4 % de l'énoncé — l'étape 5 le juge contre "
+        "l'inflation réellement constatée."
     )
 
     st.markdown("#### Conclusion de l'étape 4")
@@ -630,7 +659,9 @@ def _bloc_retenu() -> None:
         f"100 M€ : {_poids(part_act)} d'actions en quatre zones, dont 30 "
         f"titres européens en direct ; {_poids(oblig)} d'obligations d'État, "
         f"dont deux échelles en direct ; {_poids(w['or'])} d'or. Rendement "
-        f"espéré {_pct(r4['rendement_espere'])}, pire baisse "
+        f"espéré {_pct(r4['rendement_espere'])} brut, soit {_pct(net)} net "
+        f"de frais — {viz.fr(net - seuil, 'point', 2)} au-dessus de "
+        f"l'inflation de l'énoncé. Pire baisse "
         f"{viz.fr(r4['pire_baisse'], '%', 1)}. Question que le calcul ne "
         f"s'est pas posée : combien de temps reste-t-il sous son plus haut ? "
         f"C'est l'étape 5."
