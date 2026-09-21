@@ -6,196 +6,205 @@ maj: 2026-09-21
 
 # Backtest et mesures de risque
 
-> [!warning] Ce que ce rejeu ne peut pas prouver
-> Les vingt années de données sont **celles qui ont servi à construire le
-> portefeuille** : [[05 - Optimisation sous contrainte de perte]] a cherché
-> une répartition qui ne perde jamais plus de 14 % sur cette période. Qu'elle
-> n'y perde pas plus de 14 % est **acquis d'avance** et ne dit rien de la
-> prochaine crise.
+## En une phrase
+
+**On rejoue le portefeuille retenu jour par jour de 2006 à aujourd'hui, pour
+voir non pas s'il a gagné, mais combien de temps il est resté dans le
+rouge.**
+
+## L'avertissement à dire en premier
+
+> [!warning] Ce rejeu ne prouve pas que la limite tient
+> Les vingt années de données sont **exactement celles qui ont servi à
+> construire le portefeuille** : l'étape 4 a cherché une répartition qui ne
+> perde jamais plus de 14 % **sur cette période**.
 >
-> Le rejeu mesure ce que l'optimisation **n'a pas regardé** : la durée des
-> baisses et la distribution des résultats sur un an.
+> Qu'elle n'y perde pas plus de 14 % n'est donc pas un résultat, c'est une
+> conséquence mécanique de la façon dont on l'a construite. Ça ne dit rien
+> de la prochaine crise.
+>
+> **Alors à quoi sert le rejeu ?** À mesurer ce que l'optimisation n'a pas
+> regardé : la **durée** des baisses, et la fréquence des mauvaises années.
+> Ces deux choses-là ne sont contraintes nulle part, donc elles sont
+> informatives.
 
-## 1. La valeur du portefeuille
+C'est le genre de phrase qu'il vaut mieux dire soi-même. Si le jury la
+trouve avant toi, tu passes pour quelqu'un qui n'a pas vu le problème.
 
-```python
-def valeur():
-    w = {k: x for k, x in allocation.poids_retenus().items() if x > 0}
-    debut = allocation.resultats()["fenetre"][0]    # MÊME fenêtre que l'optim
-    v = allocation.portefeuille(allocation.series()[debut:], w)
-    return v / 100 * allocation.MONTANT
-```
+## 1. La mesure de base : la baisse depuis le plus haut
 
-Le point important est `debut` : la fenêtre est **relue depuis le fichier de
-résultats de l'optimisation**, pas redéfinie. Si les deux différaient d'un
-mois, les drawdowns ne seraient plus comparables et personne ne le verrait.
+À chaque instant, on compare la valeur du portefeuille à son **meilleur
+niveau atteint depuis le début**. L'écart, c'est ce que le client verrait
+sur son relevé s'il comparait à son meilleur souvenir.
 
-## 2. Drawdown
+> [!note] Le « meilleur niveau » porte sur toute l'histoire, pas sur une fenêtre
+> Conséquence concrète : en 2011, la perte se mesure encore depuis le sommet
+> de **2007**, parce que le portefeuille n'y était pas revenu entre-temps.
+>
+> C'est la lecture la plus dure possible, et c'est volontaire. Une mesure
+> glissante ferait disparaître les crises longues.
 
-$$DD_t = \frac{V_t}{\max_{s \le t} V_s} - 1$$
+## 2. Le vrai enseignement : la durée, pas la profondeur
 
-```python
-dd = v / v.cummax() - 1
-```
+Pour chaque baisse de plus de 5 %, on note quatre choses : la date du
+sommet, la date du point bas, la perte, et **la date du retour au sommet**.
 
-Le `cummax()` porte sur **toute l'histoire**, pas sur une fenêtre glissante.
-Conséquence à connaître : en 2011, la perte se mesure encore depuis le
-sommet de 2007, parce que le portefeuille n'y était pas revenu. C'est la
-lecture la plus dure, et c'est volontaire.
-
-### Détection des épisodes
-
-`episodes(v, seuil=0.05)` découpe chaque passage sous le plus haut :
-
-```python
-haut = v.cummax()
-sous = v < haut
-for d, s in sous.items():
-    if s and debut is None: debut = d
-    if (not s or d == v.index[-1]) and debut is not None:
-        fin = d if not s else None          # None = pas encore remonté
-        creux = v[debut:d].idxmin()
-        sommet = v[:debut].index[-2] if len(v[:debut]) > 1 else debut
-        perte = float(v[creux] / haut[creux] - 1)
-```
-
-Chaque épisode retient : date du sommet, date du creux, perte, **date du
-retour au sommet** (ou `None`). C'est cette dernière qui produit le vrai
-enseignement du backtest.
+C'est la dernière qui est instructive, parce que c'est elle que vit le
+client.
 
 | Mesure | Valeur |
 |---|---|
-| Temps à plus de 1 % sous le plus haut | 53 % |
-| Temps à plus de 5 % | 17 % |
-| Temps à plus de 10 % | 4 % |
-| Plus longue période sous l'eau (2022) | **32 mois** |
+| Temps passé à plus de 1 % sous son plus haut | **53 %** |
+| Temps passé à plus de 5 % | 17 % |
+| Temps passé à plus de 10 % | 4 % |
+| Plus longue période sous l'eau | **32 mois** (2022) |
 
-> [!important] Le résultat le plus instructif
-> **2022 est la crise la plus longue, pas la plus profonde.** 32 mois sous
-> l'eau pour une baisse moindre qu'en 2008. La raison : les obligations,
-> qui font les deux tiers du portefeuille, **ont baissé avec les actions**.
-> C'est le régime que redoute précisément le client, et c'est celui qu'un
-> 60/40 classique ne prévoit pas.
+**Comment le dire au client :** la plupart du temps, votre patrimoine est un
+peu en dessous de son meilleur niveau — c'est normal, c'est la vie d'un
+portefeuille investi. Une fois sur six environ, il en est à plus de 5 %. Les
+pertes proches de la limite sont rares et brèves.
 
-## 3. VaR et CVaR historiques
+> [!important] 2022 est la crise la plus instructive du lot
+> **32 mois sous l'eau, pour une baisse pourtant moins profonde qu'en 2008.**
+>
+> Pourquoi ? Parce que les obligations, qui font les deux tiers du
+> portefeuille, **ont baissé en même temps que les actions**. Dans une
+> récession classique (2008, 2011), les obligations montent quand les
+> actions chutent : c'est ce qui amortit. Dans un choc d'inflation, les deux
+> baissent ensemble et rien n'amortit.
+>
+> C'est exactement le régime que redoute M. Lauren. Et c'est l'argument qui
+> disqualifie un 60/40 classique pour ce mandat : le protéger avec un 60/40
+> reviendrait à le laisser sans protection dans le seul scénario qu'il
+> craint.
 
-Sur **228 années glissantes**, à chaque fin de mois :
+## 3. À quoi ressemble une mauvaise année
 
-```python
-def un_an(v):
-    m = v.resample("ME").last()
-    return (m / m.shift(12) - 1).dropna() * 100
+On regarde les rendements sur douze mois glissants, à chaque fin de mois —
+228 « années » au total.
 
-def var_cvar(r, niveau=0.95):
-    q = float(np.quantile(r, 1 - niveau))
-    return q, float(r[r <= q].mean())
-```
+Deux chiffres, et il faut bien comprendre la différence :
 
-$$\text{VaR}_{95\%} = q_{5\%}(r_{12m}) \qquad
-\text{CVaR}_{95\%} = \mathbb{E}\left[r_{12m} \mid r_{12m} \le q_{5\%}\right]$$
+- **« La perte dépassée une année sur vingt »** : on classe les 228 années
+  de la pire à la meilleure, on regarde la 12ᵉ. En dessous, on est dans les
+  5 % les plus mauvaises. **−6,5 %.**
+- **« La perte moyenne de ces années-là »** : quand on est dans ces 5 %,
+  combien perd-on en moyenne ? **−8,5 %.**
 
-**Historiques, pas paramétriques** : pas d'hypothèse gaussienne, pas de
-fenêtre pondérée, pas de GARCH. On lit les quantiles empiriques. Le choix
-se défend sur un échantillon qui contient 2008 et 2022 — une gaussienne
-sous-estimerait la queue d'un facteur 2 ou 3.
+> [!tip] Pourquoi les deux, et pas seulement le premier
+> Le premier dit **à partir de quand** on est dans les mauvaises années. Il
+> ne dit rien de ce qui se passe une fois qu'on y est. Le second dit
+> **de combien** ça tombe.
+>
+> C'est toute la différence entre VaR et CVaR, et c'est ce qui disqualifie
+> la variante « croissance » de [[05 - Optimisation sous contrainte de perte]] :
+> elle respectait le premier chiffre et catastrophait le second.
 
-| Mesure | Portefeuille retenu |
+| Mesure | Valeur |
 |---|---|
-| VaR 95 % à un an | −6,5 % |
-| CVaR 95 % | −8,5 % |
+| Perte dépassée une année sur vingt | −6,5 % |
+| Perte moyenne ces années-là | −8,5 % |
 | Pire année | −11,4 % |
-| Années en perte | 18 % |
+| Part des années en perte | 18 % |
 
-### La lecture à retenir
+**Le point de lecture.** La pire *année* fait −11,4 %, alors que la pire
+*baisse* atteint −14 %. L'écart vient des baisses longues : en 2008 comme en
+2022, la perte s'est accumulée sur plus d'un an. **C'est précisément pour
+cela que la limite du mandat a été mesurée depuis le plus haut et non sur
+douze mois** : une limite annuelle aurait laissé passer ces baisses.
 
-La **pire année fait −11,4 %** alors que la **pire baisse atteint −14 %**.
-L'écart vient des baisses longues : en 2008 comme en 2022, la perte s'est
-accumulée sur plus d'un an. C'est exactement pour cela que la limite du
-mandat a été mesurée depuis le plus haut et non sur douze mois glissants —
-**une limite annuelle aurait laissé passer ces baisses.**
+> [!danger] Ce que valent vraiment ces chiffres
+> Les 228 années glissantes **se recouvrent** : deux années qui commencent à
+> un mois d'écart partagent onze mois sur douze. Ce ne sont donc pas 228
+> observations indépendantes — il y en a de l'ordre de vingt, et seulement
+> **sept épisodes de baisse distincts**.
+>
+> Un seuil « une année sur vingt » calculé là-dessus repose sur une poignée
+> d'observations. Les chiffres sont descriptifs, pas prédictifs.
 
-> [!danger] Ce que valent ces quantiles
-> Les 228 fenêtres **se chevauchent** : deux années glissantes consécutives
-> partagent onze mois sur douze. Le nombre d'observations **indépendantes**
-> est de l'ordre de 20, et le nombre d'épisodes de baisse distincts est de
-> **sept**. Un quantile à 5 % sur 228 points corrélés n'a pas la précision
-> que le chiffre suggère.
+## 4. La correction du 21/09/2026 : juger dans le bon monde
 
-## 4. Le régime d'inflation — la correction du 21/09/2026
+> [!bug] L'erreur qu'il y avait
+> Le rendement réalisé (4,47 % par an) était comparé au **seuil de 4 % de
+> l'énoncé**. Sauf que ce 4 % décrit un monde où l'inflation est de 4 % — et
+> la période rejouée n'a pas vécu ça du tout.
+>
+> C'est le même piège que celui de J.P. Morgan dans
+> [[03 - Rendements espérés]] : **juger un résultat obtenu dans un monde
+> avec l'exigence d'un autre monde.** Et ici il jouait **contre** le
+> portefeuille.
 
-> [!bug] L'erreur qui a été corrigée
-> Le rendement réalisé (4,47 %/an) était comparé au **seuil de 4 % de
-> l'énoncé**. Or ce 4 % décrit un monde à 4 % d'inflation, et la période
-> rejouée en a vécu un autre. **Juger un résultat d'un régime avec
-> l'exigence d'un autre** — c'est le même piège que celui signalé dans
-> [[03 - Rendements espérés]] à propos de J.P. Morgan. Et ici il jouait
-> **en défaveur** du portefeuille.
+### Ce qu'on a mesuré
 
-### La mesure
+On a pris l'indice des prix de la zone euro (FRED, IPCH) sur la **fenêtre
+exacte du rejeu**, et on a calculé de combien les prix ont monté.
 
-Série FRED `CP0000EZCCM086NEST` — IPCH zone euro, mensuel, base 2015 = 100 —
-sur la **fenêtre exacte du rejeu**.
-
-$$\pi_{\text{réalisée}} = \left(\frac{I_{\text{fin}}}{I_{\text{début}}}\right)^{1/n} - 1$$
-
-> [!tip] Le piège écarté dans ce calcul
-> **On ne fait pas la moyenne des glissements annuels.** Elle surpondère les
-> années de forte inflation (2022 à +9,2 %) et ne redonne pas l'érosion
-> réelle du pouvoir d'achat. Le **taux composé entre les deux bornes** est
-> la seule mesure homogène à un rendement annualisé.
+> [!tip] Le piège évité dans ce calcul
+> On ne fait **pas** la moyenne des inflations annuelles. Elle surpondère les
+> années extrêmes — 2022 à +9,2 % — et ne redonne pas l'érosion réelle du
+> pouvoir d'achat.
+>
+> On calcule le **taux composé entre le début et la fin** : de combien les
+> prix ont-ils monté au total, et quel taux annuel régulier donnerait le
+> même résultat. C'est la seule mesure homogène à un rendement annualisé.
 
 | | Valeur |
 |---|---|
-| Fenêtre | 10/2006 → 08/2026 (19,8 ans) |
-| Inflation cumulée | **53,46 %** |
-| Inflation annualisée | **2,18 %** |
+| Fenêtre | octobre 2006 → août 2026 (19,8 ans) |
+| Hausse totale des prix | **53,5 %** |
+| Soit par an | **2,18 %** |
 | Rendement du portefeuille | 4,47 % |
-| **Rendement réel** | **+2,29 %/an** |
+| **Gain de pouvoir d'achat** | **+2,29 % par an** |
 
-L'objectif du client a donc été tenu **largement**, et non de justesse.
+**L'objectif du client a donc été tenu largement**, et non de justesse comme
+le laissait croire la comparaison au seuil de 4 %.
 
-### Le sous-produit inattendu
+### Le sous-produit inattendu, et il est bon à prendre
 
-| Fenêtre | Inflation zone euro |
+| Sur les… | Inflation zone euro |
 |---|---|
-| 20 ans | 2,18 %/an |
-| 10 ans | 2,88 %/an |
-| **5 ans** | **4,31 %/an** |
+| 20 dernières années | 2,18 % par an |
+| 10 dernières années | 2,88 % par an |
+| **5 dernières années** | **4,31 % par an** |
 
-L'hypothèse de 4 % du client n'est donc **pas une crainte disproportionnée**
-— c'est une extrapolation de ce qu'il vient de vivre. C'est une lecture plus
-juste, et plus respectueuse, que « c'est le double de la cible de la BCE ».
+L'hypothèse de 4 % de M. Lauren n'est donc **pas une crainte
+disproportionnée** : c'est presque exactement ce que la zone euro vient de
+vivre. **Il n'extrapole pas une peur, il extrapole son vécu.**
 
-## 5. Les années sous l'objectif
+C'est une façon nettement plus juste — et plus respectueuse — de présenter
+son hypothèse que « c'est le double de la cible de la BCE ».
+
+## 5. Les années qui n'atteignent pas l'objectif
 
 Deux mesures, et il faut donner la bonne :
 
-| Seuil | Années glissantes en dessous |
+| Seuil de comparaison | Années glissantes en dessous |
 |---|---|
-| Inflation constatée (2,18 %) | **29 %** |
+| L'inflation réellement constatée (2,18 %) | **29 %** |
 | Les 4 % de l'énoncé | 40,8 % |
 
-> [!note] À dire avant qu'on le demande
-> Près d'une année glissante sur quatre n'a pas battu l'inflation de son
-> époque. C'est normal et il faut l'énoncer : **préserver le pouvoir d'achat
-> est un objectif de moyenne longue, pas une garantie annuelle**, et aucun
-> portefeuille tenu à 15 % de perte maximum ne peut promettre le contraire.
-> Le chiffre est recalculable par n'importe qui à partir des données du
-> dossier.
+> [!note] Le chiffre qu'il vaut mieux donner soi-même
+> Près d'une année sur quatre n'a pas battu l'inflation de son époque.
+>
+> C'est normal, et il faut le formuler ainsi : **préserver le pouvoir
+> d'achat est un objectif de moyenne longue, pas une garantie annuelle.**
+> Aucun portefeuille tenu à 15 % de perte maximum ne peut promettre le
+> contraire — et n'importe qui peut recalculer ce chiffre à partir des
+> données du dossier.
 
-## 6. Les limites de données du backtest
+## 6. Ce que le rejeu ne sait pas faire
 
-- **Remplaçants avant 2018.** Plusieurs supports n'existaient pas sur toute
-  la période et sont représentés par un indice proche. Certains **flattent** :
-  les indexées d'avant 2009 sont un emprunt d'État classique, qui a mieux
-  tenu en 2008. C'est la raison de la marge de prudence à 14 %.
-- **Actions Europe mesurées sur l'indice**, pas sur les 30 titres — pour ne
-  pas importer le biais de rétro-sélection de
+- **Les remplaçants d'avant 2018.** Plusieurs supports n'existaient pas sur
+  toute la période et sont représentés par un indice proche. Certains
+  **flattent** : les indexées d'avant 2009 sont représentées par un emprunt
+  d'État classique, qui a mieux tenu en 2008. C'est la raison d'être de la
+  marge de prudence à 14 %.
+- **Les actions européennes sont mesurées sur l'indice**, pas sur les 30
+  titres, pour ne pas importer le passé flatteur de
   [[04 - Notation des actions - 5 piliers]].
-- **Crédit reconstitué** avant 2016 à partir des écarts américains,
-  corrélation faible : c'est la ligne la moins bien mesurée.
-- **Pas de frais de transaction ni de slippage** dans le rejeu. Le
-  rééquilibrage mensuel de 100 M€ sur des ETF liquides coûterait quelques
-  points de base par an, non déduits.
+- **Le crédit est reconstitué** avant 2016 à partir des écarts américains,
+  avec une corrélation faible : c'est la ligne la moins bien mesurée.
+- **Aucun frais de transaction.** Rééquilibrer 100 M€ tous les mois coûterait
+  quelques points de base par an, non déduits du rejeu.
 
 → Amont : [[05 - Optimisation sous contrainte de perte]] · Index : [[00 - Index des modèles]]

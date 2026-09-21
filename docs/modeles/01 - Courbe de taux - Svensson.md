@@ -5,36 +5,102 @@ donnees: data/taux_marche.json, clé "svensson"
 maj: 2026-09-21
 ---
 
-# Courbe de taux — Svensson (1994)
+# Courbe de taux — Svensson
 
-## Le problème qu'il résout
+## En une phrase
 
-La BCE publie chaque jour une courbe zéro-coupon de la zone euro. Elle ne la
-publie pas comme une liste de taux, mais comme **six paramètres** : c'est une
-fonction continue $r(m)$ qui donne le taux pour n'importe quelle échéance,
-y compris celles où aucune obligation n'existe.
+**Une machine qui donne le taux d'intérêt pour n'importe quelle durée, à
+partir de six nombres publiés chaque jour par la BCE.**
 
-C'est ce qui rend l'obligataire souverain **constructible en direct** dans ce
-dossier : on n'a pas besoin d'une cotation d'une ligne nommée (introuvable
-sans source payante), on price l'obligation sur la courbe. C'est exactement
-ce que fait un gérant obligataire pour juger si un titre est cher.
+## Le problème
 
-## La formule
+Prêter de l'argent à l'État allemand pour 3 mois, ce n'est pas le même taux
+que pour 10 ans. Il y a donc un taux par durée — c'est ce qu'on appelle la
+courbe des taux.
 
-Svensson étend Nelson-Siegel (1987) en ajoutant une seconde bosse.
+Le problème pratique : les obligations qui existent ont des échéances en
+désordre. Il y en a une à 4 ans et 2 mois, une à 7 ans et 9 mois, rien à
+6 ans. Si j'ai besoin du taux à 6 ans exactement, personne ne me le donne.
+
+Deux solutions possibles :
+
+1. **Relier les points** entre les obligations existantes. Simple, mais on
+   recopie le bruit : si une obligation cote un peu de travers ce jour-là
+   (peu échangée, mal cotée), la courbe fait une bosse qui n'existe pas.
+2. **Décrire la forme de la courbe** par quelques nombres, et accepter de
+   ne pas passer exactement par chaque point. C'est Svensson.
+
+## L'idée : une courbe de taux a toujours la même allure
+
+Regarde n'importe quelle courbe de taux, de n'importe quel pays, de
+n'importe quelle époque. Elle se décrit toujours avec trois ingrédients :
+
+**1. Un niveau général.** La courbe est globalement haute ou globalement
+basse. En 2021 elle était vers 0 %, aujourd'hui vers 3 %.
+
+**2. Une pente.** Soit le court terme rapporte moins que le long terme
+(courbe montante, situation normale : on exige plus pour prêter longtemps),
+soit l'inverse (courbe inversée, signal de récession classique).
+
+**3. Une ou deux bosses au milieu.** La courbe n'est presque jamais une
+ligne droite. Il y a souvent un renflement vers 2-3 ans, parfois un second
+vers 10-15 ans, parce que les banques centrales agissent sur le court terme
+et les assureurs achètent le très long.
+
+> [!tip] L'analogie
+> C'est comme décrire un visage. Tu peux lister la couleur de chaque pixel
+> (l'interpolation), ou tu peux dire « ovale, yeux écartés, nez droit »
+> (Svensson). La seconde description est plus courte, plus robuste au bruit,
+> et elle permet de dessiner les parties qu'on n'a pas vues.
+
+## Les six nombres
+
+| Nom | Ce qu'il règle | Comment le lire |
+|---|---|---|
+| **β₀** | Le niveau du très long terme | Le taux vers lequel la courbe tend quand on va très loin. Aujourd'hui ≈ 3,3 % |
+| **β₁** | La pente | Le taux au jour le jour vaut **β₀ + β₁**. Si β₁ est négatif, le court terme est sous le long : courbe montante |
+| **β₂** | La taille de la première bosse | Positif = renflement, négatif = creux |
+| **β₃** | La taille de la seconde bosse | Idem, plus loin sur la courbe |
+| **τ₁** | Où se situe la première bosse | En années. Typiquement 1 à 3 ans |
+| **τ₂** | Où se situe la seconde | Typiquement 10 à 20 ans |
+
+**Quatre boutons de taille, deux boutons de position.** C'est tout.
+
+> [!note] Les deux lectures immédiates d'un gérant
+> - **β₀ + β₁** = le taux court d'aujourd'hui.
+> - **−β₁** = l'écart court-long, c'est-à-dire la pente. C'est le signal de
+>   cycle le plus regardé au monde : une pente qui s'inverse a précédé la
+>   plupart des récessions.
+
+## La formule, pour mémoire
 
 $$
 r(m) = \beta_0
-+ \beta_1 \underbrace{\frac{1 - e^{-m/\tau_1}}{m/\tau_1}}_{f_1}
-+ \beta_2 \underbrace{\left[\frac{1 - e^{-m/\tau_1}}{m/\tau_1} - e^{-m/\tau_1}\right]}_{f_2}
-+ \beta_3 \underbrace{\left[\frac{1 - e^{-m/\tau_2}}{m/\tau_2} - e^{-m/\tau_2}\right]}_{f_3}
++ \beta_1 f_1(m)
++ \beta_2 f_2(m)
++ \beta_3 f_3(m)
 $$
 
-Taux en pourcentage, **capitalisation continue**, $m$ en années.
+**Ce que ça dit en français :** le taux pour une durée *m* est un niveau de
+base, plus une contribution de pente, plus deux contributions de bosse.
+Chaque *f* est une forme fixe, et les β disent avec quelle intensité on
+applique chaque forme.
+
+Les trois formes ont des comportements qui font tout le travail :
+
+- **f₁ (la pente)** vaut 1 pour les durées très courtes et s'efface
+  progressivement vers 0 pour les longues. Donc β₁ agit sur le court terme
+  et plus du tout sur le long.
+- **f₂ et f₃ (les bosses)** valent 0 aux deux extrémités et sont maximales
+  au milieu, autour de τ₁ et τ₂. Donc elles déforment le ventre de la courbe
+  sans toucher ni le court ni le long.
+
+C'est cette propriété — *chaque forme agit sur une zone et une seule* — qui
+rend le modèle lisible. Si tu changes β₂, seul le ventre bouge.
 
 ```python
 def taux_zero(m, p):
-    m = max(m, 1e-6)                      # évite la division par zéro en m=0
+    m = max(m, 1e-6)                      # évite la division par zéro
     a, b = m / p["tau1"], m / p["tau2"]
     f1 = (1 - math.exp(-a)) / a
     f2 = f1 - math.exp(-a)
@@ -42,86 +108,57 @@ def taux_zero(m, p):
     return p["beta0"] + p["beta1"]*f1 + p["beta2"]*f2 + p["beta3"]*f3
 ```
 
-## Ce que fait chaque terme
+## Ce que ça permet dans le dossier
 
-| Terme | Comportement en $m \to 0$ | en $m \to \infty$ | Interprétation |
-|---|---|---|---|
-| $\beta_0$ | 1 | 1 | **Niveau long.** L'asymptote : le taux vers lequel la courbe tend. |
-| $\beta_1 f_1$ | $\to \beta_1$ | $\to 0$ | **Pente.** $r(0) = \beta_0 + \beta_1$, donc $-\beta_1$ est l'écart court-long. |
-| $\beta_2 f_2$ | $\to 0$ | $\to 0$ | **Première bosse**, centrée autour de $\tau_1$. |
-| $\beta_3 f_3$ | $\to 0$ | $\to 0$ | **Seconde bosse**, centrée autour de $\tau_2$. |
+**Les emprunts d'État sont achetés en direct**, pas via un fonds. Pour cela
+il faut pouvoir dire ce que vaut une obligation qui n'existe pas encore —
+par exemple « une obligation à 18 mois pour couvrir le décaissement de
+M. Lauren ». Sans Svensson, il faudrait une source de cotations payante.
+Avec, un fichier de six nombres suffit.
 
-Les deux facteurs de bosse sont nuls aux deux extrémités : ils ne déforment
-la courbe qu'au milieu. C'est toute l'astuce — quatre paramètres de niveau
-et deux d'emplacement suffisent à reproduire les formes réelles d'une courbe
-(croissante, plate, inversée, en bosse, en S).
+C'est aussi ce qui permet de construire l'échelle AAA de 6 à 24 mois pour
+les 10 M€ : aucune des quatre échéances n'a besoin d'exister sur le marché.
 
-> [!tip] La lecture de gérant
-> $\beta_0$ te dit où le marché voit les taux à très long terme.
-> $\beta_0 + \beta_1$ te dit le taux au jour le jour.
-> Leur différence, c'est la pente — le signal de cycle le plus regardé.
-> $\beta_2, \beta_3$ te disent où la courbe est déformée, donc où il y a
-> potentiellement de la valeur relative.
+## Le contrôle qu'il fallait faire
 
-## Pourquoi ce modèle et pas une interpolation
+> [!check] Vérifié le 18/09/2026
+> La formule réimplémentée redonne les taux publiés par la BCE **à 0,0005
+> point près**. Ce contrôle n'est pas une formalité : une erreur de
+> convention produit une courbe parfaitement plausible et complètement
+> fausse, de 30 à 50 points de base.
 
-Une interpolation (spline, linéaire) passe par tous les points observés,
-y compris le bruit. Svensson **impose une forme** : quatre facteurs
-seulement, donc la courbe ne peut pas osciller librement. Trois
-conséquences pratiques :
+## Le piège à connaître : deux façons de compter les intérêts
 
-1. **Elle extrapole proprement.** Demander $r(0{,}5)$ ou $r(37)$ a un sens
-   même si aucune obligation n'y cote.
-2. **Elle lisse le bruit de cotation.** Deux obligations de même échéance qui
-   cotent différemment (liquidité, ancienneté) ne créent pas de pic.
-3. **Elle est comparable dans le temps.** Les six paramètres d'hier et
-   d'aujourd'hui se comparent terme à terme.
+Il existe deux conventions pour dire « 3 % par an » :
 
-Le prix à payer : la courbe ne repasse pas exactement par chaque prix
-observé. Pour de la valeur relative ligne à ligne, c'est un défaut ; pour
-construire une allocation, c'est ce qu'on veut.
+- **Capitalisation annuelle** : 100 € deviennent 103 € au bout d'un an.
+  C'est celle du quotidien.
+- **Capitalisation continue** : les intérêts sont réinvestis en permanence,
+  à chaque instant. 100 € deviennent 103,05 €.
 
-## Contrôle effectué
+**La BCE publie en capitalisation continue.** Le rendement actuariel des
+obligations, lui, est en capitalisation annuelle. Les deux conventions
+cohabitent donc dans le même fichier.
 
-> [!check] Vérifié le 2026-09-18
-> La formule ré-implémentée ici redonne les taux publiés par la BCE à
-> **0,0005 point près**. Le contrôle est indispensable : une erreur de
-> convention (continue vs actuarielle, ou $\tau$ en mois au lieu d'années)
-> produit une courbe qui a l'air plausible et qui est fausse de 30 à 50 pb.
+L'écart est faible — de l'ordre de 6 points de base pour un taux de 3,5 % —
+mais c'est exactement le genre d'erreur invisible : le résultat reste
+plausible, personne ne le remarque, et tous les chiffres aval sont décalés.
 
-## Le piège de convention
+## Limites
 
-Svensson donne des taux en **capitalisation continue**. L'actualisation
-s'écrit donc en exponentielle :
-
-$$DF(m) = e^{-\frac{r(m) + c}{100} \cdot m}$$
-
-où $c$ est un choc de taux en points de pourcentage (0 en temps normal).
-
-```python
-def actualisation(m, p, choc=0.0):
-    return math.exp(-(taux_zero(m, p) + choc) / 100 * m)
-```
-
-Mais le **rendement actuariel** renvoyé par [[02 - Valorisation obligataire]]
-est en capitalisation annuelle, $(1+y)^{-t}$. Les deux conventions coexistent
-dans le même fichier. Mélanger les deux fait une erreur d'environ
-$y^2/2$ — soit ~6 pb à 3,5 %, ce qui est invisible à l'œil et faux.
-
-## Deux usages dans le dossier
-
-1. **L'échelle AAA des 10 M€** — quatre zéro-coupon à 6, 12, 18, 24 mois.
-   Pour recevoir $M$ à l'échéance $t$, on investit $M \cdot DF(t)$
-   aujourd'hui. Taux garanti $= DF(t)^{-1/t} - 1$.
-2. **L'échelle 2-3-5-7-10 ans** — cinq obligations émises au pair, dont on
-   calcule le rendement moyen et la sensibilité.
+- La courbe **ne repasse pas exactement** par chaque obligation cotée. Pour
+  faire de la valeur relative ligne à ligne (« cette obligation est-elle
+  chère face à sa voisine ? »), c'est un défaut. Pour construire une
+  allocation, c'est ce qu'on veut.
+- Elle décrit la **qualité de crédit moyenne** de son périmètre. La courbe
+  AAA et la courbe « toutes zone euro » sont deux objets différents ; leur
+  écart est le spread souverain moyen, qui n'est pas modélisé émetteur par
+  émetteur.
 
 ## Sources
 
-- Svensson, L. (1994), *Estimating and Interpreting Forward Interest Rates:
-  Sweden 1992-1994*, NBER WP 4871.
-- Nelson & Siegel (1987), *Parsimonious Modeling of Yield Curves*, J. Business.
-- Données : BCE, `data-api.ecb.europa.eu`, clé `YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_{m}Y`
-  — **sans clé API**, c'est une des rares sources de qualité totalement libres.
+- Svensson, L. (1994), NBER WP 4871. Extension de Nelson & Siegel (1987).
+- BCE, `data-api.ecb.europa.eu` — **sans clé API**, une des rares sources de
+  qualité totalement libres.
 
 → Suite : [[02 - Valorisation obligataire]]
