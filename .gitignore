@@ -19,3 +19,8 @@ outputs/*.log
 scripts/pitch/node_modules/
 scripts/pitch/package-lock.json
 scripts/pitch/data.json
+
+# Générateur du dossier technique (docx)
+node_modules/
+package.json
+package-lock.json
