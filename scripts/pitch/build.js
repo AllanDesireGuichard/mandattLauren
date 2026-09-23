@@ -1,4 +1,4 @@
-// Pitch oral du mandat Lauren — 37 slides, speech client dans les notes.
+// Pitch oral du mandat Lauren — 41 slides, speech client dans les notes.
 // Lit data.json (PYTHONPATH=. python3 scripts/pitch/extraire.py), puis :
 //   cd scripts/pitch && npm install && npm run build
 // Sortie : outputs/Mandat_Lauren_pitch_genere.pptx. Depuis la bascule du
@@ -722,6 +722,107 @@ dark("Backtests", "Le portefeuille rejoué de 2006 à aujourd'hui : combien de t
     ["Prix aberrants", "Allers-retours isolés retirés ; baisses de crédit sur cours du vendredi", "—"],
   ], M, 1.6, W - 2 * M, [2.4, 5.8, 3.93], { fontSize: 12.5, rowH: 0.7, bold1: true });
   s.addNotes("Annexe sur les données : comment l'historique a été reconstitué, et les contrôles appliqués.");
+}
+{
+  // Annexe C — la notation des actions, racontée avant d'être formulée.
+  // Reprise de docs/modeles/04 : on dit ce que le chiffre VEUT DIRE, et on
+  // ne pose une formule que là où elle apprend quelque chose (1/PER).
+  const s = base(0, "Annexe C — Comment 600 actions deviennent 30", { kicker: "Pour les questions techniques" });
+  callout(s, M, 1.5, W - 2 * M, 0.95, "Le problème : on veut mélanger un PER, une marge, une volatilité et une croissance. **Trois obstacles — les unités diffèrent, les sens s'opposent, et le niveau « normal » dépend du secteur.**", INK, 14.5);
+
+  const E = [
+    ["① Tout mettre dans le même sens", "On remplace chaque indicateur par une version où **plus haut = mieux**. Le PER devient **1 / PER**, soit le rendement des bénéfices : à un PER de 20 on achète 5 % par an. Ce n'est pas cosmétique — passer d'un PER de 10 à 20 coûte 5 points de rendement, de 30 à 40 seulement 0,8. Sur le PER brut, les deux écarts valent « 10 »."],
+    ["② Comparer chacune à son secteur", "On remplace la valeur par **de combien elle s'écarte de la moyenne de son secteur**, mesuré en nombre d'écarts-types. Une action à +1 est meilleure que 84 % de ses pairs, à 0 elle est dans la moyenne. Tout devient comparable, donc moyennable."],
+    ["③ Puis seulement, la moyenne", "Cinq piliers à poids égaux — valorisation, croissance, dynamique, qualité, résistance. Aucun n'a de raison **mesurée** d'être privilégié : les pondérer demanderait d'estimer des primes de facteur, ce qui est un autre métier."],
+  ];
+  E.forEach(([t, txt], i) => {
+    const x = M + i * 4.25;
+    card(s, x, 2.65, 4.0, 2.6);
+    s.addText(t, { x: x + 0.22, y: 2.8, w: 3.56, h: 0.6, fontFace: HF, fontSize: 15, bold: true, color: INK, margin: 0, isTextBox: true });
+    para(s, x + 0.22, 3.42, 3.56, 1.7, rich(txt), 12.8);
+  });
+
+  callout(s, M, 5.5, W - 2 * M, 1.1, "**Pourquoi « de son secteur » et pas « du marché entier »** : sinon les banques et l'énergie, structurellement bon marché, rafleraient toutes les bonnes notes de valorisation. On construirait **un pari sectoriel déguisé en sélection de titres**.", CARD, 14);
+  s.addNotes("Annexe technique sur la notation. Le point à retenir si on me pose la question : ce n'est pas un modèle à facteurs. On n'explique pas un rendement, on classe des titres les uns par rapport aux autres — c'est du stock screening, et ça ne prétend pas prédire. Les trois étapes règlent trois problèmes concrets : mettre tous les indicateurs dans le sens « plus haut = mieux », les ramener sur une échelle commune en les comparant à leur propre secteur, et seulement alors en faire une moyenne. Le choix du secteur plutôt que du marché entier est le plus important : sans lui, on sélectionnerait des secteurs en croyant sélectionner des sociétés. Deux détails si on creuse : les données aberrantes sont supprimées et non corrigées — Yahoo confond les pence et les livres sur certaines valeurs de Londres, ce qui donnait des PER multipliés par cent — et pour les banques on retire l'endettement, le flux de trésorerie et la marge, parce que la dette d'une banque est sa matière première, pas un fardeau.");
+}
+
+{
+  // Annexe D — Svensson. Consigne d'Allan : raconter ce que ça veut dire
+  // AVANT toute formule. Il n'y en a donc aucune sur cette slide.
+  const s = base(0, "Annexe D — La courbe des taux, en six nombres", { kicker: "Pour les questions techniques · modèle de Svensson, publié chaque jour par la BCE" });
+  callout(s, M, 1.5, W - 2 * M, 0.95, "Le problème : les obligations qui existent ont des échéances **en désordre**. Une à 4 ans et 2 mois, une à 7 ans et 9 mois, rien à 6 ans. Si j'ai besoin du taux à 6 ans, personne ne me le donne.", INK, 14.5);
+
+  card(s, M, 2.65, 6.0, 2.5);
+  s.addText("Deux façons de combler les trous", { x: M + 0.25, y: 2.8, w: 5.5, h: 0.4, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, M + 0.25, 3.28, 5.5, 1.75, bullets([
+    "**Relier les points.** Simple, mais on recopie le bruit : une obligation mal cotée ce jour-là crée une bosse qui n'existe pas",
+    "**Décrire la forme** par quelques nombres, en acceptant de ne pas passer exactement par chaque point. C'est Svensson",
+  ]), 12.5, { paraSpaceAfter: 8 });
+
+  card(s, 6.83, 2.65, 5.9, 2.5);
+  s.addText("Une courbe a toujours la même allure", { x: 7.08, y: 2.8, w: 5.4, h: 0.4, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, 7.08, 3.28, 5.4, 1.75, bullets([
+    "**Un niveau** : globalement haute ou basse",
+    "**Une pente** : le court rapporte moins que le long (normal), ou l'inverse (signal de récession)",
+    "**Une ou deux bosses** : banques centrales sur le court, assureurs sur le très long",
+  ]), 12.5, { paraSpaceAfter: 6 });
+
+  card(s, M, 5.35, 6.0, 1.5);
+  s.addText("Les six nombres", { x: M + 0.25, y: 5.45, w: 5.5, h: 0.35, fontFace: HF, fontSize: 15, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, M + 0.25, 5.82, 5.5, 0.95, rich("**Quatre boutons de taille, deux boutons de position.** Le niveau, la pente, la taille des deux bosses — et où chaque bosse se situe. C'est tout."), 13);
+
+  callout(s, 6.83, 5.35, 5.9, 1.5, "**L'analogie.** Décrire un visage : lister la couleur de chaque pixel, ou dire « ovale, yeux écartés, nez droit ». La seconde description est plus courte, **résiste au bruit**, et permet de dessiner ce qu'on n'a pas vu.", CARD, 13);
+  s.addNotes("Annexe technique sur la courbe des taux. Si on me demande d'où viennent les taux que j'utilise pour valoriser les obligations : ils viennent de la courbe zéro-coupon publiée chaque jour par la Banque centrale européenne, calculée avec le modèle de Svensson. L'idée tient en une phrase : plutôt que de relier les points entre les obligations qui existent — ce qui recopie le bruit de cotation — on décrit la forme de la courbe par six nombres. Une courbe de taux a toujours la même allure : un niveau, une pente, une ou deux bosses. Quatre boutons règlent les tailles, deux règlent les positions. C'est comme décrire un visage : on peut lister chaque pixel, ou dire « ovale, yeux écartés, nez droit ». La seconde description est plus robuste, et surtout elle permet de donner le taux à six ans même si aucune obligation ne tombe exactement à six ans. Deux lectures immédiates pour un gérant : le niveau seul donne le très long terme, et le niveau plus la pente donnent le taux au jour le jour.");
+}
+{
+  // Annexe E — pourquoi pas Markowitz. C'est LA question d'un jury de
+  // finance, et elle n'était traitée nulle part dans le deck. Reprise de
+  // docs/modeles/05 : l'expérience du paquet de cartes, qui se fait en
+  // séance et ne demande aucune formule.
+  const s = base(0, "Annexe E — Pourquoi pas Markowitz", { kicker: "Pour les questions techniques · la question qui sera posée" });
+  callout(s, M, 1.5, W - 2 * M, 0.95, "M. Lauren n'a pas dit « je veux une volatilité de 6 % ». Il a dit **« je ne veux jamais perdre plus de 15 % »**. Ce sont deux objets différents, et le second ne se déduit pas du premier.", INK, 14.5);
+
+  card(s, M, 2.65, 6.0, 2.6);
+  s.addText("L'expérience du paquet de cartes", { x: M + 0.25, y: 2.8, w: 5.5, h: 0.4, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, M + 0.25, 3.28, 5.5, 1.8, bullets([
+    "Prends les rendements mensuels du portefeuille sur vingt ans, et **mélange les mois au hasard**",
+    "**La volatilité ne bouge pas d'un iota** : elle ne regarde que la dispersion des rendements",
+    "**La pire baisse change du tout au tout** : mauvais mois groupés, on creuse 40 % ; éparpillés, jamais plus de 10 %",
+  ]), 12.5, { paraSpaceAfter: 7 });
+
+  card(s, 6.83, 2.65, 5.9, 2.6);
+  s.addText("Ce qu'on en tire", { x: 7.08, y: 2.8, w: 5.4, h: 0.4, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, 7.08, 3.28, 5.4, 1.8, rich("**La volatilité ignore l'ordre. La pire baisse ne dépend que de l'ordre.**\n\nIl n'existe donc aucune formule reliant la matrice de covariance à la perte maximale — sauf en supposant les rendements indépendants et gaussiens, ce qui est faux précisément dans les crises, c'est-à-dire là où ça compte.\n\nOn mesure donc directement sur le chemin : chaque répartition candidate est rejouée jour par jour, rééquilibrée chaque mois."), 12.5);
+
+  callout(s, M, 5.45, 6.0, 1.4, "**Le prix, et il est assumé.** La contrainte est évaluée sur **une seule trajectoire**, celle qui a eu lieu. C'est du surapprentissage au sens plein — d'où le résultat brut rejeté, puis les règles chiffrées une par une.", CARD, 12.5);
+  callout(s, 6.83, 5.45, 5.9, 1.4, "**Et Black-Litterman ?** Écarté pour une autre raison : les opinions sont **déjà** dans les rendements espérés, qui viennent des valorisations. Les réinjecter reviendrait à les compter deux fois.", CARD, 12.5);
+  s.addNotes("Annexe technique, et c'est la question qu'on me posera en premier. La théorie classique dit : matrice de covariance, minimisation de la variance, frontière efficiente. Je ne l'ai pas fait, pour une raison simple : la contrainte du client n'est pas une volatilité. Il n'a pas demandé une volatilité de six pour cent, il a demandé de ne jamais perdre plus de quinze. L'expérience qui tranche tient en une phrase : prenez les rendements mensuels, mélangez les mois comme un paquet de cartes. La volatilité est identique — elle ne regarde que la dispersion. La pire baisse, elle, change complètement : si les mauvais mois se suivent vous creusez quarante pour cent, s'ils sont éparpillés vous ne descendez jamais sous dix. La volatilité ignore l'ordre, le drawdown ne dépend que de l'ordre. Il n'y a donc pas de formule qui relie la covariance à la perte maximale, sauf sous hypothèse d'indépendance et de normalité — hypothèse fausse exactement dans les crises. Optimiser la variance en espérant que la perte suive aurait été un raccourci non vérifié. Je dois dire le prix de mon choix : la contrainte est mesurée sur une seule trajectoire, celle qui a eu lieu, donc c'est du surapprentissage. C'est précisément pour ça que le résultat brut du calcul libre est rejeté et que j'ajoute des règles dont je chiffre le coût une par une. Sur Black-Litterman enfin : écarté parce que mes opinions sont déjà dans les rendements espérés, qui sortent des valorisations. Dire que l'Europe est moins chère donc rapportera plus, c'est déjà l'opinion. La réinjecter serait la compter deux fois.");
+}
+
+{
+  // Annexe F — duration, sensibilité, convexité, portage et glissement.
+  // Le deck cite des chiffres de sensibilité sans jamais les définir.
+  const s = base(0, "Annexe F — Ce que « duration » veut dire", { kicker: "Pour les questions techniques · d'où viennent les chiffres de sensibilité du dossier" });
+  const SVA = D.souverains, CR = D.credit, CFA = D.credit_fonds;
+
+  const B = [
+    ["La duration", `**Le délai moyen de récupération de mon argent.** Une obligation à 10 ans ne me rend pas tout dans 10 ans : elle verse des coupons avant. Avec de gros coupons, sa duration tombe vers 8 ans. Un zéro-coupon à 10 ans a une duration de 10 ans pile, puisque tout arrive à la fin.`],
+    ["La sensibilité", `La duration, corrigée d'un petit facteur, et sa lecture est directe : **si tous les taux montent d'un point, le prix baisse d'environ autant de pour cent.** L'intuition : si je détiens du 3 % et que le marché paie 4 %, personne ne veut du mien à son prix — il baisse jusqu'à redevenir compétitif.`],
+    ["La convexité", `La relation taux-prix n'est pas une droite, elle est courbée **dans le bon sens pour le détenteur** : quand les taux montent on perd un peu moins que prévu, quand ils baissent on gagne un peu plus. Positive pour toute obligation classique — c'est un actif gratuit.`],
+  ];
+  B.forEach(([t, txt], i) => {
+    const x = M + i * 4.25;
+    card(s, x, 1.5, 4.0, 2.4);
+    s.addText(t, { x: x + 0.22, y: 1.62, w: 3.56, h: 0.4, fontFace: HF, fontSize: 15.5, bold: true, color: INK, margin: 0, isTextBox: true });
+    para(s, x + 0.22, 2.08, 3.56, 1.7, rich(txt), 12.8);
+  });
+
+  callout(s, M, 4.1, W - 2 * M, 1.0, `**Ce que fait le code, et c'est mieux que l'approximation.** Au lieu d'estimer la perte par « sensibilité plus convexité », il **revalorise réellement** l'obligation avec la courbe décalée d'un point. Exact au lieu d'approché : l'échelle 2-10 ans perd **${pct(-SVA.choc_long)}**, le fonds de crédit (durée ${fr(CFA.duree)} an) bien moins.`, INK, 13.5);
+
+  card(s, M, 5.35, W - 2 * M, 1.4);
+  s.addText("D'où vient le rendement d'une année, si la courbe ne bouge pas", { x: M + 0.25, y: 5.48, w: 8, h: 0.35, fontFace: HF, fontSize: 15, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, M + 0.25, 5.88, 11.6, 0.8, rich("**Le portage** : j'encaisse le coupon, c'est évident. **Le glissement** : mon obligation à 10 ans devient une obligation à 9 ans, et sur une courbe montante le taux à 9 ans est plus bas — donc elle est valorisée plus cher. J'ai gagné sans que rien ne bouge, juste parce que le temps a passé."), 12.8);
+  s.addNotes(`Annexe technique sur les mesures obligataires, pour les chiffres de sensibilité cités dans le dossier. La duration, c'est le délai moyen de récupération de l'argent : une obligation à dix ans verse des coupons avant l'échéance, donc elle me rend mon argent en moyenne plus tôt que dans dix ans. La sensibilité, c'est la duration corrigée d'un petit facteur, et elle se lit directement : si les taux montent d'un point, le prix baisse d'à peu près autant de pour cent. C'est de là que vient le chiffre du dossier — l'échelle deux-dix ans perdrait ${pct(-SVA.choc_long)} si les taux montaient d'un point. L'intuition est simple : si je détiens du trois pour cent et que le marché se met à payer quatre, personne ne veut du mien à son prix actuel, donc il baisse jusqu'à redevenir compétitif. La convexité est la bonne nouvelle : la relation n'est pas une droite mais une courbe, et elle est courbée en faveur du détenteur — on perd un peu moins que prévu quand les taux montent, on gagne un peu plus quand ils baissent. Un détail de méthode si on me le demande : je ne passe pas par l'approximation sensibilité plus convexité, je revalorise réellement l'obligation avec la courbe décalée d'un point, ce qui est exact plutôt qu'approché et évite de décrocher sur les longues maturités. Enfin, si la courbe ne bouge pas d'un an sur l'autre, je gagne quand même par deux canaux : le portage, c'est-à-dire le coupon, et le glissement — mon obligation à dix ans devient une neuf ans, valorisée avec un taux plus bas sur une courbe montante, donc son prix monte tout seul.`);
 }
 
 pres.writeFile({ fileName: OUT }).then((f) => console.log("écrit :", f, "·", slideNo, "slides"));
