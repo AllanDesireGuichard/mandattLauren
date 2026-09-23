@@ -139,8 +139,10 @@ def _v(x: float, signe: bool = False) -> str:
 def _risque() -> dict:
     s = allocation.series_risque()
     pendant, dates = allocation.pendant_la_baisse(s)
+    hors, crise, semaines = allocation.correlations(s)
     return {"s": s, "pertes": allocation.pertes_crises(s),
-            "pendant": pendant, "dates": dates}
+            "pendant": pendant, "dates": dates,
+            "corr": (hors, crise), "semaines": semaines}
 
 
 def _bloc_risque() -> None:
@@ -183,6 +185,8 @@ def _bloc_risque() -> None:
         f"- **Matières premières et bitcoin** baissent avec les actions."
     )
     _graphique_baisses(r["s"])
+
+    _correlations(r)
     st.markdown(
         "Comme ce lien change d'une crise à l'autre, le calcul ne s'appuie "
         "pas sur une corrélation moyenne. Il fait traverser à chaque "
@@ -194,6 +198,100 @@ def _bloc_risque() -> None:
         "**➜ Les États amortissent les récessions, pas l'inflation ; l'or "
         "tient partout.** Reste à trouver la répartition qui rapporte le plus "
         "sans jamais perdre plus de 15 %."
+    )
+
+
+# Libelles courts : dans deux graphiques cote a cote, les noms complets
+# passent a l'oblique et deviennent illisibles.
+CORR_NOMS = {"poche_actions": "Actions", "etats_courts": "AAA courts",
+             "etats_longs": "États 2-10", "credit_court": "Crédit",
+             "indexees": "Indexées", "or": "Or", "matieres": "Matières"}
+
+# Echelle centree sur zero, bornee a la main : symetrique, sinon le gris du
+# milieu ne tombe plus sur la corrélation nulle et la couleur ment.
+CORR_BORNE = 0.8
+
+
+def _heatmap_corr(m: pd.DataFrame, titre: str, barre: bool) -> go.Figure:
+    """Une matrice de corrélation. Diagonale retirée : elle vaut 100 partout
+    et n'apprend rien, mais elle écraserait l'échelle de couleur."""
+    noms = [CORR_NOMS[k] for k in m.index]
+    z = m.to_numpy(copy=True) * 100
+    for i in range(len(z)):
+        z[i, i] = float("nan")
+    fig = go.Figure(go.Heatmap(
+        z=z, x=noms, y=noms, zmin=-CORR_BORNE * 100, zmax=CORR_BORNE * 100,
+        colorscale=viz.echelle_divergente(), showscale=barre,
+        xgap=2, ygap=2,
+        text=[[("" if pd.isna(v) else viz.fr(v, "", 0)) for v in ligne]
+              for ligne in z],
+        texttemplate="%{text}", textfont={"size": 12, "color": viz.INK},
+        hovertemplate="%{y} et %{x} : %{z:.0f} %<extra></extra>",
+        colorbar={"title": {"text": "%", "font": {"size": 11}},
+                  "thickness": 10, "len": 0.8, "tickfont": {"size": 10},
+                  "outlinewidth": 0},
+    ))
+    fig.update_layout(**viz.layout(titre, height=340))
+    fig.update_xaxes(showgrid=False, zeroline=False, side="top")
+    fig.update_yaxes(showgrid=False, zeroline=False, autorange="reversed")
+    return fig
+
+
+def _correlations(r: dict) -> None:
+    hors, crise = r["corr"]
+    n = r["semaines"]
+    st.markdown("#### Les supports bougent-ils ensemble ?")
+    st.markdown(
+        "Le tableau précédent dit combien chacun a perdu. Celui-ci dit s'ils "
+        "perdent **en même temps**. Deux supports à 100 font la même chose ; "
+        "à 0 ils sont indépendants ; en dessous de 0, l'un monte quand "
+        "l'autre baisse. La mesure est faite deux fois : sur les semaines "
+        "ordinaires, puis sur les seules semaines de crise — parce que c'est "
+        "là, et seulement là, que la question compte."
+    )
+    g, d = st.columns(2)
+    with g:
+        st.plotly_chart(_heatmap_corr(
+            hors, f"Hors crise · {n['hors_crise']} semaines", False),
+            width="stretch")
+    with d:
+        st.plotly_chart(_heatmap_corr(
+            crise, f"En crise · {n['en_crise']} semaines", True),
+            width="stretch")
+    st.caption(
+        "Variations hebdomadaires en euros, octobre 2006 - septembre 2026. "
+        "Crises : les quatre fenêtres datées plus haut. Bitcoin écarté : ses "
+        "cotations ne commencent qu'en 2014, le garder mélangerait deux "
+        "périodes dans le même tableau. Diagonale retirée (elle vaut 100)."
+    )
+
+    # La paire de la poche defensive qui se resserre le plus : hors actions
+    # et hors diagonale, le plus fort ecart entre la crise et le reste.
+    a = "poche_actions"
+    ecarts = (crise - hors).drop(index=a, columns=a)
+    for k in ecarts.index:
+        ecarts.loc[k, k] = float("nan")
+    pire = ecarts.stack().idxmax()
+    st.markdown(
+        f"**Lecture.** Face aux actions, deux supports se retournent quand la "
+        f"crise arrive :\n"
+        f"- **L'échelle AAA** passe de {_v(hors.loc[a, 'etats_courts'] * 100)} "
+        f"à {_v(crise.loc[a, 'etats_courts'] * 100)} : elle ne suit pas les "
+        f"actions en temps normal, et s'y oppose franchement quand elles "
+        f"chutent.\n"
+        f"- **L'or** fait le même chemin, de "
+        f"{_v(hors.loc[a, 'or'] * 100, True)} à "
+        f"{_v(crise.loc[a, 'or'] * 100, True)}. C'est ce qui le rend utile "
+        f"malgré un rendement espéré de 4 % seulement.\n"
+        f"- **Les matières premières** restent le support le plus lié aux "
+        f"actions ({_v(crise.loc[a, 'matieres'] * 100, True)} en crise) : "
+        f"elles diversifient peu, d'où la place réduite qu'elles prendront.\n"
+        f"- **Le revers, et il est réel** : la poche défensive se resserre "
+        f"sur elle-même. {CORR_NOMS[pire[0]]} et {CORR_NOMS[pire[1]]} "
+        f"passent de {_v(hors.loc[pire] * 100)} à {_v(crise.loc[pire] * 100)}. "
+        f"Les amortisseurs deviennent un seul pari au moment où on compte "
+        f"sur eux — c'est la raison de ne pas concentrer le défensif sur une "
+        f"seule maturité."
     )
 
 

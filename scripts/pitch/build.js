@@ -1,8 +1,11 @@
-// Pitch oral du mandat Lauren — 36 slides, speech client dans les notes.
+// Pitch oral du mandat Lauren — 37 slides, speech client dans les notes.
 // Lit data.json (PYTHONPATH=. python3 scripts/pitch/extraire.py), puis :
 //   cd scripts/pitch && npm install && npm run build
-// Sortie : outputs/Mandat_Lauren_pitch_genere.pptx. Ne jamais écrire sur
-// Mandat_Lauren_pitch.pptx : c'est la version retouchée à la main par Allan.
+// Sortie : outputs/Mandat_Lauren_pitch_genere.pptx. Depuis la bascule du
+// 2026-09-21, ce générateur est la source du deck de référence : on régénère
+// puis on recopie sur Mandat_Lauren_pitch.pptx. L'écriture directe reste
+// refusée, pour qu'une retouche faite à la main ne soit jamais écrasée sans
+// qu'on l'ait vue : comparer les deux fichiers avant de recopier.
 const pptxgen = require("pptxgenjs");
 const D = require("./data.json");
 const OUT = process.argv[2] || "Mandat_Lauren_pitch_genere.pptx";
@@ -487,6 +490,56 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
   s.addNotes(`Deuxième ingrédient : le comportement en crise. Les actions perdent jusqu'à ${pct(-pa, 0)} en 2008. Sans amortisseur, on ne pourrait donc pas en détenir plus de ${pct(15 / -pa * 100, 0)}. Pour aller au-delà, il faut des supports qui montent quand les actions baissent. En 2008, les emprunts d'État gagnent 14 % et l'or 39 % : ils amortissent. Mais en 2022, crise d'inflation, les obligations baissent avec les actions : plus d'amortisseur. C'est le régime décrit à l'étape 2. L'or est le seul qui tienne partout. Parce que ce lien change d'une crise à l'autre, le calcul ne s'appuie pas sur une corrélation moyenne : il fait traverser à chaque portefeuille les vingt années, jour après jour.`);
 }
 
+{
+  // Matrices de corrélation. Échelle divergente du référentiel dataviz :
+  // pôle froid / gris neutre / pôle chaud, bornée à ±80 pour que le gris
+  // tombe exactement sur zéro. Diagonale retirée : elle vaut 100 partout,
+  // n'apprend rien et écraserait l'échelle.
+  const s = base(4, "Les mêmes supports, mais quand ça tangue", { kicker: "Corrélation des variations hebdomadaires : 100 = ils font la même chose, 0 = indépendants, négatif = l'un monte quand l'autre baisse", source: "Séries quotidiennes en euros, octobre 2006 - septembre 2026 · crises : les quatre fenêtres datées · bitcoin écarté (cotations depuis 2014 seulement)" });
+  const C = D.corr;
+  const LONG = { poche_actions: "Poche actions", etats_courts: "Échelle AAA", etats_longs: "États 2-10 ans", credit_court: "Crédit court", indexees: "Obligations indexées", or: "Or", matieres: "Matières premières" };
+  const COURT = { poche_actions: "Act.", etats_courts: "AAA", etats_longs: "2-10", credit_court: "Créd.", indexees: "Idx.", or: "Or", matieres: "Mat." };
+  const RAMPE = ["2a78d6", "6097de", "90b5e4", "c0d2e9", "f0efec", "f3cfc0", "f3af95", "f18d68", "eb6834"];
+  const BORNE = 80;
+
+  const teinte = (v) => {
+    const t = Math.min(1, Math.max(0, (v + BORNE) / (2 * BORNE))) * (RAMPE.length - 1);
+    const i = Math.min(RAMPE.length - 2, Math.floor(t)), f = t - i;
+    const mix = (a, b) => Math.round(parseInt(a, 16) + (parseInt(b, 16) - parseInt(a, 16)) * f).toString(16).padStart(2, "0");
+    const A = RAMPE[i], B = RAMPE[i + 1];
+    return mix(A.slice(0, 2), B.slice(0, 2)) + mix(A.slice(2, 4), B.slice(2, 4)) + mix(A.slice(4, 6), B.slice(4, 6));
+  };
+
+  const matrice = (m, x, titre, sous) => {
+    s.addText([{ text: titre, options: { bold: true, color: INK } }, { text: "   " + sous, options: { color: MUTED, fontSize: 11 } }],
+      { x, y: 1.52, w: 5.9, h: 0.3, fontFace: BF, fontSize: 13.5, margin: 0, isTextBox: true });
+    const entete = ["", ...C.ordre.map((k) => COURT[k])];
+    const corps = C.ordre.map((k, i) => [LONG[k], ...C.ordre.map((_, j) => (
+      i === j ? { text: "", options: { fill: { color: WHITE } } }
+              : { text: fr(m[i][j], 0), options: { fill: { color: teinte(m[i][j]) }, color: TEXT } }))]);
+    table(s, [entete, ...corps], x, 1.85, 5.9, [1.7, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
+      { fontSize: 10.5, rowH: 0.4, bold1: true, alignRight: true, zebra: false });
+  };
+  matrice(C.hors, M, "Hors crise", `${C.semaines.hors_crise} semaines`);
+  matrice(C.crise, M + 6.23, "En crise", `${C.semaines.en_crise} semaines`);
+
+  const ix = (k) => C.ordre.indexOf(k);
+  const a = ix("poche_actions");
+  const cor = (v) => (v > 0 ? "+" : "") + fr(v, 0);
+  const av = (k) => cor(C.hors[a][ix(k)]), ap = (k) => cor(C.crise[a][ix(k)]);
+  const ent = (i, j) => cor(C[i][ix(j[0])][ix(j[1])]);
+  card(s, M, 5.32, W - 2 * M, 1.55);
+  para(s, M + 0.25, 5.45, 5.75, 1.35, bullets([
+    `**L'échelle AAA** passe de ${av("etats_courts")} à ${ap("etats_courts")} face aux actions, **l'or** de ${av("or")} à ${ap("or")} : les deux amortisseurs se déclenchent au bon moment`,
+    `**Les matières premières** restent à ${ap("matieres")} : elles diversifient peu, d'où leur place réduite`,
+  ]), 13, { paraSpaceAfter: 7 });
+  para(s, M + 6.35, 5.45, 5.5, 1.35, bullets([
+    `**Le revers** : entre eux, crédit court et indexées passent de ${ent("hors", ["credit_court", "indexees"])} à ${ent("crise", ["credit_court", "indexees"])}, États courts et longs de ${ent("hors", ["etats_courts", "etats_longs"])} à ${ent("crise", ["etats_courts", "etats_longs"])}`,
+    "Le coussin **se resserre sur lui-même** : d'où le refus de le concentrer sur une seule maturité",
+  ]), 13, { paraSpaceAfter: 7 });
+
+  s.addNotes(`Un mot sur la corrélation, parce que la question vient toujours. À gauche, les semaines ordinaires ; à droite, les seules semaines de crise. Deux chiffres comptent. L'échelle AAA était à ${av("etats_courts")} face aux actions en temps normal : indépendante. En crise elle passe à ${ap("etats_courts")} : elle monte quand les actions chutent. L'or fait le même chemin, de ${av("or")} à ${ap("or")}. Voilà pourquoi on garde de l'or malgré un rendement espéré de 4 % seulement : on ne l'achète pas pour son rendement, on l'achète pour ce qu'il fait ce jour-là. À l'inverse, les matières premières restent à ${ap("matieres")} : elles diversifient peu, et c'est pour ça qu'elles ont une place réduite. Et je veux être honnête sur le revers, parce qu'on me le demanderait sinon : la poche défensive, elle, se resserre. Crédit court et indexées passent de ${ent("hors", ["credit_court", "indexees"])} à ${ent("crise", ["credit_court", "indexees"])} entre eux. Autrement dit les amortisseurs deviennent un seul pari au moment où on compte sur eux. C'est exactement la raison pour laquelle on ne met pas tout le défensif sur la même maturité, et pourquoi le calcul de la page suivante ne travaille pas sur une corrélation moyenne, mais fait traverser au portefeuille les vingt années jour après jour.`);
+}
 {
   const s = base(4, "Le calcul libre apprend le passé par cœur", { kicker: "La répartition qui rapporte le plus, avec une seule exigence : jamais plus de 15 % de baisse sur 2006-2026" });
   const L = LIB.poids;

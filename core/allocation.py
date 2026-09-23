@@ -188,16 +188,30 @@ def pendant_la_baisse(s: pd.DataFrame, ref: str = "poche_actions"
     return pd.DataFrame(out), dates
 
 
-def correlations(s: pd.DataFrame, ref: str = "poche_actions") -> pd.DataFrame:
-    """Corrélation hebdomadaire avec la poche actions : hors crise / en crise."""
-    r = s.resample("W-FRI").last().pct_change(fill_method=None)
+# La poche actions compte pour un seul support : c'est à ce niveau que se
+# joue la diversification du portefeuille, les quatre zones étant de toute
+# façon tenues ensemble à l'étape 4.
+CORR_ORDRE = ("poche_actions", "etats_courts", "etats_longs", "credit_court",
+              "indexees", "or", "matieres")
+
+
+def correlations(s: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    """
+    Corrélation des variations hebdomadaires entre supports, mesurée
+    séparément hors crise et pendant les quatre crises datées.
+
+    Le bitcoin est écarté : il ne commence qu'en 2014 quand tout le reste
+    part de 2006, et il n'entre pas dans le portefeuille. Le garder ferait
+    cohabiter deux fenêtres dans le même tableau.
+    """
+    cols = [k for k in CORR_ORDRE if k in s.columns]
+    r = s[cols].resample("W-FRI").last().pct_change(fill_method=None)
     en_crise = pd.Series(False, index=r.index)
     for a, b, _ in CRISES.values():
         en_crise[a:b] = True
-    return pd.DataFrame({
-        "hors_crise": r[~en_crise].corr()[ref],
-        "en_crise": r[en_crise].corr()[ref],
-    })
+    hors, pendant = r[~en_crise].dropna(), r[en_crise].dropna()
+    return (hors.corr(), pendant.corr(),
+            {"hors_crise": len(hors), "en_crise": len(pendant)})
 
 
 # ----------------------------------------------------------------------

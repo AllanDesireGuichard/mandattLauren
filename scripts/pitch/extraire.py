@@ -162,6 +162,14 @@ def main() -> None:
     out["pertes"], out["pendant"] = tab(pe), tab(pend)
     out["crises_lib"] = {c_: lib for c_, (_, _, lib) in allocation.CRISES.items()}
 
+    hors, crise, semaines = allocation.correlations(s)
+    out["corr"] = {
+        "ordre": list(hors.index),
+        "hors": [[round(v * 100) for v in ligne] for ligne in hors.to_numpy()],
+        "crise": [[round(v * 100) for v in ligne] for ligne in crise.to_numpy()],
+        "semaines": semaines,
+    }
+
     res = allocation.resultats()
     out["scenarios"] = {n: {"rdt": x["rendement_espere"], "pire": x["pire_baisse"],
                             "poids": _poids_par_ligne(x["poids"]),
