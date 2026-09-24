@@ -192,6 +192,23 @@ def _bloc_notation(d: pd.DataFrame) -> None:
         "Yahoo (un PER de 1 042) sont écartées. La note d'un pilier est la "
         "moyenne de ses indicateurs, la note finale la moyenne des cinq "
         "piliers.",
+        "<strong>Ce que cette note ne dit pas, et pourquoi</strong> : "
+        "comparer chaque société à son propre secteur rend la note "
+        "<em>aveugle aux secteurs</em>. Elle dit qu'une banque est meilleure "
+        "que les autres banques ; elle ne dit jamais s'il faut détenir des "
+        "banques. Les 9 secteurs de la sélection finale en sont un résultat, "
+        "jamais une décision.",
+        "<strong>La vue macro de l'étape 2 ne descend donc pas jusqu'aux "
+        "secteurs, et c'est délibéré.</strong> Elle agit là où elle est "
+        "mesurable : sur la répartition entre classes d'actifs (étape 4). "
+        "C'est elle qui met le crédit à zéro parce que sa prime n'a été plus "
+        "basse que 2 % du temps en quarante ans, qui impose 15 % "
+        "d'obligations indexées contre le choc d'inflation, et qui ne retient "
+        "que 3,3 % d'or. Traduire en plus ce diagnostic en paris sectoriels "
+        "reviendrait à miser deux fois sur la même lecture : si elle se "
+        "trompe, elle se trompe sur l'allocation ET sur les titres. C'est le "
+        "même refus que celui qui fige la clé actions 40/35/10/15 plutôt que "
+        "de parier sur le yen — un pari assumé par portefeuille, pas trois.",
         source=f"core/scoring.py · composition iShares STOXX Europe 600 au "
                f"{d['date_composition'].iloc[0].replace('.', ' ')} · Yahoo "
                f"Finance, relevé du {taux.date_fr(actions.releve())}",

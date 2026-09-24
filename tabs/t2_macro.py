@@ -685,6 +685,16 @@ def _bloc_rendements() -> None:
         "fourchette. Reste à choisir les supports (étape 3), puis les "
         "proportions (étape 4)."
     )
+    st.markdown(
+        "**Où cette lecture agit, et où elle n'agit pas.** Ces rendements "
+        "espérés sont l'entrée directe du calcul de l'étape 4 : c'est cette "
+        "lecture macro qui décide des proportions entre classes d'actifs. "
+        "Elle ne descend en revanche **pas** jusqu'au choix des titres de "
+        "l'étape 3, dont la notation compare chaque société à son propre "
+        "secteur et reste donc aveugle aux secteurs. Ce n'est pas un oubli : "
+        "en tirer aussi des paris sectoriels reviendrait à miser deux fois "
+        "sur le même diagnostic. Un portefeuille, un pari."
+    )
 
 
 def _graphique_rendements(C: dict) -> None:
