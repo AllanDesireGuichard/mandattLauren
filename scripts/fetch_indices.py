@@ -73,7 +73,10 @@ EN_USD = {"VGK", "SPY", "EWJ", "EEM", "GLD", "DJP", "BTC-USD"}
 
 # classe : libellé, support réel (étape 3), source longue, ticker de contrôle
 CLASSES = {
-    "actions_europe": ("Actions européennes", "30 titres en direct",
+    # Pas de nombre dans ce libellé : il serait figé dans
+    # data/indices_longs.json et démentirait l'étape 3 au premier changement
+    # de sélection. L'onglet 4 le reconstruit depuis outlook.N_FINAL.
+    "actions_europe": ("Actions européennes", "titres en direct",
                        "Vanguard FTSE Europe (VGK), en euros", "panier"),
     "usa": ("Actions américaines", "XZMU", "SPDR S&P 500 (SPY), en euros",
             "XZMU.DE"),

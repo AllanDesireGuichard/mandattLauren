@@ -53,7 +53,7 @@
  "classes": {
   "actions_europe": {
    "libelle": "Actions européennes",
-   "support": "30 titres en direct",
+   "support": "titres en direct",
    "source": "Vanguard FTSE Europe (VGK), en euros",
    "debut": "2006-10-02",
    "controle_ticker": "panier",

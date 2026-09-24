@@ -110,6 +110,14 @@ FICHIER = Path(__file__).resolve().parents[1] / "data" / "actions" / "outlook.cs
 MAX_SECTEUR = 2
 MAX_PAYS = 4
 
+# Le nombre de titres retenus au second étage. Il vit ICI, dans le module qui
+# fait la sélection, et non dans l'onglet qui l'affiche : le 2026-09-24 il
+# était écrit dans tabs/t3_lignes.py, dans les deux valeurs par défaut
+# ci-dessous, et un « 30 » périmé traînait en plus dans le libellé de
+# data/indices_longs.json — l'onglet 3 annonçait 15 titres pendant que
+# l'onglet 4 en affichait 30.
+N_FINAL = 15
+
 # Au-delà de ce percentile de dispersion, l'avenir de la société est jugé
 # illisible. Seuil MESURÉ sur les titres retenus, pas fixé à la main : il
 # suit l'état du marché, comme scoring.plafond_volatilite.
@@ -249,7 +257,7 @@ def juger(sel: pd.DataFrame, x: pd.DataFrame) -> pd.DataFrame:
     return d.reset_index()
 
 
-def selectionner(d: pd.DataFrame, n: int = 15) -> pd.DataFrame:
+def selectionner(d: pd.DataFrame, n: int = N_FINAL) -> pd.DataFrame:
     """
     Les n titres retenus au second étage, parmi ceux qu'aucun garde-fou
     n'écarte, classés par note d'avenir et sous les plafonds resserrés.
@@ -271,6 +279,6 @@ def selectionner(d: pd.DataFrame, n: int = 15) -> pd.DataFrame:
     return d.loc[retenus]
 
 
-def final(sel: pd.DataFrame, n: int = 15) -> pd.DataFrame:
+def final(sel: pd.DataFrame, n: int = N_FINAL) -> pd.DataFrame:
     """Chaîne complète : les 30 jugés, puis les n retenus."""
     return selectionner(juger(sel, indicateurs()), n=n)

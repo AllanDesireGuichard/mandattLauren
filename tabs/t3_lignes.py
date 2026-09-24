@@ -29,7 +29,7 @@ from tabs import t3_credit, t3_fonds
 # Nombre de titres retenus au second étage. 15 est le résultat mesuré des
 # plafonds (2 par secteur, 4 par pays) appliqués aux 20 titres qui franchissent
 # les garde-fous : en demander 16 n'en donne pas davantage.
-NB_FINAL = 15
+NB_FINAL = outlook.N_FINAL
 
 # Ordre d'affichage des garde-fous, et surtout : liste EXHAUSTIVE. Les motifs
 # sont sinon déduits des titres écartés, et un garde-fou qui ne mord sur

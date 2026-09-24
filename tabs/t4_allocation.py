@@ -20,8 +20,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import (actions, allocation, fonds, ips, obligations, pedago,
-                  taux, viz)
+from core import (actions, allocation, fonds, ips, obligations, outlook,
+                  pedago, taux, viz)
 
 
 def _pct(v: float) -> str:
@@ -656,6 +656,11 @@ def _bloc_retenu() -> None:
         if x < 0.0005:
             continue
         sup = e.loc[k, "support"]
+        # Le nombre de titres vient de l'étape 3, pas du libellé figé dans
+        # data/indices_longs.json : il y était resté à 30 après le passage
+        # à 15, et cet onglet démentait l'onglet 3.
+        if k == "actions_europe":
+            sup = f"{outlook.N_FINAL} {sup}"
         if k in fonds_de:
             c = cl[k]
             sup = f"{c['retenu'].split('.')[0]} · {c['candidats'][c['retenu']]['nom']}"
