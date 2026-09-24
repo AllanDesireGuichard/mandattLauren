@@ -3,13 +3,16 @@
 
 Construit bloc par bloc, comme l'onglet 2. Blocs 1 et 2 (2026-09-18) :
 l'entonnoir et les exclusions, puis la notation des actions européennes et
-la sélection des 30 titres. Bloc 3 : les emprunts d'État en direct. Bloc 4
-(tabs/t3_fonds.py) : les fonds et ETF des autres classes. Bloc 5
+la sélection des 30 titres. Bloc 3 (2026-09-24) : ce que les analystes
+attendent, qui resserre les 30 en 15. Bloc 4 : les emprunts d'État en direct.
+Bloc 5 (tabs/t3_fonds.py) : les fonds et ETF des autres classes. Bloc 6
 (tabs/t3_credit.py) : le crédit.
 
-Décisions validées avec Allan : 30 titres ; grandes capitalisations
-(10 Md€ et plus) ; cinq piliers à poids égaux, dont « Résistance » ;
-exclusions par industrie + décisions nommées, chacune avec sa raison.
+Décisions validées avec Allan : grandes capitalisations (10 Md€ et plus) ;
+cinq piliers à poids égaux, dont « Résistance » ; exclusions par industrie +
+décisions nommées, chacune avec sa raison ; 30 titres sur le constaté, puis
+15 sur l'attendu (2026-09-24). Les attentes des analystes forment un étage
+SÉPARÉ et non un sixième pilier : les piliers classent, l'avenir élimine.
 """
 from __future__ import annotations
 
@@ -19,8 +22,14 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import actions, obligations, pedago, scoring, taux, viz
+from core import actions, obligations, outlook, pedago, scoring, taux, viz
 from tabs import t3_credit, t3_fonds
+
+
+# Nombre de titres retenus au second étage. 15 est le résultat mesuré des
+# plafonds (2 par secteur, 4 par pays) appliqués aux 20 titres qui franchissent
+# les garde-fous : en demander 16 n'en donne pas davantage.
+NB_FINAL = 15
 
 
 @st.cache_data(show_spinner="Notation des 600 titres…")
@@ -41,6 +50,7 @@ def render() -> None:
     d = _univers()
     _bloc_entonnoir(d)
     _bloc_notation(d)
+    _bloc_avenir(d)
     _bloc_souverains()
     t3_fonds.bloc()
     t3_credit.bloc()
@@ -51,6 +61,14 @@ def render() -> None:
 # Bloc 1 — l'entonnoir et les exclusions
 # --------------------------------------------------------------------------
 
+def court(nom: str) -> str:
+    """Nom sans forme juridique : « Thales S.A. » -> « Thales »."""
+    return re.sub(r"(,?\s+(plc|p\.l\.c\.|s\.a\.|s\.p\.a\.|sa|ag|se|n\.v\.|"
+                  r"asa|ab|\(publ\)|holdings?|société anonyme|"
+                  r"aktiengesellschaft))+\.?$", "", nom,
+                  flags=re.IGNORECASE).strip()
+
+
 def _bloc_entonnoir(d: pd.DataFrame) -> None:
     n = len(d)
     excl = d[d["exclusion"].notna()]
@@ -59,7 +77,7 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
     notes = d[d["note"].notna()]
     sel = actions.selection(d)
 
-    st.markdown("#### De 600 valeurs à 30 : l'entonnoir")
+    st.markdown(f"#### De 600 valeurs à {NB_FINAL} : l'entonnoir")
     st.markdown(
         "Point de départ : le **STOXX Europe 600**, les 600 plus grandes "
         "entreprises cotées d'Europe. On ne garde que les **grandes "
@@ -72,15 +90,9 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
         (f"− {len(inv)} non notables", "sociétés d'investissement"),
         (f"− {len(petites)} trop petites", "moins de 10 Md€"),
         (f"{len(notes)} notées", "sur cinq piliers"),
-        (f"{len(sel)} retenues", "les meilleures notes, diversifiées"),
+        (f"{len(sel)} présélectionnées", "les meilleures notes, diversifiées"),
+        (f"{NB_FINAL} retenues", "ce que les analystes attendent"),
     ])
-
-    def court(nom: str) -> str:
-        """Nom sans forme juridique : « Thales S.A. » -> « Thales »."""
-        return re.sub(r"(,?\s+(plc|p\.l\.c\.|s\.a\.|s\.p\.a\.|sa|ag|se|n\.v\.|"
-                      r"asa|ab|\(publ\)|holdings?|société anonyme|"
-                      r"aktiengesellschaft))+\.?$", "", nom,
-                      flags=re.IGNORECASE).strip()
 
     lignes = "\n".join(
         f"- **{motif.capitalize()} ({len(g)})** : "
@@ -128,7 +140,7 @@ def _pilier_fr(v: float) -> str:
 def _bloc_notation(d: pd.DataFrame) -> None:
     sel = actions.selection(d)
 
-    st.markdown("#### La notation et les 30 titres retenus")
+    st.markdown("#### La notation : les 30 titres présélectionnés")
     st.markdown(
         "Chaque société reçoit une note sur cinq piliers à poids égaux, en "
         "comparaison avec **les sociétés de son propre secteur** (une banque "
@@ -144,7 +156,7 @@ def _bloc_notation(d: pd.DataFrame) -> None:
                      Note=sel["note"].map(_pilier_fr))[
         ["Rang", "longName", "secteur", "pays", "Note"]]
     tab.columns = ["Rang", "Société", "Secteur", "Pays", "Note"]
-    st.markdown("**Les 30 titres retenus**")
+    st.markdown("**Les 30 titres présélectionnés**")
     st.table(tab.set_index("Rang"))
     st.caption(
         "Note : écart à la moyenne du secteur (0 = dans la moyenne, +1 = "
@@ -165,9 +177,6 @@ def _bloc_notation(d: pd.DataFrame) -> None:
         "qu'un seul thème (les mines d'or, par exemple) prenne toute la place."
     )
 
-    _fiche(d, sel)
-    _panier(sel)
-
     pedago.explique(
         "Comment la note est calculée",
         "Pour chaque indicateur (PER, marges, endettement, performance, "
@@ -183,78 +192,261 @@ def _bloc_notation(d: pd.DataFrame) -> None:
     )
 
 
-def _panier(sel: pd.DataFrame) -> None:
-    p = actions.panier_face_indice(sel)
-    a, b = p["panier"], p["indice"]
-    st.markdown("**Le panier face à l'indice : résiste-t-il mieux ?**")
+# --------------------------------------------------------------------------
+# Bloc 3 — ce que les analystes attendent, et le resserrement à 15 titres
+# --------------------------------------------------------------------------
+
+def _bloc_avenir(d: pd.DataFrame) -> None:
+    sel = actions.selection(d)
+    x = outlook.indicateurs()
+    j = outlook.juger(sel, x)
+    fin = outlook.selectionner(j, n=NB_FINAL)
+    retenus = set(fin["ticker"])
+
+    st.markdown(f"#### De 30 à {NB_FINAL} : ce que les analystes attendent")
+    st.markdown(
+        "Les cinq piliers mesurent ce que ces sociétés **sont** : leurs "
+        "comptes, leurs marges, leur comportement dans les crises passées. "
+        "Tout y est constaté. Reste la question qu'un gérant pose ensuite : "
+        "**où vont-elles ?** On interroge pour cela le consensus des "
+        "analystes qui suivent chaque titre — entre 5 et 25 selon la société."
+    )
+    st.markdown(
+        "Quatre mesures, et aucune n'est l'avis « acheter / conserver / "
+        "vendre » :\n"
+        "- **La révision** : de combien le bénéfice attendu a bougé en trois "
+        "mois. C'est le **sens** dans lequel le consensus se déplace ;\n"
+        "- **Le solde des révisions** : sur le dernier mois, quelle part des "
+        "analystes qui ont changé d'avis l'ont fait à la hausse ;\n"
+        "- **Le potentiel** : l'objectif de cours moyen, comparé au cours "
+        "d'aujourd'hui ;\n"
+        "- **La dispersion** : l'écart entre la prévision la plus optimiste "
+        "et la plus pessimiste. Elle mesure si l'avenir de la société est "
+        "**lisible**."
+    )
+    st.markdown(
+        "**Pourquoi écarter l'avis lui-même.** Il est presque toujours "
+        "positif — les analystes recommandent rarement de vendre — donc il "
+        "sépare mal. Et il manque purement et simplement sur 7 des 30 "
+        "sociétés, dont des groupes suivis par 14 à 16 analystes. En faire "
+        "un critère les écarterait pour une raison technique. Il est affiché "
+        "dans le tableau, il ne décide de rien."
+    )
+
+    _nuage(j, retenus)
+    _table_avenir(j, retenus)
+
+    ecartes = j[j["motif"].notna()]
+    par_motif = {}
+    for _, r in ecartes.iterrows():
+        par_motif.setdefault(r["motif"].split(" · ")[0], []).append(
+            court(r["longName"]))
+    st.markdown(
+        "**Ce qui fait sortir un titre.** Trois garde-fous, appliqués avant "
+        "tout classement :\n"
+        + "\n".join(
+            f"- **{m}** ({len(v)}) : " + ", ".join(sorted(v))
+            for m, v in par_motif.items())
+        + "\n\nLes autres sortants sont bien classés mais arrivent dans un "
+        "secteur ou un pays déjà complet."
+    )
+
+    seuil = outlook.plafond_dispersion(x)
+    pedago.explique(
+        "Les trois garde-fous, et ce qu'ils coûtent",
+        "<strong>Le cours au-dessus de l'objectif</strong> : si le consensus "
+        "voit le titre plus bas qu'il ne cote, on ne l'achète pas. Huit "
+        "sociétés sortent ainsi, dont Endesa — deuxième au classement des "
+        "cinq piliers, mais que 23 analystes voient reculer de 16 %.",
+        "<strong>Les prévisions en net recul</strong> : un bénéfice attendu "
+        "coupé de plus de 5 % en trois mois est un signal qu'on ne discute "
+        "pas. Norsk Hydro sort à −17 %, Rio Tinto à −5 %.",
+        "<strong>L'avenir illisible</strong> : quand les analystes ne "
+        "s'accordent pas sur le bénéfice à venir, la sélection n'a pas de "
+        f"prise. Au-delà de {viz.fr(seuil, '%', 0)} d'écart entre la "
+        "prévision la plus haute et la plus basse, le titre sort. Le seuil "
+        "n'est pas choisi : c'est le niveau des 10 % les plus dispersés. "
+        "Ce garde-fou vise surtout les pétrolières et les minières, dont le "
+        "bénéfice dépend d'un prix que personne ne sait prévoir — OMV "
+        "atteint 90 %, Rio Tinto 68 %.",
+        "<strong>Ce que ces règles coûtent, dit franchement</strong> : les "
+        "titres défensifs bien valorisés cotent souvent au-dessus de leur "
+        "objectif. Le premier garde-fou frappe donc surtout des services aux "
+        "collectivités et de la santé, et le panier resserré en ressort plus "
+        "agité que celui de 30 titres. Le chiffrage est juste en dessous.",
+        source=f"core/outlook.py · consensus Yahoo Finance, relevé du "
+               f"{taux.date_fr(outlook.releve())}",
+    )
+
+    _fiche(d, sel, j)
+    _panier(sel, fin)
+
+
+def _nuage(j: pd.DataFrame, retenus: set) -> None:
+    """Le constaté en abscisse, l'attendu en ordonnée : la décision en une image."""
+    fig = go.Figure()
+    for garde, nom, couleur in [
+            (False, f"Écartés ({len(j) - len(retenus)})", "#b9b7b1"),
+            (True, f"Retenus ({len(retenus)})", viz.CATEGORICAL[0])]:
+        g = j[j["ticker"].isin(retenus) == garde]
+        fig.add_trace(go.Scatter(
+            x=g["note"], y=g["note_avenir"], name=nom, mode="markers+text",
+            marker={"size": 11, "color": couleur,
+                    "line": {"width": 1, "color": viz.SURFACE}},
+            text=[court(n) for n in g["longName"]],
+            textposition="top center",
+            textfont={"size": 9, "color": viz.INK_2 if garde else "#8f8d88"},
+            customdata=g[["revision", "potentiel", "dispersion"]],
+            hovertemplate="<b>%{text}</b><br>Note des cinq piliers : %{x:.2f}"
+                          "<br>Note d'avenir : %{y:.2f}"
+                          "<br>Révision : %{customdata[0]:.1f} %"
+                          "<br>Potentiel : %{customdata[1]:.1f} %"
+                          "<br>Dispersion : %{customdata[2]:.0f} %<extra></extra>"))
+    fig.add_hline(y=0, line={"color": viz.INK_2, "width": 1, "dash": "dot"})
+    fig.update_layout(**viz.layout(
+        "Ce que les sociétés sont (abscisse) et ce qu'on en attend (ordonnée)",
+        height=460,
+        xaxis={"gridcolor": viz.GRID, "title": "Note des cinq piliers"},
+        yaxis={"gridcolor": viz.GRID, "title": "Note d'avenir"}))
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+    st.markdown(
+        "**Lecture.**\n"
+        "- **En haut** : le consensus se redresse. **En bas** : il se "
+        "dégrade. La ligne pointillée est le point mort.\n"
+        "- **À droite** : les mieux notées sur le passé et le présent.\n"
+        "- Les deux mesures ne se recouvrent pas — c'est tout l'intérêt de "
+        "poser la seconde question. argenx est la mieux notée des trente "
+        "**et** bien orientée : elle est retenue sans discussion. Endesa est "
+        "deuxième au classement et bien orientée elle aussi, mais elle cote "
+        "au-dessus de son objectif : elle sort.\n"
+        "- Un point en bas à droite est le piège que cette étape sert à "
+        "éviter : une société qui a tout pour elle **sauf** la suite."
+    )
+
+
+def _table_avenir(j: pd.DataFrame, retenus: set) -> None:
+    t = j.sort_values("note_avenir", ascending=False)
+    tab = pd.DataFrame({
+        "Société": [court(n) for n in t["longName"]],
+        "Note": t["note"].map(_pilier_fr),
+        "Suivi par": t["analystes"].map(
+            lambda v: "—" if pd.isna(v) else f"{int(v)} analystes"),
+        "Avis": t["avis"],
+        "Révision": t["revision"].map(lambda v: viz.fr(v, "%", 1)),
+        "Solde": t["solde"].map(lambda v: viz.fr(v, "%", 0)),
+        "Potentiel": t["potentiel"].map(lambda v: viz.fr(v, "%", 1)),
+        "Dispersion": t["dispersion"].map(lambda v: viz.fr(v, "%", 0)),
+        "Avenir": t["note_avenir"].map(_pilier_fr),
+        "Retenu": ["Oui" if k in retenus else "—" for k in t["ticker"]],
+        "Motif de sortie": t["motif"].fillna("—"),
+    })
+    st.markdown("**Les 30 présélectionnés, classés sur l'avenir**")
+    st.table(tab.set_index("Société"))
+    st.caption(
+        "Révision : variation du bénéfice attendu sur trois mois. Solde : "
+        "part des révisions du dernier mois qui vont à la hausse, tenue pour "
+        "neutre en dessous de trois révisions — sur une seule, elle ne "
+        "pourrait valoir que −100 ou +100 %. Potentiel : objectif de cours "
+        "moyen comparé au cours. Dispersion : écart entre la prévision la "
+        "plus haute et la plus basse. La note d'avenir ne retient que la "
+        "révision et le solde ; le potentiel et la dispersion servent de "
+        f"garde-fous. Au plus {outlook.MAX_SECTEUR} titres par secteur et "
+        f"{outlook.MAX_PAYS} par pays."
+    )
+
+
+def _panier(sel: pd.DataFrame, fin: pd.DataFrame) -> None:
+    """
+    Ce que le resserrement change, chiffré. Les deux paniers sont construits
+    à parts égales et en euros, et comparés à l'indice. La comparaison est
+    volontairement montrée dans les deux sens : resserrer coûte du risque, et
+    le dossier le dit plutôt que de le laisser trouver.
+    """
+    p30 = actions.panier_face_indice(sel)
+    p15 = actions.panier_face_indice(fin)
+    a, b, ind = p15["panier"], p30["panier"], p30["indice"]
+
+    st.markdown("**Ce que le resserrement change : les deux paniers face à "
+                "l'indice**")
     st.markdown(
         "Plus la poche d'actions baisse modérément en crise, plus on peut en "
-        "détenir sous la limite de 15 %. D'où la comparaison des 30 titres, à "
-        "parts égales et en euros, avec l'indice."
+        "détenir sous la limite de 15 %. Passer de 30 à "
+        f"{len(fin)} titres doit donc être payé, ou gagné, en risque — voici "
+        "le prix."
     )
-    c = st.columns(3)
-    c[0].metric("Volatilité sur 3 ans", viz.fr(a["vol_3a"], "%", 1),
-                f"indice : {viz.fr(b['vol_3a'], '%', 1)}", delta_color="off")
-    c[1].metric("Perte maximale en 2020", viz.fr(a["dd_2020"], "%", 1),
-                f"indice : {viz.fr(b['dd_2020'], '%', 1)}", delta_color="off")
-    c[2].metric("Perte maximale en 2022", viz.fr(a["dd_2022"], "%", 1),
-                f"indice : {viz.fr(b['dd_2022'], '%', 1)}", delta_color="off")
+    mesures = [("Volatilité sur 3 ans", "vol_3a"),
+               ("Perte maximale en 2020", "dd_2020"),
+               ("Perte maximale en 2022", "dd_2022")]
+    st.table(pd.DataFrame(
+        [[viz.fr(src[cle], "%", 1) for _, cle in mesures]
+         for src in (a, b, ind)],
+        index=[f"Les {len(fin)} retenus", "Les 30 présélectionnés",
+               "Indice STOXX Europe 600"],
+        columns=[nom for nom, _ in mesures]))
 
-    lecture = []
-    lecture.append("moins agité que l'indice au quotidien" if a["vol_3a"] < b["vol_3a"]
-                   else "plus agité que l'indice au quotidien")
-    for an in ("2020", "2022"):
-        ecart = a[f"dd_{an}"] - b[f"dd_{an}"]
-        if abs(ecart) < 1:
-            lecture.append(f"à égalité avec lui en {an}")
-        elif ecart > 0:
-            lecture.append(f"a mieux résisté en {an} "
-                           f"({viz.fr(ecart, 'points', 1)} de perte en moins)")
-        else:
-            lecture.append(f"a davantage baissé en {an} "
-                           f"({viz.fr(-ecart, 'points', 1)} de perte en plus)")
+    ecart_vol = a["vol_3a"] - b["vol_3a"]
+    ecart_2020 = a["dd_2020"] - b["dd_2020"]
     st.markdown(
-        "**Lecture.** Le panier est " + ", ".join(lecture[:-1]) + " et "
-        + lecture[-1] + ". Mais il perd bien plus que 15 % en crise : c'est "
-        "le dosage avec les obligations et l'or, à l'étape 4, qui tiendra la "
+        f"**Lecture.** Resserrer à {len(fin)} titres rend le panier "
+        f"**{viz.fr(abs(ecart_vol), 'point', 2)} "
+        + ("plus" if ecart_vol > 0 else "moins")
+        + " agité** au quotidien et lui fait perdre "
+        f"**{viz.fr(abs(ecart_2020), 'points', 1)} de "
+        + ("plus" if ecart_2020 < 0 else "moins")
+        + " en 2020**. La raison est identifiable : le garde-fou de "
+        "l'objectif de cours frappe surtout les valeurs **défensives**, qui "
+        "cotent souvent au-dessus de leur cible quand elles sont chères — "
+        "des services aux collectivités et de la santé. Chercher l'avenir "
+        "coûte de la protection, c'est un arbitrage assumé.\n\n"
+        "Il reste moins agité que l'indice, et l'ordre de grandeur compte : "
+        "les actions européennes pèsent environ un huitième du portefeuille "
+        "final, si bien que cet écart y vaut moins d'un cinquième de point. "
+        "Le panier perd de toute façon bien plus que 15 % en crise : c'est le "
+        "dosage avec les obligations et l'or, à l'étape 4, qui tiendra la "
         "limite."
     )
 
     fig = go.Figure()
-    for cle, nom, couleur in [("indice", "STOXX Europe 600", viz.CATEGORICAL[1]),
-                              ("panier", "Les 30 titres retenus",
-                               viz.CATEGORICAL[0])]:
-        s = p["series"][cle]
+    series = [("indice", p30, "STOXX Europe 600", viz.CATEGORICAL[1]),
+              ("panier", p30, "Les 30 présélectionnés", "#b9b7b1"),
+              ("panier", p15, f"Les {len(fin)} retenus", viz.CATEGORICAL[0])]
+    for cle, src, nom, couleur in series:
+        s = src["series"][cle]
         s = s / s.iloc[0] * 100
         fig.add_trace(go.Scatter(
             x=s.index, y=s, name=nom, mode="lines",
             line={"color": couleur, "width": 2},
             hovertemplate=f"{nom} : %{{y:.0f}}<extra></extra>"))
     fig.update_layout(**viz.layout(
-        "Les 30 titres et l'indice depuis 2019, en euros (base 100)",
+        "Les deux paniers et l'indice depuis 2019, en euros (base 100)",
         height=380, hovermode="x unified",
         yaxis={"gridcolor": viz.GRID}, xaxis={"gridcolor": viz.GRID}))
     st.plotly_chart(fig, width="stretch")
     st.caption(
         "Ce graphique ne mesure pas la méthode : les titres ont été choisis "
-        "aujourd'hui, leur passé est flatteur par construction. Il ne sert "
-        "qu'à vérifier leur comportement en crise."
+        "aujourd'hui, leur passé est flatteur par construction — et le "
+        "resserrement repose sur des attentes d'analystes d'aujourd'hui, qui "
+        "n'existaient pas en 2019. Il ne sert qu'à vérifier le comportement "
+        "des deux paniers en crise."
     )
 
 
-def _fiche(d: pd.DataFrame, sel: pd.DataFrame) -> None:
+def _fiche(d: pd.DataFrame, sel: pd.DataFrame, j: pd.DataFrame) -> None:
     st.markdown("**Fiche par titre**")
     options = list(sel["ticker"])
     noms = dict(zip(sel["ticker"], sel["longName"]))
     t = st.selectbox("Choisir une société", options,
                      format_func=lambda k: noms[k], key="fiche_titre")
     r = d[d["ticker"] == t].iloc[0]
+    a = j[j["ticker"] == t].iloc[0]
     secteur = d[(d["secteur"] == r["secteur"]) & d["note"].notna()]
 
     rang_sect = int((secteur["note"] > r["note"]).sum()) + 1
+    verdict = (f"écartée — {a['motif'].lower()}" if pd.notna(a["motif"])
+               else "retenue au second étage")
     st.markdown(f"**{r['longName']}** · {r['secteur']} · {r['pays']} — note "
                 f"**{_pilier_fr(r['note'])}**, {rang_sect}e sur "
-                f"{len(secteur)} dans son secteur.")
+                f"{len(secteur)} dans son secteur. {verdict.capitalize()}.")
     fig = go.Figure(go.Bar(
         x=[r[p] for p in scoring.PILIERS], y=scoring.PILIERS,
         orientation="h",
@@ -272,6 +464,67 @@ def _fiche(d: pd.DataFrame, sel: pd.DataFrame) -> None:
         xaxis={"gridcolor": viz.GRID, "range": [-3, 3.5]},
         yaxis={"autorange": "reversed"}, showlegend=False))
     st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+    _attentes(a)
+
+
+def _attentes(a: pd.Series) -> None:
+    """Ce que les analystes attendent du titre affiché dans la fiche."""
+    dev = "p" if a["devise_cours"] == "GBp" else a["devise_cours"]
+    n = "—" if pd.isna(a["analystes"]) else f"{int(a['analystes'])}"
+    st.markdown(
+        f"**Ce que les analystes attendent** — {n} suivent la société, "
+        f"avis moyen : {a['avis'].lower()}."
+    )
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=[a["cible_basse"], a["cible_haute"]], y=["Objectif", "Objectif"],
+        mode="lines", line={"color": "#b9b7b1", "width": 6},
+        hoverinfo="skip", showlegend=False))
+    for val, nom, couleur, pos in [
+            (a["cible_basse"], "Plus bas", "#b9b7b1", "bottom center"),
+            (a["cible_haute"], "Plus haut", "#b9b7b1", "bottom center"),
+            (a["cible"], "Objectif moyen", viz.CATEGORICAL[0], "top center"),
+            (a["cours"], "Cours du jour", viz.CATEGORICAL[1], "top center")]:
+        fig.add_trace(go.Scatter(
+            x=[val], y=["Objectif"], mode="markers+text", name=nom,
+            marker={"size": 13, "color": couleur,
+                    "line": {"width": 1, "color": viz.SURFACE}},
+            text=[f"{nom}<br>{viz.fr(val, dev, 2)}"], textposition=pos,
+            textfont={"size": 10, "color": viz.INK_2}, showlegend=False,
+            hovertemplate=f"{nom} : {viz.fr(val, dev, 2)}<extra></extra>"))
+    marge = (a["cible_haute"] - a["cible_basse"]) * 0.35 or 1
+    fig.update_layout(**viz.layout(
+        "Le cours d'aujourd'hui face aux objectifs des analystes",
+        height=210,
+        xaxis={"gridcolor": viz.GRID,
+               "range": [min(a["cible_basse"], a["cours"]) - marge,
+                         max(a["cible_haute"], a["cours"]) + marge]},
+        yaxis={"showgrid": False, "showticklabels": False}))
+    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
+
+    sens = "relevé" if a["revision"] >= 0 else "abaissé"
+    nrev = int(a["revisions_30j"])
+    solde = (f"sur {nrev} révisions du dernier mois, "
+             f"{viz.fr(a['solde'], '%', 0)} vont à la hausse"
+             if nrev >= outlook.REVISIONS_MIN else
+             f"une seule révision le dernier mois" if nrev == 1 else
+             f"{nrev} révisions le dernier mois, trop peu pour conclure"
+             if nrev else "aucune révision le dernier mois")
+    st.markdown(
+        f"- Le bénéfice attendu a été **{sens} de "
+        f"{viz.fr(abs(a['revision']), '%', 1)}** en trois mois ; {solde}.\n"
+        f"- L'objectif moyen est **{viz.fr(a['potentiel'], '%', 1)}** "
+        "au-dessus du cours."
+        if a["potentiel"] >= 0 else
+        f"- Le bénéfice attendu a été **{sens} de "
+        f"{viz.fr(abs(a['revision']), '%', 1)}** en trois mois ; {solde}.\n"
+        f"- Le cours est **{viz.fr(abs(a['potentiel']), '%', 1)} au-dessus** "
+        "de l'objectif moyen."
+    )
+    st.markdown(
+        f"- Les analystes s'écartent de **{viz.fr(a['dispersion'], '%', 0)}** "
+        "entre leur prévision la plus haute et la plus basse."
+    )
 
 
 # --------------------------------------------------------------------------
@@ -415,7 +668,7 @@ def _suite() -> None:
     cr = json.loads((racine / "fonds_credit.json").read_text(encoding="utf-8"))
     st.markdown("#### Conclusion de l'étape 3 : un support par classe")
     lignes = [
-        ("Actions européennes", "30 titres en direct", "—"),
+        ("Actions européennes", f"{NB_FINAL} titres en direct", "—"),
         ("Emprunts d'État, 10 M€ à décaisser",
          "Échelle AAA en direct, 6 à 24 mois", "—"),
         ("Emprunts d'État, poche longue",
