@@ -170,6 +170,11 @@ def main() -> None:
         "semaines": semaines,
     }
 
+    # Les plafonds sont exportés plutôt que recopiés dans le deck : la slide
+    # des règles doit pouvoir dire lesquels sont SATURÉS et lesquels ne le
+    # sont pas — c'est ce qui explique le 3,3 % d'or (plafond 10 %).
+    out["plafonds"] = {k: v * 100 for k, v in allocation.PLAFONDS.items()}
+
     res = allocation.resultats()
     out["scenarios"] = {n: {"rdt": x["rendement_espere"], "pire": x["pire_baisse"],
                             "poids": _poids_par_ligne(x["poids"]),
