@@ -13,6 +13,20 @@ La pire baisse n'est pas une fonction lisse des poids : on part de plusieurs
 points de départ tirés au hasard et on garde le meilleur résultat qui
 respecte la limite. Tirage fixé (graine 0) : le résultat est reproductible.
 
+LES DÉPARTS SONT ADMISSIBLES PAR CONSTRUCTION — corrigé le 2026-09-24.
+Ils étaient tirés par un Dirichlet uniforme, qui ignore les bornes : il pose
+en moyenne 14 % sur chaque support alors que les matières premières plafonnent
+à 5 %, l'or à 10 %, les indexées à 15 %. MESURÉ : 3 tirages sur 200
+respectaient les bornes, et UN SEUL DÉPART SUR SEIZE aboutissait à une
+solution admissible. Trois graines sur huit n'en trouvaient aucune et le
+script levait « aucun portefeuille ne respecte la limite » — le résultat du
+dossier tenait à un départ heureux.
+`depart()` remplit désormais les bornes par capacité disponible, puis on ne
+garde que les tirages qui respectent AUSSI la limite de baisse, et on ajoute
+un point d'ancrage déterministe très obligataire qui la respecte toujours.
+L'optimum trouvé est inchangé : les cinq graines qui convergeaient donnaient
+déjà le même (or entre 3,30 et 3,48 %, rendement 5,31 % à l'identique).
+
 SCÉNARIOS. Le bloc 3 montre le calcul libre, puis l'éprouve : on abaisse
 un rendement espéré d'un demi-point (dans la marge d'erreur de l'étape 2),
 puis le Japon jusqu'au niveau des États-Unis. CONSTAT (2026-09-18) : la
@@ -38,19 +52,102 @@ sys.path.insert(0, str(RACINE))
 from core import allocation  # noqa: E402
 
 DEPARTS = 16
+# Tirages autorisés pour obtenir DEPARTS points admissibles. Le plafond évite
+# une boucle sans fin si la limite de baisse est si serrée qu'aucun tirage ne
+# passe : on part alors du seul point d'ancrage, et la suite le dira.
+TIRAGES_MAX = 400
+
+
+def depart(rng: np.random.Generator,
+           bornes: list[tuple[float, float]]) -> np.ndarray:
+    """
+    Un portefeuille tiré au hasard qui respecte les bornes, par construction.
+
+    On pose d'abord chaque poids à son minimum, puis on distribue le reste au
+    hasard en ne donnant à chaque support que ce qu'il peut encore prendre.
+    Ce qui déborde d'un plafond est redistribué au tour suivant.
+    """
+    lo = np.array([b[0] for b in bornes])
+    hi = np.array([b[1] for b in bornes])
+    w = lo.copy()
+    for _ in range(50):
+        reste = 1.0 - w.sum()
+        if reste <= 1e-12:
+            break
+        capacite = hi - w
+        libre = capacite > 1e-12
+        if not libre.any():
+            break
+        part = np.zeros_like(w)
+        part[libre] = rng.dirichlet(np.ones(int(libre.sum())))
+        w = w + np.minimum(reste * part, capacite)
+    return w / w.sum()
+
+
+def ancrage(bornes: list[tuple[float, float]],
+            cles: list[str]) -> np.ndarray:
+    """
+    Un départ déterministe qui respecte toujours la limite de baisse : tout le
+    minimum imposé, puis le reste sur l'échelle AAA de 6 à 24 mois, le seul
+    support à la fois sans plafond et vraiment peu risqué. Il garantit
+    qu'`optimiser` a toujours au moins un point admissible d'où partir.
+
+    PAS les emprunts d'État 2-10 ans, qui semblaient le choix naturel :
+    mesuré le 2026-09-24, 100 % de ce support perd 15,29 % sur 2006-2026,
+    soit au-delà de la limite du mandat. L'ancrage aurait été inadmissible.
+    L'échelle AAA perd 7,09 %.
+    """
+    w = np.array([b[0] for b in bornes])
+    w[cles.index("etats_courts")] += 1.0 - w.sum()
+    return w
+
+
+def ramener(chemin: allocation.Chemin, w: np.ndarray, ancre: np.ndarray,
+            limite: float) -> np.ndarray:
+    """
+    Ramène dans le domaine un portefeuille qui dépasse la limite de peu.
+
+    SLSQP s'arrête à la tolérance près, et on acceptait le résultat avec
+    5e-4 de marge : le portefeuille retenu ressortait à -14,05 % pour une
+    limite de -14 %, et c'est ce chiffre qui partait dans le dossier. On le
+    mélange donc à l'ancrage — un portefeuille très peu risqué — dans la
+    plus petite proportion qui suffit à respecter la limite. Le mélange de
+    deux points d'une boîte reste dans la boîte : les bornes tiennent.
+    """
+    if chemin.pire_baisse(w) >= -limite:
+        return w
+    bas, haut = 0.0, 1.0
+    for _ in range(40):
+        m = (bas + haut) / 2
+        if chemin.pire_baisse((1 - m) * w + m * ancre) >= -limite:
+            haut = m
+        else:
+            bas = m
+    return (1 - haut) * w + haut * ancre
 
 
 def optimiser(chemin: allocation.Chemin, mu: np.ndarray,
-              bornes: list[tuple[float, float]], limite: float) -> np.ndarray:
-    n = len(mu)
+              bornes: list[tuple[float, float]], limite: float,
+              cles: list[str]) -> np.ndarray:
     contraintes = [
         {"type": "eq", "fun": lambda w: w.sum() - 1},
         {"type": "ineq", "fun": lambda w: limite + chemin.pire_baisse(w)},
     ]
     rng = np.random.default_rng(0)
+
+    # Les points de départ : l'ancrage, puis des tirages qui respectent les
+    # bornes ET la limite de baisse. SLSQP ne sait pas revenir dans le domaine
+    # quand il en part — c'est ce qui faisait échouer 15 départs sur 16.
+    departs = [ancrage(bornes, cles)]
+    for _ in range(TIRAGES_MAX):
+        if len(departs) >= DEPARTS:
+            break
+        w0 = depart(rng, bornes)
+        if chemin.pire_baisse(w0) >= -limite:
+            departs.append(w0)
+
     meilleur = None
-    for _ in range(DEPARTS):
-        w0 = rng.dirichlet(np.ones(n))
+    for w0 in departs:
         r = minimize(lambda w: -w @ mu, w0, method="SLSQP", bounds=bornes,
                      constraints=contraintes,
                      options={"maxiter": 400, "ftol": 1e-9})
@@ -58,6 +155,10 @@ def optimiser(chemin: allocation.Chemin, mu: np.ndarray,
         w = w / w.sum()
         if chemin.pire_baisse(w) < -limite - 5e-4:
             continue
+        # Le candidat est dans la tolérance de SLSQP, pas forcément dans la
+        # limite : on l'y ramène avant de le comparer, sinon on compare des
+        # rendements obtenus sous des risques différents.
+        w = ramener(chemin, w, departs[0], limite)
         if meilleur is None or w @ mu > meilleur @ mu:
             meilleur = w
     if meilleur is None:
@@ -100,7 +201,7 @@ def main() -> int:
     scenarios = {}
     t0 = time.time()
 
-    w = optimiser(chemin, mu, libre, lim)
+    w = optimiser(chemin, mu, libre, lim, cles)
     scenarios["libre"] = decrire(
         "Calcul libre", cles, w, mu, s,
         "Seule exigence : ne jamais perdre plus de 15 % depuis le plus haut.")
@@ -118,7 +219,7 @@ def main() -> int:
                           ("moins_indexees", "indexees", -0.5)):
         mu2 = mu.copy()
         mu2[cles.index(k)] += delta
-        w = optimiser(chemin, mu2, libre, lim)
+        w = optimiser(chemin, mu2, libre, lim, cles)
         scenarios[nom] = decrire(
             f"Calcul libre, {e.loc[k, 'classe'].lower()} à "
             f"{mu2[cles.index(k)]:.2f} %", cles, w, mu2, s,
@@ -136,7 +237,7 @@ def main() -> int:
     etapes = []
     b = list(libre)
     b[cles.index("etats_courts")] = (allocation.MIN_AAA, 1.0)
-    w = optimiser(chemin, mu, b, lim)
+    w = optimiser(chemin, mu, b, lim, cles)
     scenarios["r1_aaa"] = decrire("+ les 10 M€ en AAA", cles, w, mu, s,
                                   "Au moins 10 % sur l'échelle AAA.")
     etapes.append("r1_aaa")
@@ -165,7 +266,7 @@ def main() -> int:
         ("r4_marge", "+ la marge de sécurité", "Pire baisse visée : 14 % au "
          "lieu de 15 %.", True, allocation.LIMITE_MARGE),
     ):
-        w = optimiser(ch2, mu2, bornes(plaf), limite)
+        w = optimiser(ch2, mu2, bornes(plaf), limite, cles2)
         scenarios[nom] = decrire(lib, cles2, w, mu2, s2, note)
         scenarios[nom]["limite"] = limite
         etapes.append(nom)

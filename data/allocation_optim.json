@@ -1,5 +1,5 @@
 {
- "releve": "2026-09-18",
+ "releve": "2026-09-24",
  "limite": 0.15,
  "etapes": [
   "r1_aaa",
@@ -71,7 +71,7 @@
    "rendement_espere": 6.321,
    "pire_baisse": -15.0,
    "sommet": "2020-02-06",
-   "creux": "2020-03-18",
+   "creux": "2020-03-16",
    "crises": {
     "2008": -12.5,
     "2011": -13.1,
@@ -102,8 +102,8 @@
    },
    "rendement_espere": 5.894,
    "pire_baisse": -15.0,
-   "sommet": "2022-03-07",
-   "creux": "2022-10-19",
+   "sommet": "2020-02-17",
+   "creux": "2020-03-18",
    "crises": {
     "2008": -10.6,
     "2011": -12.8,
@@ -126,16 +126,16 @@
     "japon": 0.3258,
     "emergents": 0.0,
     "etats_courts": 0.0,
-    "etats_longs": 0.0764,
+    "etats_longs": 0.0763,
     "credit_court": 0.0392,
-    "indexees": 0.5203,
-    "or": 0.0383,
+    "indexees": 0.5202,
+    "or": 0.0384,
     "matieres": 0.0
    },
    "rendement_espere": 6.204,
    "pire_baisse": -15.0,
-   "sommet": "2020-02-13",
-   "creux": "2020-03-16",
+   "sommet": "2007-02-26",
+   "creux": "2008-10-10",
    "crises": {
     "2008": -15.0,
     "2011": -12.0,
@@ -216,7 +216,7 @@
    "rendement_espere": 5.4,
    "pire_baisse": -15.0,
    "sommet": "2007-10-29",
-   "creux": "2009-03-09",
+   "creux": "2008-12-08",
    "crises": {
     "2008": -15.0,
     "2011": -7.1,
