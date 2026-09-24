@@ -31,6 +31,12 @@ from tabs import t3_credit, t3_fonds
 # les garde-fous : en demander 16 n'en donne pas davantage.
 NB_FINAL = 15
 
+# Ordre d'affichage des garde-fous, et surtout : liste EXHAUSTIVE. Les motifs
+# sont sinon déduits des titres écartés, et un garde-fou qui ne mord sur
+# personne disparaîtrait silencieusement de la page.
+ORDRE_MOTIFS = ("Cours au-dessus de la cible sans relais des bénéfices",
+                "Prévisions en net recul", "Avenir illisible")
+
 
 @st.cache_data(show_spinner="Notation des 600 titres…")
 def _univers() -> pd.DataFrame:
@@ -237,16 +243,25 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
     _table_avenir(j, retenus)
 
     ecartes = j[j["motif"].notna()]
+    # Chaque titre compte sous TOUS les motifs qui s'appliquent, pas sous le
+    # premier : `juger` les accumule volontairement (Rio Tinto cumule un
+    # consensus en recul et un avenir illisible), n'en montrer qu'un donnerait
+    # une raison plus faible que la réalité.
     par_motif = {}
     for _, r in ecartes.iterrows():
-        par_motif.setdefault(r["motif"].split(" · ")[0], []).append(
-            court(r["longName"]))
+        for m in r["motif"].split(" · "):
+            par_motif.setdefault(m, []).append(court(r["longName"]))
+    # Un garde-fou qui n'écarte personne doit être annoncé quand même : son
+    # zéro est un résultat, pas un oubli. C'est le cas du premier au relevé
+    # du 2026-09-24 (voir le docstring de core/outlook.py).
+    lignes = []
+    for m in ORDRE_MOTIFS:
+        v = par_motif.get(m, [])
+        lignes.append(f"- **{m}** ({len(v)}) : " + (", ".join(sorted(v))
+                      if v else "_aucun titre au relevé du jour_"))
     st.markdown(
         "**Ce qui fait sortir un titre.** Trois garde-fous, appliqués avant "
-        "tout classement :\n"
-        + "\n".join(
-            f"- **{m}** ({len(v)}) : " + ", ".join(sorted(v))
-            for m, v in par_motif.items())
+        "tout classement :\n" + "\n".join(lignes)
         + "\n\nLes autres sortants sont bien classés mais arrivent dans un "
         "secteur ou un pays déjà complet."
     )
@@ -254,10 +269,17 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
     seuil = outlook.plafond_dispersion(x)
     pedago.explique(
         "Les trois garde-fous, et ce qu'ils coûtent",
-        "<strong>Le cours au-dessus de l'objectif</strong> : si le consensus "
-        "voit le titre plus bas qu'il ne cote, on ne l'achète pas. Huit "
-        "sociétés sortent ainsi, dont Endesa — deuxième au classement des "
-        "cinq piliers, mais que 23 analystes voient reculer de 16 %.",
+        "<strong>Le cours au-dessus de l'objectif, sans relais des "
+        "bénéfices</strong> : coter plus haut que son objectif de cours ne "
+        "suffit pas à faire sortir un titre, car l'objectif est lent — "
+        "l'analyste relève son estimation de bénéfice d'abord, et ne remonte "
+        "sa cible qu'ensuite. Un cours au-dessus de la cible signale donc "
+        "souvent une hausse récente que le consensus n'a pas encore "
+        "rattrapée. Le titre ne sort que si les bénéfices attendus ne suivent "
+        "pas. <strong>Au relevé du jour, aucune société n'est dans ce "
+        "cas</strong> : les huit qui cotent au-dessus de leur objectif ont "
+        "toutes un bénéfice attendu en hausse — Endesa +1,8 %, Orion +6,4 %, "
+        "Vår Energi +7,3 %.",
         "<strong>Les prévisions en net recul</strong> : un bénéfice attendu "
         "coupé de plus de 5 % en trois mois est un signal qu'on ne discute "
         "pas. Norsk Hydro sort à −17 %, Rio Tinto à −5 %.",
@@ -269,11 +291,11 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
         "Ce garde-fou vise surtout les pétrolières et les minières, dont le "
         "bénéfice dépend d'un prix que personne ne sait prévoir — OMV "
         "atteint 90 %, Rio Tinto 68 %.",
-        "<strong>Ce que ces règles coûtent, dit franchement</strong> : les "
-        "titres défensifs bien valorisés cotent souvent au-dessus de leur "
-        "objectif. Le premier garde-fou frappe donc surtout des services aux "
-        "collectivités et de la santé, et le panier resserré en ressort plus "
-        "agité que celui de 30 titres. Le chiffrage est juste en dessous.",
+        "<strong>Ce que ces règles coûtent, dit franchement</strong> : même "
+        "sans écarter personne à tort, resserrer trente titres en quinze "
+        "enlève de la diversification, et le panier resserré en ressort plus "
+        "agité que celui de trente. C'est le prix du choix, pas une erreur de "
+        "réglage. Le chiffrage est juste en dessous.",
         source=f"core/outlook.py · consensus Yahoo Finance, relevé du "
                f"{taux.date_fr(outlook.releve())}",
     )
@@ -317,10 +339,14 @@ def _nuage(j: pd.DataFrame, retenus: set) -> None:
         "- Les deux mesures ne se recouvrent pas — c'est tout l'intérêt de "
         "poser la seconde question. argenx est la mieux notée des trente "
         "**et** bien orientée : elle est retenue sans discussion. Endesa est "
-        "deuxième au classement et bien orientée elle aussi, mais elle cote "
-        "au-dessus de son objectif : elle sort.\n"
+        "deuxième au classement et mieux orientée encore ; elle cote pourtant "
+        "16 % au-dessus de son objectif de cours, parce que ses bénéfices "
+        "attendus montent plus vite que la cible des analystes.\n"
         "- Un point en bas à droite est le piège que cette étape sert à "
-        "éviter : une société qui a tout pour elle **sauf** la suite."
+        "éviter : une société qui a tout pour elle **sauf** la suite. "
+        "United Utilities est cinquième des trente sur les cinq piliers et "
+        "dernière sur l'avenir — son bénéfice attendu recule de 2 % et aucun "
+        "analyste ne relève. Elle ne passe pas."
     )
 
 

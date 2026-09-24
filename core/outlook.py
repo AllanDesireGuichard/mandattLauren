@@ -32,14 +32,46 @@ POURQUOI CES QUATRE INDICATEURS, et pas l'avis « acheter / conserver / vendre �
                   et non à l'effectif d'analystes, et tenue pour neutre en
                   dessous de trois révisions (voir `indicateurs`) ;
     potentiel     objectif de cours consensus rapporté au cours. Sert en
-                  GARDE-FOU, pas en score : un cours au-dessus de la cible est
-                  un signal franc, la valeur exacte du potentiel ne l'est pas ;
+                  GARDE-FOU, pas en score : la valeur exacte du potentiel n'est
+                  pas un signal, mais un cours au-dessus de la cible ET des
+                  bénéfices qui ne suivent pas en est un (voir plus bas) ;
     dispersion    écart entre l'estimation la plus haute et la plus basse,
                   rapporté à la moyenne. Mesure à quel point l'avenir de la
                   société est lisible. Sert aussi en garde-fou : elle est
                   structurellement sectorielle (une pétrolière dépend d'un
                   prix que personne ne prévoit), donc la noter reviendrait à
                   noter le secteur.
+
+POURQUOI LE GARDE-FOU DU POTENTIEL EST CONDITIONNEL, révision d'Allan du
+2026-09-24. Il excluait tout titre cotant au-dessus de son objectif. Il
+disait donc l'inverse de ce que ce module explique deux paragraphes plus
+haut : si la cible bouge plus lentement que le cours — c'est l'argument qui
+sert à écarter le potentiel du score — alors un potentiel NÉGATIF signale
+d'abord une hausse récente, et une cible qui n'a pas rattrapé son retard.
+
+MESURÉ SUR LE RELEVÉ DU 2026-09-24, et c'est sans appel : les HUIT titres
+cotant au-dessus de leur objectif ont TOUS un bénéfice attendu révisé à la
+HAUSSE. Endesa +1,8 %, EMS-Chemie +3,0 %, Evolution +2,0 %, OMV +10,8 %,
+Equinor +4,0 %, Orion +6,4 %, Sabadell +2,7 %, Vår Energi +7,3 %. OMV a la
+deuxième meilleure révision des trente et sortait pour un objectif périmé.
+L'ordre est celui qu'on attend d'un consensus : l'analyste relève son BPA
+d'abord, son objectif de cours suit avec du retard. La règle ne sanctionnait
+donc pas la cherté, elle sanctionnait la bonne dynamique bénéficiaire.
+
+LA RÈGLE RETENUE. Un objectif dépassé n'est un avertissement que si les
+bénéfices ne suivent pas : `potentiel < 0` ET `revision <= 0`. Le garde-fou
+reste — une société chère dont le consensus stagne doit sortir — mais il ne
+mord plus sur le cas inverse. Sur le relevé du 2026-09-24 il n'écarte AUCUN
+titre, et ce zéro est le résultat : il n'y a pas, aujourd'hui, de société
+au-dessus de sa cible sans bénéfices pour la justifier.
+
+CE QUE LE CHANGEMENT A COÛTÉ ET RAPPORTÉ, mesuré sur le panier à 15 :
+  règle d'avant  vol 11,72 %  2020 -37,3 %  2022 -13,4 %   8 secteurs, 6 pays
+  règle retenue  vol 11,49 %  2020 -37,8 %  2022 -12,5 %   9 secteurs, 8 pays
+Entrent Endesa, Orion et Vår Energi ; sortent Carrefour, Iberdrola et Ipsen.
+Les deux seuils intermédiaires essayés (tolérer 5 % puis 10 % de dépassement)
+faisaient à peu près aussi bien, mais leur seuil ne répond à aucune question :
+celui-ci en pose une.
 
 DEVISES : les quatre sont des ratios, la devise s'annule dans chacun. Aucun
 ne mélange un montant publié (« financialCurrency », le dollar pour argenx et
@@ -201,8 +233,13 @@ def juger(sel: pd.DataFrame, x: pd.DataFrame) -> pd.DataFrame:
     # Tous les motifs qui s'appliquent, pas seulement le premier : Rio Tinto
     # cumule un consensus en recul et une dispersion de 68 %, et n'afficher
     # que l'un des deux donnerait une raison plus faible que la réalité.
+    # Conditionnel, et non plus `potentiel < 0` seul : un objectif dépassé
+    # n'est un avertissement que si le bénéfice attendu ne suit pas. Voir le
+    # docstring du module — les huit titres concernés au 2026-09-24 étaient
+    # tous révisés à la hausse, la règle d'avant écartait la bonne dynamique.
     griefs = {
-        "Cours au-dessus de la cible": d["potentiel"] < 0,
+        "Cours au-dessus de la cible sans relais des bénéfices":
+            (d["potentiel"] < 0) & (d["revision"] <= 0),
         "Prévisions en net recul": d["revision"] < REVISION_MIN,
         "Avenir illisible": d["dispersion"] > seuil,
         "Attentes indisponibles": d["revision"].isna() | d["potentiel"].isna(),
