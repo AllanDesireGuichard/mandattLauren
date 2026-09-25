@@ -33,16 +33,6 @@ def _cell(d: dict | None) -> list | None:
     return None if d is None else [d["valeur"], d["avant"]]
 
 
-def _poids_par_ligne(po: dict) -> dict:
-    """Poche actions éclatée selon la clé 40/35/10/15."""
-    o = dict(po)
-    pc = o.pop("poche_actions", None)
-    if pc is not None:
-        for k, m in allocation.MIX_ACTIONS.items():
-            o[k] = pc * m
-    return o
-
-
 def main() -> None:
     out: dict = {}
 
@@ -187,11 +177,14 @@ def main() -> None:
     }
 
     cl = fonds.charger()["classes"]
-    out["fonds"] = [(cl[k]["libelle"], cl[k]["retenu"].split(".")[0],
-                     cl[k]["candidats"][cl[k]["retenu"]]["nom"],
-                     cl[k]["candidats"][cl[k]["retenu"]]["frais"],
-                     cl[k]["candidats"][cl[k]["retenu"]]["taille"])
-                    for k in fonds.ORDRE]
+    # fonds.ORDRE ne contient plus le bitcoin depuis le 2026-09-25 : build.js
+    # retirait « IB1T » à la main de cette liste, ce qui marchait tant que
+    # personne ne changeait le ticker. La décision « pas de crypto » vit
+    # maintenant dans core/fonds.
+    out["fonds"] = [(x["libelle"], x["ticker"].split(".")[0], x["nom"],
+                     x["frais"], x["taille"], x["statut"])
+                    for x in fonds.exclusions(cl)]
+    out["fonds_non_conformes"] = [x["ticker"] for x in fonds.non_conformes(cl)]
     out["xzem_ecart"] = cl["emergents"]["candidats"][cl["emergents"]["retenu"]]["ecart_moyen"]
     fc = json.loads((RACINE / "data" / "fonds_credit.json").read_text(encoding="utf-8"))
     q = fc["fonds"][fc["retenu"]]
@@ -206,6 +199,7 @@ def main() -> None:
     e = allocation.entrees()
     out["entrees"] = [(k, e.loc[k, "classe"], e.loc[k, "rendement"])
                       for k in e.index if not e.loc[k, "hors_calcul"]]
+    out["panier_rdt"] = allocation.rendement_panier()
     s = allocation.series_risque()
     pe = allocation.pertes_crises(s)
     pend, _ = allocation.pendant_la_baisse(s)
@@ -235,11 +229,23 @@ def main() -> None:
                       "min_aaa": allocation.MIN_AAA * 100}
 
     res = allocation.resultats()
-    out["scenarios"] = {n: {"rdt": x["rendement_espere"], "pire": x["pire_baisse"],
-                            "poids": _poids_par_ligne(x["poids"]),
-                            "variante": x.get("variante")}
-                        for n, x in res["scenarios"].items()}
+    # Le rendement de chaque scénario est RECALCULÉ aux rendements espérés du
+    # jour, comme dans l'application : celui inscrit dans
+    # data/allocation_optim.json date de l'optimisation, et le deck annonçait
+    # donc un rendement qui ne suivait pas la sélection de la poche actions.
+    # Les trois scénarios d'épreuve (japon, indexées) ont été calculés avec un
+    # rendement MODIFIÉ : pour eux on garde le chiffre inscrit, qui est le seul
+    # cohérent avec leurs poids.
+    vifs = ["libre"] + res["etapes"]
+    out["scenarios"] = {
+        n: {"rdt": (allocation.rendement(x["poids"], e) if n in vifs
+                    else x["rendement_espere"]),
+            "pire": x["pire_baisse"],
+            "poids": allocation.par_ligne(x["poids"]),
+            "variante": x.get("variante")}
+        for n, x in res["scenarios"].items()}
     out["realise"] = res["scenarios"][allocation.RETENU]["realise"]
+    out["optim"] = allocation.controle_optimisation(e)
 
     w = allocation.poids_retenus()
     out["retenu"] = w
@@ -258,9 +264,8 @@ def main() -> None:
     # qui lui reste. Le deck comparait un rendement brut à un seuil net.
     out["frais_inst"] = out["frais_total"] / allocation.MONTANT * 100
     out["frais_mandat"] = ips.FRAIS_MANDAT * 100
-    out["net"] = ips.rendement_net(
-        res["scenarios"][allocation.RETENU]["rendement_espere"],
-        out["frais_inst"])
+    out["net"] = ips.rendement_net(allocation.rendement_retenu(e),
+                                   out["frais_inst"])
     out["seuil"] = ips.INFLATION_TARGET * 100
 
     # --- étape 5 : backtests --------------------------------------------

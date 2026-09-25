@@ -267,6 +267,33 @@ def _bloc_var(d: dict) -> None:
         f"95 % repose sur une poignée d'épisodes, celle à 99 % sur un seul. "
         f"Ce ne sont pas des prévisions."
     )
+
+    # La chaîne se terminait sans conclusion, quand les étapes 2, 3 et 4 en ont
+    # une. C'est la dernière chose que le lecteur voit : elle doit refermer les
+    # cinq étapes, pas seulement le dernier tableau.
+    st.markdown("#### Conclusion de l'étape 5")
+    ep = d["ep"]
+    plus_longue = max(backtests.mois(a, b) for a, b in
+                      zip(ep["sommet"], ep["retour"]) if pd.notna(b))
+    st.markdown(
+        f"Le portefeuille de l'étape 4, rejoué sur vingt ans, tient la limite "
+        f"— pire baisse {_pct(-d['t']['pire'])} depuis le plus haut — mais "
+        f"c'était **acquis d'avance** : la contrainte a été posée sur ces "
+        f"mêmes données. Ce que le rejeu apprend, lui, ne l'était pas : une "
+        f"baisse peut durer **{_mois(plus_longue)}** avant que le patrimoine "
+        f"retrouve son plus haut, le portefeuille passe "
+        f"{_pct(d['t']['5'], 0)} du temps à plus de 5 % sous son sommet, et "
+        f"une année glissante sur "
+        f"{round(100 / max((r < infl).mean() * 100, 1e-9))} ne bat pas "
+        f"l'inflation de son époque. Les trois sont à dire au client avant "
+        f"qu'il les découvre."
+    )
+    st.caption(
+        "Fin de la chaîne : l'énoncé (1), les rendements espérés (2), les "
+        "supports (3), les proportions (4), le rejeu (5). Aucun chiffre "
+        "n'apparaît avant l'étape qui le calcule — c'est la règle de "
+        "construction de l'application."
+    )
 def _graphique_annees(r: pd.Series, v95: float, c95: float) -> None:
     fig = go.Figure()
     fig.add_trace(go.Histogram(

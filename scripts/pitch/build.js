@@ -1,4 +1,5 @@
-// Pitch oral du mandat Lauren — 41 slides, speech client dans les notes.
+// Pitch oral du mandat Lauren : un fil principal court, le détail en annexes.
+// Le speech client est dans les notes de chaque slide.
 // Lit data.json (PYTHONPATH=. python3 scripts/pitch/extraire.py), puis :
 //   cd scripts/pitch && npm install && npm run build
 // Sortie : outputs/Mandat_Lauren_pitch_genere.pptx. Depuis la bascule du
@@ -400,17 +401,6 @@ dark("Analyse ligne à ligne", "Avec quoi investir : des titres en direct pour l
   s.addNotes(`Une précision de méthode, et j'insiste dessus parce qu'elle sépare deux choses que l'on confond souvent. Les exclusions tabac, armement et charbon sont des contraintes du client : elles sont subies, non négociables, et leur respect se constate. Ce que vous voyez ici est l'inverse : c'est notre décision de gérant, assumée et révisable, et c'est à nous de la défendre. D'où une slide séparée. POURQUOI UNE EXCLUSION ET NON UN MALUS DANS LA NOTE, si on me le demande : parce que le signe d'un malus n'est pas déterminé. Dire que les gérants sous-pondèrent l'automobile justifie aussi bien de la vendre, si le consensus a raison, que de l'acheter, puisqu'elle est devenue bon marché parce qu'elle est détestée. Nos cinq piliers disent d'ailleurs exactement ces deux choses à la fois : sur les constructeurs, la Dynamique sort à moins 0,58 quand la Valorisation sort à plus 0,62, et la note finale ressort à la médiane de l'univers. La note ne rate donc pas la difficulté du secteur — le momentum médian des constructeurs est à moins 15,9 % quand l'univers est à plus 15,5 % — elle juge qu'elle est DÉJÀ PAYÉE par le prix. Retrancher un malus reviendrait à casser cette compensation sans le dire. Une exclusion déclarée, elle, est datée, motivée, et son coût se mesure. DERNIER POINT, et je le dis avant qu'on me le demande : la colonne de droite dit ce que NOS données pensent de chaque thèse, y compris quand elles la contredisent. Sur la chimie de spécialité, elles la contredisent — quinze titres, milieu de classement. La vue y anticipe une dégradation que les chiffres n'enregistrent pas encore, et c'est aussi le seul cas qui nous coûte un titre. C'est écrit dans le tableau plutôt que caché.`);
 }
 
-{
-  const s = base(3, `Les ${D.entonnoir.sel} présélectionnés`, { kicker: "Premier étage : ce que les sociétés SONT · note = écart à la moyenne du secteur (+1 = nettement meilleure)", source: "Composition iShares STOXX Europe 600 · données Yahoo Finance relevées en septembre 2026" });
-  const t = D.trente;
-  const name = (n) => n.replace(/,?\s+(plc|p\.l\.c\.|s\.a\.|s\.p\.a\.|sa|ag|se|n\.v\.|asa|ab|\(publ\)|holdings?|société anonyme|aktiengesellschaft|group|limited|oyj|a\/s)\.?$/i, "").replace(/,?\s+(plc|s\.a\.|ag|se|sa|n\.v\.)\.?$/i, "");
-  const half = (a) => [["#", "Société", "Secteur", "Pays", "Note"], ...a.map((r, i) => [String(r.i + 1), name(r[0]).slice(0, 30), r[1], r[2], "+" + fr(r[3], 2)])];
-  const rows = t.map((r, i) => Object.assign([...r], { i }));
-  const cw = [0.35, 2.35, 1.75, 1.0, 0.6];
-  table(s, half(rows.slice(0, 15)), M, 1.55, 6.05, cw, { fontSize: 9.5, rowH: 0.305 });
-  table(s, half(rows.slice(15)), 6.68, 1.55, 6.05, cw, { fontSize: 9.5, rowH: 0.305 });
-  s.addNotes(`Voici les ${D.entonnoir.sel} titres que la notation retient : ils couvrent ${Object.keys(D.secteurs30).length} secteurs sur 11. Ce n'est PAS encore le portefeuille — c'est le premier étage, celui du constaté : bilan, marges, valorisation, comportement en crise. Tout y est mesuré sur le passé et le présent. La slide suivante pose la question d'après, celle de l'avenir, et resserre ces ${D.entonnoir.sel} en ${D.entonnoir.final}. La sélection ne ressemble pas à l'indice, et c'est voulu : la note ignore la taille des sociétés, elle ne regarde que leurs qualités face à leurs concurrentes. Je peux ouvrir la fiche de n'importe quel titre dans l'application.`);
-}
 
 {
   // Deuxième étage, ajouté au deck le 2026-09-25 : il existait dans
@@ -492,39 +482,36 @@ dark("Analyse ligne à ligne", "Avec quoi investir : des titres en direct pour l
 
 {
   const s = base(3, "Les autres classes : les meilleurs fonds", { kicker: "Exclusions conformes au mandat  →  taille d'au moins 1 Md€  →  frais les plus bas", source: "justETF, Yahoo, méthodologies MSCI lues le 18/09/2026 · « Screened » écarté : il n'exclut pas l'armement conventionnel" });
-  const rows = [["Classe", "Fonds retenu", "Frais / an", "Taille"]];
-  D.fonds.filter((f) => f[1] !== "IB1T").forEach(([cl, t, nom, fr_, tl]) => rows.push([cl, `${t} · ${nom.replace(" UCITS ETF", "").replace(" EUR (Acc)", "").replace(" 1C", "")}`, pct(fr_, 2), fr(tl / 1000, 1) + " Md€"]));
+  // La colonne « Exclusions » est la PREMIÈRE des trois règles de sélection et
+  // n'était affichée nulle part : le deck annonçait la conformité en
+  // sous-titre sans jamais la montrer fonds par fonds. « Sans objet » veut
+  // dire qu'il n'y a aucune action d'entreprise à filtrer (États, or,
+  // contrats à terme), pas que rien n'a été vérifié.
+  if (D.fonds_non_conformes.length) throw new Error("fonds retenus non conformes aux exclusions : " + D.fonds_non_conformes.join(", "));
+  const EX = { conforme: "Conforme", "sans objet": "Sans objet" };
+  const rows = [["Classe", "Fonds retenu", "Exclusions", "Frais / an", "Taille"]];
+  D.fonds.forEach(([cl, t, nom, fr_, tl, ex]) => rows.push([cl, `${t} · ${nom.replace(" UCITS ETF", "").replace(" EUR (Acc)", "").replace(" 1C", "")}`, EX[ex] || ex, pct(fr_, 2), fr(tl / 1000, 1) + " Md€"]));
   const cf = D.credit_fonds;
-  rows.push(["Crédit euro bien noté, court", `${cf.ticker} · ${cf.nom.replace(" UCITS ETF EUR (Dist)", "")}`, pct(cf.frais, 2), fr(cf.taille / 1000, 1) + " Md€"]);
-  table(s, rows, M, 1.6, 8.3, [2.6, 3.9, 0.9, 0.9], { fontSize: 11.5, rowH: 0.48, bold1: true });
+  rows.push(["Crédit euro bien noté, court", `${cf.ticker} · ${cf.nom.replace(" UCITS ETF EUR (Dist)", "")}`, "Conforme", pct(cf.frais, 2), fr(cf.taille / 1000, 1) + " Md€"]);
+  table(s, rows, M, 1.6, 8.3, [2.4, 3.1, 1.0, 0.9, 0.9], { fontSize: 11.5, rowH: 0.48, bold1: true });
   para(s, 9.2, 1.6, 3.55, 5.2, bullets([
+    "**Aucun fonds non conforme retenu** : *sans objet* = ni action ni entreprise à filtrer (États, or, contrats à terme)",
     "**États-Unis et Japon séparés**, plutôt qu'un fonds Monde qui recompterait l'Europe",
     `**Émergents** : le seul fonds conforme s'écarte du marché (${sgn(D.xzem_ecart, 1)} par an sur 7 ans) — écart annoncé au client`,
     "**Infrastructure retirée** : aucun fonds à la fois assez gros et conforme",
-    "**Neuf libellés faux** corrigés dans l'univers de départ",
-  ]), 12.5, { paraSpaceAfter: 9 });
+    "**Pas de fonds Bitcoin** : la décision est de ne pas en détenir",
+  ]), 12, { paraSpaceAfter: 7 });
   s.addNotes("Pour les autres classes, on passe par des fonds cotés, choisis selon une règle simple : d'abord des exclusions conformes au mandat, puis une taille d'au moins un milliard, pour ne jamais peser plus de 1 % d'un fonds, et enfin les frais les plus bas. Point de vigilance : un filtre ESG dit « Screened » n'exclut pas l'armement conventionnel, alors que nous l'avons exclu des actions en direct ; nous avons donc lu les méthodologies d'indices et retenu des indices plus stricts. Conséquence pour les émergents : le seul fonds conforme s'éloigne nettement du marché, écart que nous annoncerons au client. L'infrastructure a été retirée : aucun fonds n'était à la fois assez gros et conforme. Enfin, en revérifiant l'univers de départ, nous avons trouvé neuf fonds mal libellés, dont un fonds d'actions américaines présenté comme de la dette émergente.");
 }
 
-{
-  const cf = D.credit_fonds;
-  const s = base(3, "Le crédit court rapporte à peine plus que l'État", { kicker: `Fonds retenu : ${cf.ticker}, obligations d'entreprises bien notées, durée ${fr(cf.duree)} an`, source: "Fiches iShares · courbe BCE (État de même échéance) · pertes sur défauts : Moody's" });
-  stat(s, M, 1.8, 3.8, "+0,24 pt", "de plus qu'un État de même échéance (0,13 pt après défauts)", FAM.eta, 44);
-  stat(s, 4.75, 1.8, 3.8, `${pct(cf.dd2020)}`, `en 2020, contre ${pct(cf.etat2020)} pour l'État de même durée`, NEG, 44);
-  stat(s, 8.9, 1.8, 3.8, "3,39 %", "rendement retenu pour l'étape 4, défauts déduits", INK, 44);
-  const rr = [["Haut rendement euro", RC.hy_euro.c], ["Crédit court retenu", 3.39], ["États zone euro 2-10 ans", D.souverains.rdt_long], ["Crédit, indice toutes durées", RC.credit_ig_eur.c]];
-  s.addChart(pres.charts.BAR, [{ name: "Rendement", labels: rr.map((r) => r[0]), values: rr.map((r) => r[1]) }],
-    { ...chartBase("Rendement espéré, défauts déduits"), x: M, y: 3.75, w: 7.2, h: 3.1, barDir: "bar", chartColors: [FAM.eta], showValue: true, dataLabelFormatCode: '0.00" %"', dataLabelPosition: "outEnd", valAxisHidden: true, valGridLine: { style: "none" }, valAxisMinVal: 0, valAxisMaxVal: 5, showLegend: false, barGapWidthPct: 40, catAxisOrientation: "maxMin" });
-  callout(s, 8.2, 3.9, 4.53, 2.9, "Le haut rendement rapporte, défauts déduits, **moins que les États**. Le crédit court, **moins que l'échelle d'États 2-10 ans** : sa place sera au mieux modeste.", INK, 15);
-  s.addNotes("Le crédit mérite une slide, parce que le résultat est contre-intuitif. Le haut rendement, une fois les défauts déduits, rapporte moins que les États : écarté. Le crédit bien noté court ne rapporte que 0,24 point de plus qu'un État de même échéance, et il a perdu trois fois plus en 2020. Défauts déduits, il rapporte 3,39 %, moins que notre échelle d'emprunts d'État. On le garde dans l'univers, mais on verra à l'étape 4 que le calcul lui donne zéro, à raison.");
-}
 
 // ================================================================ SECTION 4
 dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 % sans jamais perdre plus de 15 %", { num: "4" })
   .addNotes("Quatrième étape, le cœur de l'exercice : combien placer sur chaque support.");
 
 {
-  const s = base(4, "Seules les actions et les indexées dépassent 4 %", { kicker: "Rendement espéré de chaque support : étape 2, corrigé de ce que l'étape 3 a appris", source: "Actions européennes : rendement de l'indice (le panier n'est pas supposé battre son marché)" });
+  const PR = D.panier_rdt;
+  const s = base(4, "Seules les actions et les indexées dépassent 4 %", { kicker: "Rendement espéré de chaque support : étape 2, corrigé de ce que l'étape 3 a appris", source: `Actions européennes : ${pct(PR.central, 2)}, mesuré sur les ${PR.n} titres retenus — 1/PER ${pct(PR.m1_reel, 2)}, dividende ${pct(PR.dividende, 2)} + croissance ${pct(PR.croissance, 2)}, plus ${pct(PR.inflation, 0)} d'inflation` });
   const nm = { actions_europe: "Actions Europe", usa: "Actions États-Unis", japon: "Actions Japon", emergents: "Actions émergentes", etats_courts: "Échelle AAA (10 M€)", etats_longs: "États 2-10 ans", credit_court: "Crédit court", indexees: "Indexées", or: "Or", matieres: "Matières premières" };
   const rows = D.entrees.slice().sort((a, b) => a[2] - b[2]);
   s.addChart(pres.charts.BAR, [
@@ -534,7 +521,9 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
   card(s, 8.3, 1.6, 4.43, 2.9);
   s.addText("La règle de perte", { x: 8.55, y: 1.72, w: 4, h: 0.4, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
   para(s, 8.55, 2.15, 4.0, 2.3, bullets(["Mesurée **depuis le plus haut**", "Sur **les 100 M€** ensemble", "Jamais au-delà de 15 % dans **2008, 2011, 2020, 2022**", "**Pas de crypto**"]), 13.5, { paraSpaceAfter: 6 });
-  callout(s, 8.3, 4.75, 4.43, 2.05, "Chaque euro placé en obligations ou en or devra être **compensé par des actions** : c'est la tension entre 4 % et 15 %.", INK, 14);
+  callout(s, 8.3, 4.75, 4.43, 1.25, "Chaque euro placé en obligations ou en or devra être **compensé par des actions** : c'est la tension entre 4 % et 15 %.", INK, 14);
+  // Le seul rendement espéré qui ne vient pas de l'indice de sa classe.
+  para(s, 8.3, 6.15, 4.43, 0.8, rich(`**Actions Europe : ${pct(PR.central, 2)} mesuré sur les ${PR.n} titres retenus**, pas sur l'indice — même méthode, appliquée au panier qu'on achète.`), 12);
   s.addNotes("Le calcul a besoin de trois ingrédients. La règle : la perte se mesure depuis le plus haut, sur les 100 millions, et ne doit jamais dépasser 15 % dans les quatre crises de référence. Les rendements espérés : seules les actions et les obligations indexées dépassent 4 %. Tout le reste rapporte moins : chaque euro placé en obligations devra être compensé par des actions. Et le troisième ingrédient, c'est le comportement de chaque support en crise, sur vingt ans. Or la plupart des fonds datent de 2018 : avant, on utilise un remplaçant qui suit le même marché, et pour les États une obligation recalculée sur la courbe de la BCE.");
 }
 
@@ -551,56 +540,6 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
   s.addNotes(`Deuxième ingrédient : le comportement en crise. Les actions perdent jusqu'à ${pct(-pa, 0)} en 2008. Sans amortisseur, on ne pourrait donc pas en détenir plus de ${pct(15 / -pa * 100, 0)}. Pour aller au-delà, il faut des supports qui montent quand les actions baissent. En 2008, sur la fenêtre de crise, les emprunts d'État gagnent ${pct(D.perf_crises.etats_longs['2008'])} et l'or ${pct(D.perf_crises.or['2008'])} : ils amortissent. Mais en 2022, crise d'inflation, les obligations baissent avec les actions : plus d'amortisseur. C'est le régime décrit à l'étape 2. L'or est le seul qui tienne partout. Parce que ce lien change d'une crise à l'autre, le calcul ne s'appuie pas sur une corrélation moyenne : il fait traverser à chaque portefeuille les vingt années, jour après jour.`);
 }
 
-{
-  // Matrices de corrélation. Échelle divergente du référentiel dataviz :
-  // pôle froid / gris neutre / pôle chaud, bornée à ±80 pour que le gris
-  // tombe exactement sur zéro. Diagonale retirée : elle vaut 100 partout,
-  // n'apprend rien et écraserait l'échelle.
-  const s = base(4, "Les mêmes supports, mais quand ça tangue", { kicker: "Corrélation des variations hebdomadaires : 100 = ils font la même chose, 0 = indépendants, négatif = l'un monte quand l'autre baisse", source: "Séries quotidiennes en euros, octobre 2006 - septembre 2026 · crises : les quatre fenêtres datées · bitcoin écarté (cotations depuis 2014 seulement)" });
-  const C = D.corr;
-  const LONG = { poche_actions: "Poche actions", etats_courts: "Échelle AAA", etats_longs: "États 2-10 ans", credit_court: "Crédit court", indexees: "Obligations indexées", or: "Or", matieres: "Matières premières" };
-  const COURT = { poche_actions: "Act.", etats_courts: "AAA", etats_longs: "2-10", credit_court: "Créd.", indexees: "Idx.", or: "Or", matieres: "Mat." };
-  const RAMPE = ["2a78d6", "6097de", "90b5e4", "c0d2e9", "f0efec", "f3cfc0", "f3af95", "f18d68", "eb6834"];
-  const BORNE = 80;
-
-  const teinte = (v) => {
-    const t = Math.min(1, Math.max(0, (v + BORNE) / (2 * BORNE))) * (RAMPE.length - 1);
-    const i = Math.min(RAMPE.length - 2, Math.floor(t)), f = t - i;
-    const mix = (a, b) => Math.round(parseInt(a, 16) + (parseInt(b, 16) - parseInt(a, 16)) * f).toString(16).padStart(2, "0");
-    const A = RAMPE[i], B = RAMPE[i + 1];
-    return mix(A.slice(0, 2), B.slice(0, 2)) + mix(A.slice(2, 4), B.slice(2, 4)) + mix(A.slice(4, 6), B.slice(4, 6));
-  };
-
-  const matrice = (m, x, titre, sous) => {
-    s.addText([{ text: titre, options: { bold: true, color: INK } }, { text: "   " + sous, options: { color: MUTED, fontSize: 11 } }],
-      { x, y: 1.52, w: 5.9, h: 0.3, fontFace: BF, fontSize: 13.5, margin: 0, isTextBox: true });
-    const entete = ["", ...C.ordre.map((k) => COURT[k])];
-    const corps = C.ordre.map((k, i) => [LONG[k], ...C.ordre.map((_, j) => (
-      i === j ? { text: "", options: { fill: { color: WHITE } } }
-              : { text: fr(m[i][j], 0), options: { fill: { color: teinte(m[i][j]) }, color: TEXT } }))]);
-    table(s, [entete, ...corps], x, 1.85, 5.9, [1.7, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
-      { fontSize: 10.5, rowH: 0.4, bold1: true, alignRight: true, zebra: false });
-  };
-  matrice(C.hors, M, "Hors crise", `${C.semaines.hors_crise} semaines`);
-  matrice(C.crise, M + 6.23, "En crise", `${C.semaines.en_crise} semaines`);
-
-  const ix = (k) => C.ordre.indexOf(k);
-  const a = ix("poche_actions");
-  const cor = (v) => (v > 0 ? "+" : "") + fr(v, 0);
-  const av = (k) => cor(C.hors[a][ix(k)]), ap = (k) => cor(C.crise[a][ix(k)]);
-  const ent = (i, j) => cor(C[i][ix(j[0])][ix(j[1])]);
-  card(s, M, 5.32, W - 2 * M, 1.55);
-  para(s, M + 0.25, 5.45, 5.75, 1.35, bullets([
-    `**L'échelle AAA** passe de ${av("etats_courts")} à ${ap("etats_courts")} face aux actions, **l'or** de ${av("or")} à ${ap("or")} : les deux amortisseurs se déclenchent au bon moment`,
-    `**Les matières premières** restent à ${ap("matieres")} : elles diversifient peu, d'où leur place réduite`,
-  ]), 13, { paraSpaceAfter: 7 });
-  para(s, M + 6.35, 5.45, 5.5, 1.35, bullets([
-    `**Le revers** : entre eux, crédit court et indexées passent de ${ent("hors", ["credit_court", "indexees"])} à ${ent("crise", ["credit_court", "indexees"])}, États courts et longs de ${ent("hors", ["etats_courts", "etats_longs"])} à ${ent("crise", ["etats_courts", "etats_longs"])}`,
-    "Le coussin **se resserre sur lui-même** : d'où le refus de le concentrer sur une seule maturité",
-  ]), 13, { paraSpaceAfter: 7 });
-
-  s.addNotes(`Un mot sur la corrélation, parce que la question vient toujours. À gauche, les semaines ordinaires ; à droite, les seules semaines de crise. Deux chiffres comptent. L'échelle AAA était à ${av("etats_courts")} face aux actions en temps normal : indépendante. En crise elle passe à ${ap("etats_courts")} : elle monte quand les actions chutent. L'or fait le même chemin, de ${av("or")} à ${ap("or")}. Voilà pourquoi on garde de l'or malgré un rendement espéré de 4 % seulement : on ne l'achète pas pour son rendement, on l'achète pour ce qu'il fait ce jour-là. À l'inverse, les matières premières restent à ${ap("matieres")} : elles diversifient peu, et c'est pour ça qu'elles ont une place réduite. Et je veux être honnête sur le revers, parce qu'on me le demanderait sinon : la poche défensive, elle, se resserre. Crédit court et indexées passent de ${ent("hors", ["credit_court", "indexees"])} à ${ent("crise", ["credit_court", "indexees"])} entre eux. Autrement dit les amortisseurs deviennent un seul pari au moment où on compte sur eux. C'est exactement la raison pour laquelle on ne met pas tout le défensif sur la même maturité, et pourquoi le calcul de la page suivante ne travaille pas sur une corrélation moyenne, mais fait traverser au portefeuille les vingt années jour après jour.`);
-}
 {
   const s = base(4, "Le calcul libre apprend le passé par cœur", { kicker: "La répartition qui rapporte le plus, avec une seule exigence : jamais plus de 15 % de baisse sur 2006-2026" });
   const L = LIB.poids;
@@ -942,5 +881,82 @@ dark("Backtests", "Le portefeuille rejoué de 2006 à aujourd'hui : combien de t
   callout(s, M, 6.0, W - 2 * M, 0.9, `**Et la contrainte qui commande n'est pas macro.** Sur dix bornes, deux mordent — le plancher de ${pct(D.limites.min_aaa, 0)} en AAA et le plafond de ${pct(D.plafonds.indexees, 0)} sur les indexées. Ce qui borne vraiment le portefeuille, c'est la **limite de perte**, atteinte à ${pct(R4.pire, 2)}.`, CARD, 12.5);
   s.addNotes(`Annexe technique sur le lien entre l'étape 2 et l'étape 4, parce que le dossier annonce que chaque étape nourrit la suivante et qu'il faut pouvoir dire par quel canal. La lecture macro ne choisit aucun poids : elle fixe les rendements espérés de chaque classe, et c'est le calcul qui les convertit en poids sous la limite de perte. La distinction n'est pas cosmétique, elle explique pourquoi une erreur de diagnostic macro ne déforme pas le portefeuille dans les mêmes proportions. Ce qu'elle tranche : combien d'actions au total, par les rendements espérés des quatre zones ; et combien d'obligations indexées, puisque l'inflation de l'énoncé les porte au meilleur rendement obligataire du tableau et que le calcul sature leur plafond de quinze pour cent. Ce qu'elle ne tranche pas : la zone d'actions, figée par la clé quarante trente-cinq dix quinze précisément pour que la vue de zone ne devienne pas un pari ; et le secteur, puisque la note de l'étape trois compare chaque société à son propre secteur et se trouve aveugle aux secteurs par construction. UNE FORMULATION QUE J'AI CORRIGÉE, si elle figure encore quelque part : le crédit à zéro n'est PAS une décision macro. C'est une mesure de marché de l'étape trois — trois virgule trente-neuf pour cent défauts déduits, contre trois virgule soixante-trois pour les emprunts d'État. Enfin, la contrainte qui commande tout le reste n'est pas macro non plus : sur dix bornes du problème, deux seulement mordent, le plancher AAA et le plafond des indexées. L'or s'arrête à trois virgule trois pour cent pour un plafond de dix. Ce qui borne vraiment le portefeuille, c'est la limite de perte, atteinte exactement à la valeur visée.`);
 }
+
+{
+  const s = base(0, `Annexe J — Les ${D.entonnoir.sel} présélectionnés, un par un`, { kicker: "Pour les questions techniques · premier étage : ce que les sociétés SONT · note = écart à la moyenne du secteur (+1 = nettement meilleure)", source: "Composition iShares STOXX Europe 600 · données Yahoo Finance relevées en septembre 2026" });
+  const t = D.trente;
+  const name = (n) => n.replace(/,?\s+(plc|p\.l\.c\.|s\.a\.|s\.p\.a\.|sa|ag|se|n\.v\.|asa|ab|\(publ\)|holdings?|société anonyme|aktiengesellschaft|group|limited|oyj|a\/s)\.?$/i, "").replace(/,?\s+(plc|s\.a\.|ag|se|sa|n\.v\.)\.?$/i, "");
+  const half = (a) => [["#", "Société", "Secteur", "Pays", "Note"], ...a.map((r, i) => [String(r.i + 1), name(r[0]).slice(0, 30), r[1], r[2], "+" + fr(r[3], 2)])];
+  const rows = t.map((r, i) => Object.assign([...r], { i }));
+  const cw = [0.35, 2.35, 1.75, 1.0, 0.6];
+  table(s, half(rows.slice(0, 15)), M, 1.55, 6.05, cw, { fontSize: 9.5, rowH: 0.305 });
+  table(s, half(rows.slice(15)), 6.68, 1.55, 6.05, cw, { fontSize: 9.5, rowH: 0.305 });
+  s.addNotes(`Voici les ${D.entonnoir.sel} titres que la notation retient : ils couvrent ${Object.keys(D.secteurs30).length} secteurs sur 11. Ce n'est PAS encore le portefeuille — c'est le premier étage, celui du constaté : bilan, marges, valorisation, comportement en crise. Tout y est mesuré sur le passé et le présent. Le deuxième étage, dans le corps de la présentation, pose la question d'après, celle de l'avenir, et resserre ces ${D.entonnoir.sel} en ${D.entonnoir.final}. La sélection ne ressemble pas à l'indice, et c'est voulu : la note ignore la taille des sociétés, elle ne regarde que leurs qualités face à leurs concurrentes. Cette liste est en annexe : l'entonnoir suffit dans le corps de la présentation, et la seule liste qui compte est celle des ${D.entonnoir.final} retenus.`);
+}
+
+{
+  // Matrices de corrélation. Échelle divergente du référentiel dataviz :
+  // pôle froid / gris neutre / pôle chaud, bornée à ±80 pour que le gris
+  // tombe exactement sur zéro. Diagonale retirée : elle vaut 100 partout,
+  // n'apprend rien et écraserait l'échelle.
+  const s = base(0, "Annexe K — Les supports bougent-ils ensemble ?", { kicker: "Pour les questions techniques · corrélation des variations hebdomadaires : 100 = ils font la même chose, 0 = indépendants, négatif = l'un monte quand l'autre baisse", source: "Séries quotidiennes en euros, octobre 2006 - septembre 2026 · crises : les quatre fenêtres datées · bitcoin écarté (cotations depuis 2014 seulement)" });
+  const C = D.corr;
+  const LONG = { poche_actions: "Poche actions", etats_courts: "Échelle AAA", etats_longs: "États 2-10 ans", credit_court: "Crédit court", indexees: "Obligations indexées", or: "Or", matieres: "Matières premières" };
+  const COURT = { poche_actions: "Act.", etats_courts: "AAA", etats_longs: "2-10", credit_court: "Créd.", indexees: "Idx.", or: "Or", matieres: "Mat." };
+  const RAMPE = ["2a78d6", "6097de", "90b5e4", "c0d2e9", "f0efec", "f3cfc0", "f3af95", "f18d68", "eb6834"];
+  const BORNE = 80;
+
+  const teinte = (v) => {
+    const t = Math.min(1, Math.max(0, (v + BORNE) / (2 * BORNE))) * (RAMPE.length - 1);
+    const i = Math.min(RAMPE.length - 2, Math.floor(t)), f = t - i;
+    const mix = (a, b) => Math.round(parseInt(a, 16) + (parseInt(b, 16) - parseInt(a, 16)) * f).toString(16).padStart(2, "0");
+    const A = RAMPE[i], B = RAMPE[i + 1];
+    return mix(A.slice(0, 2), B.slice(0, 2)) + mix(A.slice(2, 4), B.slice(2, 4)) + mix(A.slice(4, 6), B.slice(4, 6));
+  };
+
+  const matrice = (m, x, titre, sous) => {
+    s.addText([{ text: titre, options: { bold: true, color: INK } }, { text: "   " + sous, options: { color: MUTED, fontSize: 11 } }],
+      { x, y: 1.52, w: 5.9, h: 0.3, fontFace: BF, fontSize: 13.5, margin: 0, isTextBox: true });
+    const entete = ["", ...C.ordre.map((k) => COURT[k])];
+    const corps = C.ordre.map((k, i) => [LONG[k], ...C.ordre.map((_, j) => (
+      i === j ? { text: "", options: { fill: { color: WHITE } } }
+              : { text: fr(m[i][j], 0), options: { fill: { color: teinte(m[i][j]) }, color: TEXT } }))]);
+    table(s, [entete, ...corps], x, 1.85, 5.9, [1.7, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
+      { fontSize: 10.5, rowH: 0.4, bold1: true, alignRight: true, zebra: false });
+  };
+  matrice(C.hors, M, "Hors crise", `${C.semaines.hors_crise} semaines`);
+  matrice(C.crise, M + 6.23, "En crise", `${C.semaines.en_crise} semaines`);
+
+  const ix = (k) => C.ordre.indexOf(k);
+  const a = ix("poche_actions");
+  const cor = (v) => (v > 0 ? "+" : "") + fr(v, 0);
+  const av = (k) => cor(C.hors[a][ix(k)]), ap = (k) => cor(C.crise[a][ix(k)]);
+  const ent = (i, j) => cor(C[i][ix(j[0])][ix(j[1])]);
+  card(s, M, 5.32, W - 2 * M, 1.55);
+  para(s, M + 0.25, 5.45, 5.75, 1.35, bullets([
+    `**L'échelle AAA** passe de ${av("etats_courts")} à ${ap("etats_courts")} face aux actions, **l'or** de ${av("or")} à ${ap("or")} : les deux amortisseurs se déclenchent au bon moment`,
+    `**Les matières premières** restent à ${ap("matieres")} : elles diversifient peu, d'où leur place réduite`,
+  ]), 13, { paraSpaceAfter: 7 });
+  para(s, M + 6.35, 5.45, 5.5, 1.35, bullets([
+    `**Le revers** : entre eux, crédit court et indexées passent de ${ent("hors", ["credit_court", "indexees"])} à ${ent("crise", ["credit_court", "indexees"])}, États courts et longs de ${ent("hors", ["etats_courts", "etats_longs"])} à ${ent("crise", ["etats_courts", "etats_longs"])}`,
+    "Le coussin **se resserre sur lui-même** : d'où le refus de le concentrer sur une seule maturité",
+  ]), 13, { paraSpaceAfter: 7 });
+
+  s.addNotes(`Un mot sur la corrélation, parce que la question vient toujours. À gauche, les semaines ordinaires ; à droite, les seules semaines de crise. Deux chiffres comptent. L'échelle AAA était à ${av("etats_courts")} face aux actions en temps normal : indépendante. En crise elle passe à ${ap("etats_courts")} : elle monte quand les actions chutent. L'or fait le même chemin, de ${av("or")} à ${ap("or")}. Voilà pourquoi on garde de l'or malgré un rendement espéré de 4 % seulement : on ne l'achète pas pour son rendement, on l'achète pour ce qu'il fait ce jour-là. À l'inverse, les matières premières restent à ${ap("matieres")} : elles diversifient peu, et c'est pour ça qu'elles ont une place réduite. Et je veux être honnête sur le revers, parce qu'on me le demanderait sinon : la poche défensive, elle, se resserre. Crédit court et indexées passent de ${ent("hors", ["credit_court", "indexees"])} à ${ent("crise", ["credit_court", "indexees"])} entre eux. Autrement dit les amortisseurs deviennent un seul pari au moment où on compte sur eux. C'est exactement la raison pour laquelle on ne met pas tout le défensif sur la même maturité, et pourquoi le calcul ne travaille pas sur une corrélation moyenne, mais fait traverser au portefeuille les vingt années jour après jour.`);
+}
+
+{
+  const cf = D.credit_fonds;
+  const s = base(0, "Annexe L — Le crédit court, et pourquoi il finit à zéro", { kicker: `Pour les questions techniques · fonds retenu : ${cf.ticker}, obligations d'entreprises bien notées, durée ${fr(cf.duree)} an`, source: "Fiches iShares · courbe BCE (État de même échéance) · pertes sur défauts : Moody's" });
+  stat(s, M, 1.8, 3.8, "+0,24 pt", "de plus qu'un État de même échéance (0,13 pt après défauts)", FAM.eta, 44);
+  stat(s, 4.75, 1.8, 3.8, `${pct(cf.dd2020)}`, `en 2020, contre ${pct(cf.etat2020)} pour l'État de même durée`, NEG, 44);
+  stat(s, 8.9, 1.8, 3.8, "3,39 %", "rendement retenu pour l'étape 4, défauts déduits", INK, 44);
+  const rr = [["Haut rendement euro", RC.hy_euro.c], ["Crédit court retenu", 3.39], ["États zone euro 2-10 ans", D.souverains.rdt_long], ["Crédit, indice toutes durées", RC.credit_ig_eur.c]];
+  s.addChart(pres.charts.BAR, [{ name: "Rendement", labels: rr.map((r) => r[0]), values: rr.map((r) => r[1]) }],
+    { ...chartBase("Rendement espéré, défauts déduits"), x: M, y: 3.75, w: 7.2, h: 3.1, barDir: "bar", chartColors: [FAM.eta], showValue: true, dataLabelFormatCode: '0.00" %"', dataLabelPosition: "outEnd", valAxisHidden: true, valGridLine: { style: "none" }, valAxisMinVal: 0, valAxisMaxVal: 5, showLegend: false, barGapWidthPct: 40, catAxisOrientation: "maxMin" });
+  callout(s, 8.2, 3.9, 4.53, 2.9, "Le haut rendement rapporte, défauts déduits, **moins que les États**. Le crédit court, **moins que l'échelle d'États 2-10 ans** : sa place sera au mieux modeste.", INK, 15);
+  s.addNotes("Le crédit mérite une slide, parce que le résultat est contre-intuitif. Le haut rendement, une fois les défauts déduits, rapporte moins que les États : écarté. Le crédit bien noté court ne rapporte que 0,24 point de plus qu'un État de même échéance, et il a perdu trois fois plus en 2020. Défauts déduits, il rapporte 3,39 %, moins que notre échelle d'emprunts d'État. On le garde dans l'univers, mais on verra à l'étape 4 que le calcul lui donne zéro, à raison.");
+}
+
 
 pres.writeFile({ fileName: OUT }).then((f) => console.log("écrit :", f, "·", slideNo, "slides"));

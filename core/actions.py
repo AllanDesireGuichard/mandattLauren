@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from core import exclusions, scoring, vue_secteurs
+from core import exclusions, rendements, scoring, vue_secteurs
 
 DOSSIER = Path(__file__).resolve().parents[1] / "data" / "actions"
 
@@ -110,3 +110,70 @@ def panier_face_indice(sel: pd.DataFrame) -> dict:
             "indice": mesures(indice.dropna()),
             "nb_titres": int(eur.shape[1]),
             "series": {"panier": panier.dropna(), "indice": indice.dropna()}}
+
+
+# --------------------------------------------------------------------------
+# Rendement espéré du panier réellement détenu
+# --------------------------------------------------------------------------
+# POURQUOI CE CALCUL EXISTE. Jusqu'au 2026-09-25, la poche d'actions
+# européennes entrait dans l'allocation avec le rendement espéré de l'INDICE
+# (étape 2, MSCI Europe). Conséquence : changer les titres retenus ne changeait
+# rien au rendement du portefeuille, alors que c'est la seule poche construite
+# titre par titre. Le chiffre annoncé au client ne dépendait pas de la
+# sélection qu'on lui présentait.
+#
+# LA MÉTHODE EST CELLE DE L'ÉTAPE 2, sans exception : moyenne du rendement des
+# bénéfices (1 / PER) et du dividende augmenté de la croissance réelle des
+# bénéfices, puis l'inflation de l'énoncé. Rien n'est inventé ici — on applique
+# la même formule à 15 lignes au lieu d'un indice. Voir
+# scripts/estimer_rendements.py, fonction `actions`.
+#
+# POURQUOI LA MOYENNE DES 1/PER, ET NON 1/PER MOYEN. Le panier est détenu à
+# parts égales : son rendement des bénéfices est la moyenne de ceux de ses
+# lignes. Prendre l'inverse du PER moyen donnerait le rendement d'un panier
+# pondéré par les bénéfices, qui n'est pas celui qu'on achète.
+#
+# CE QUE ÇA NE DIT PAS. Ce n'est pas une prévision de surperformance : c'est
+# une mesure de ce que coûtent les bénéfices des sociétés retenues, comparée à
+# ce que coûtent ceux de l'indice. Les deux peuvent tomber au même niveau — au
+# relevé du 2026-09-18 c'est le cas, à deux décimales près — et ce résultat est
+# plus solide que l'hypothèse qu'il remplace, parce qu'il est mesuré.
+
+
+def rendement_panier(sel: pd.DataFrame) -> dict:
+    """
+    Rendement espéré du panier d'actions retenu, méthode de l'étape 2.
+
+    `sel` : les titres RÉELLEMENT détenus (sortie de core.outlook.final), qui
+    portent les colonnes `trailingPE` et `dividendYield` de data/actions/
+    fondamentaux.csv.
+    """
+    r = rendements.charger()
+    g = r["croissance"]["central"]
+    infl = r["inflation"]
+
+    per = pd.to_numeric(sel["trailingPE"], errors="coerce")
+    div = pd.to_numeric(sel["dividendYield"], errors="coerce")
+    # Un PER négatif ou nul (société en perte) ne s'inverse pas en rendement
+    # des bénéfices : la ligne sort de cette moyenne et son absence est
+    # comptée. Un dividende absent, lui, vaut ZÉRO : chez Yahoo le champ
+    # manque quand la société n'en verse pas (argenx), et l'écarter de la
+    # moyenne ferait croire que le panier rend plus qu'il ne rend.
+    benefices = 100 / per.where(per > 0)
+    m1 = float(benefices.mean())
+    dividende = float(div.fillna(0).mean())
+    m2 = dividende + g
+    reel = (m1 + m2) / 2
+    return {
+        "n": len(sel), "central": reel + infl, "reel": reel,
+        "m1_reel": m1, "m2_reel": m2,
+        "dividende": dividende, "croissance": g, "inflation": infl,
+        "per_median": float(per.median()),
+        "sans_per": int(benefices.isna().sum()),
+        "sans_dividende": int(div.isna().sum()),
+        "methode": (f"Moyenne de deux méthodes sur les {len(sel)} titres "
+                    f"détenus, à parts égales : rendement des bénéfices "
+                    f"(moyenne des 1 / PER, {m1:.2f} %) et dividende "
+                    f"({dividende:.2f} %) + croissance réelle des bénéfices "
+                    f"({g:.2f} %), plus {infl:.0f} % d'inflation."),
+    }

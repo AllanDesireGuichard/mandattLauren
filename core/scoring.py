@@ -1,5 +1,5 @@
 """
-Notation des actions européennes sur quatre piliers, à la manière de TCP Kenz.
+Notation des actions européennes sur cinq piliers, à la manière de TCP Kenz.
 
 Décisions validées avec Allan le 2026-09-18 :
   - cinq piliers à POIDS ÉGAUX (20 % chacun) : aucun n'est privilégié sans

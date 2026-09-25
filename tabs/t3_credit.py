@@ -13,10 +13,15 @@ from pathlib import Path
 
 import streamlit as st
 
-from core import obligations, rendements, taux, viz
+from core import allocation, obligations, rendements, taux, viz
 
 FICHIER = Path(__file__).resolve().parents[1] / "data" / "fonds_credit.json"
-DEFAUTS_IG = 0.11      # perte moyenne annuelle sur défauts, Moody's (étape 2)
+
+# La perte moyenne annuelle sur défauts (Moody's, étape 2). Elle était écrite
+# ici ET dans core/allocation, qui est ce que lit l'étape 4 : c'est le même
+# chiffre qui sert à annoncer le rendement du crédit et à le faire entrer dans
+# l'optimisation, il ne doit exister qu'une fois.
+DEFAUTS_IG = allocation.DEFAUTS_IG
 
 
 def _pct(v: float) -> str:

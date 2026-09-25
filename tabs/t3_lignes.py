@@ -16,14 +16,16 @@ SÉPARÉ et non un sixième pilier : les piliers classent, l'avenir élimine.
 """
 from __future__ import annotations
 
+import json
 import re
+from pathlib import Path
 
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import (actions, fiches, obligations, outlook, pedago, scoring,
-                  taux, viz, vue_secteurs)
+from core import (actions, allocation, fiches, fonds, obligations, outlook,
+                  pedago, scoring, taux, viz, vue_secteurs)
 from tabs import t3_credit, t3_fonds
 
 
@@ -35,8 +37,18 @@ NB_FINAL = outlook.N_FINAL
 # Ordre d'affichage des garde-fous, et surtout : liste EXHAUSTIVE. Les motifs
 # sont sinon déduits des titres écartés, et un garde-fou qui ne mord sur
 # personne disparaîtrait silencieusement de la page.
+#
+# « ATTENTES INDISPONIBLES » Y MANQUAIT, et c'était une omission qui cachait un
+# titre : les quatre motifs de core/outlook.juger ne sont pas trois. Au relevé
+# du 2026-09-25, data/actions/outlook.csv a été photographié sur une sélection
+# de trente légèrement différente de celle d'aujourd'hui (le plafond de
+# volatilité est devenu sectoriel entre-temps), si bien qu'un titre de la
+# sélection n'a aucune donnée d'analystes et sort pour cette seule raison. La
+# page l'écartait sans le dire, et affirmait juste après que tous les autres
+# sortants étaient « bien classés mais dans un secteur déjà complet ».
 ORDRE_MOTIFS = ("Cours au-dessus de la cible sans relais des bénéfices",
-                "Prévisions en net recul", "Avenir illisible")
+                "Prévisions en net recul", "Avenir illisible",
+                "Attentes indisponibles")
 
 
 @st.cache_data(show_spinner="Notation des 600 titres…")
@@ -242,7 +254,6 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
         f"l'objectif **et** bénéfices qui ne suivent pas."
     )
     _bloc_fiches(fin)
-    _fiche(d, sel, j)
     _panier(sel, fin)
 
 
@@ -264,6 +275,12 @@ def _bloc_fiches(fin: pd.DataFrame) -> None:
 def _nuage(j: pd.DataFrame, retenus: set) -> None:
     """Le constaté en abscisse, l'attendu en ordonnée : la décision en une image."""
     fig = go.Figure()
+    # Un titre sans donnée d'analystes n'a pas de note d'avenir : il n'a pas
+    # d'ordonnée, donc pas de point. Il est retiré du nuage ET du compte
+    # affiché — sinon la légende annonce quinze écartés et quatorze sont
+    # dessinés. Il est nommé dans les garde-fous, sous « Attentes
+    # indisponibles ».
+    j = j[j["note_avenir"].notna() & j["note"].notna()]
     for garde, nom, couleur in [
             (False, f"Écartés ({len(j) - len(retenus)})", "#b9b7b1"),
             (True, f"Retenus ({len(retenus)})", viz.CATEGORICAL[0])]:
@@ -291,7 +308,8 @@ def _nuage(j: pd.DataFrame, retenus: set) -> None:
     st.caption(
         "En haut : le consensus se redresse. À droite : la société est bien "
         "notée sur les cinq piliers. Les retenus sont en haut à droite, "
-        "sous les plafonds de 2 par secteur et 4 par pays."
+        "sous les plafonds de 2 par secteur et 4 par pays. Les titres sans "
+        "donnée d'analystes n'ont pas d'ordonnée et ne figurent pas ici."
     )
 
 def _panier(sel: pd.DataFrame, fin: pd.DataFrame) -> None:
@@ -352,109 +370,37 @@ def _panier(sel: pd.DataFrame, fin: pd.DataFrame) -> None:
     )
 
 
-def _fiche(d: pd.DataFrame, sel: pd.DataFrame, j: pd.DataFrame) -> None:
-    st.markdown("**Fiche par titre**")
-    options = list(sel["ticker"])
-    noms = dict(zip(sel["ticker"], sel["longName"]))
-    t = st.selectbox("Choisir une société", options,
-                     format_func=lambda k: noms[k], key="fiche_titre")
-    r = d[d["ticker"] == t].iloc[0]
-    a = j[j["ticker"] == t].iloc[0]
-    secteur = d[(d["secteur"] == r["secteur"]) & d["note"].notna()]
-
-    rang_sect = int((secteur["note"] > r["note"]).sum()) + 1
-    verdict = (f"écartée — {a['motif'].lower()}" if pd.notna(a["motif"])
-               else "retenue au second étage")
-    st.markdown(f"**{r['longName']}** · {r['secteur']} · {r['pays']} — note "
-                f"**{_pilier_fr(r['note'])}**, {rang_sect}e sur "
-                f"{len(secteur)} dans son secteur. {verdict.capitalize()}.")
-    fig = go.Figure(go.Bar(
-        x=[r[p] for p in scoring.PILIERS], y=scoring.PILIERS,
-        orientation="h",
-        marker={"color": [viz.CATEGORICAL[0] if (r[p] or 0) >= 0
-                          else viz.CATEGORICAL[1]
-                          for p in scoring.PILIERS], "cornerradius": 4},
-        text=[_pilier_fr(r[p]) for p in scoring.PILIERS],
-        textposition="outside", textfont={"color": viz.INK_2},
-        hovertemplate="%{y} : %{x:.2f}<extra></extra>",
-    ))
-    fig.add_vline(x=0, line={"color": viz.INK_2, "width": 1})
-    fig.update_layout(**viz.layout(
-        "Notes par pilier, face au secteur (bleu : mieux que la moyenne)",
-        height=280,
-        xaxis={"gridcolor": viz.GRID, "range": [-3, 3.5]},
-        yaxis={"autorange": "reversed"}, showlegend=False))
-    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
-    _attentes(a)
-
-
-def _attentes(a: pd.Series) -> None:
-    """Ce que les analystes attendent du titre affiché dans la fiche."""
-    dev = "p" if a["devise_cours"] == "GBp" else a["devise_cours"]
-    n = "—" if pd.isna(a["analystes"]) else f"{int(a['analystes'])}"
-    st.markdown(
-        f"**Ce que les analystes attendent** — {n} suivent la société, "
-        f"avis moyen : {a['avis'].lower()}."
-    )
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=[a["cible_basse"], a["cible_haute"]], y=["Objectif", "Objectif"],
-        mode="lines", line={"color": "#b9b7b1", "width": 6},
-        hoverinfo="skip", showlegend=False))
-    for val, nom, couleur, pos in [
-            (a["cible_basse"], "Plus bas", "#b9b7b1", "bottom center"),
-            (a["cible_haute"], "Plus haut", "#b9b7b1", "bottom center"),
-            (a["cible"], "Objectif moyen", viz.CATEGORICAL[0], "top center"),
-            (a["cours"], "Cours du jour", viz.CATEGORICAL[1], "top center")]:
-        fig.add_trace(go.Scatter(
-            x=[val], y=["Objectif"], mode="markers+text", name=nom,
-            marker={"size": 13, "color": couleur,
-                    "line": {"width": 1, "color": viz.SURFACE}},
-            text=[f"{nom}<br>{viz.fr(val, dev, 2)}"], textposition=pos,
-            textfont={"size": 10, "color": viz.INK_2}, showlegend=False,
-            hovertemplate=f"{nom} : {viz.fr(val, dev, 2)}<extra></extra>"))
-    marge = (a["cible_haute"] - a["cible_basse"]) * 0.35 or 1
-    fig.update_layout(**viz.layout(
-        "Le cours d'aujourd'hui face aux objectifs des analystes",
-        height=210,
-        xaxis={"gridcolor": viz.GRID,
-               "range": [min(a["cible_basse"], a["cours"]) - marge,
-                         max(a["cible_haute"], a["cours"]) + marge]},
-        yaxis={"showgrid": False, "showticklabels": False}))
-    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
-
-    sens = "relevé" if a["revision"] >= 0 else "abaissé"
-    nrev = int(a["revisions_30j"])
-    solde = (f"sur {nrev} révisions du dernier mois, "
-             f"{viz.fr(a['solde'], '%', 0)} vont à la hausse"
-             if nrev >= outlook.REVISIONS_MIN else
-             f"une seule révision le dernier mois" if nrev == 1 else
-             f"{nrev} révisions le dernier mois, trop peu pour conclure"
-             if nrev else "aucune révision le dernier mois")
-    st.markdown(
-        f"- Le bénéfice attendu a été **{sens} de "
-        f"{viz.fr(abs(a['revision']), '%', 1)}** en trois mois ; {solde}.\n"
-        f"- L'objectif moyen est **{viz.fr(a['potentiel'], '%', 1)}** "
-        "au-dessus du cours."
-        if a["potentiel"] >= 0 else
-        f"- Le bénéfice attendu a été **{sens} de "
-        f"{viz.fr(abs(a['revision']), '%', 1)}** en trois mois ; {solde}.\n"
-        f"- Le cours est **{viz.fr(abs(a['potentiel']), '%', 1)} au-dessus** "
-        "de l'objectif moyen."
-    )
-    st.markdown(
-        f"- Les analystes s'écartent de **{viz.fr(a['dispersion'], '%', 0)}** "
-        "entre leur prévision la plus haute et la plus basse."
-    )
+# LE DÉROULANT « FICHE PAR TITRE » A ÉTÉ RETIRÉ LE 2026-09-25, et avec lui
+# `_fiche` et `_attentes`. Il laissait choisir une société parmi les trente et
+# affichait ses cinq piliers, puis son cours face aux objectifs des analystes.
+# Trois raisons de le retirer, dans cet ordre :
+#   - c'était le dernier déroulant de l'application, alors que la décision du
+#     2026-09-25 est qu'il n'en reste aucun : un jury ne clique pas, et ce qui
+#     n'est pas affiché n'est pas dit ;
+#   - il coûtait un rendu complet de l'onglet à chaque changement de titre ;
+#   - ce qu'il montrait est ailleurs : les quinze retenus ont leur fiche
+#     nominative (core/fiches), le nuage porte note, avenir, révision,
+#     potentiel et dispersion de chacun des trente au survol, et la fiche cite
+#     le pilier le plus fort de chaque société avec sa valeur.
+# Ce qui est perdu, et assumé : le détail des cinq piliers titre par titre, et
+# la fourchette des objectifs de cours. Les deux relèvent de la question
+# technique, pas du dossier.
 
 
 # --------------------------------------------------------------------------
 # Bloc 3 — les emprunts d'État en direct
 # --------------------------------------------------------------------------
 
+# Les échéances du graphique : elles vont plus loin que ce qu'on achète, pour
+# montrer que l'on s'arrête à 10 ans, et où.
 ECHEANCES = [2, 3, 5, 7, 10, 15, 20, 30]
-ECHELLE_LONGUE = [2, 3, 5, 7, 10]
-TRANCHES = {0.5: 2.5e6, 1.0: 2.5e6, 1.5: 2.5e6, 2.0: 2.5e6}
+
+# L'échelle des 10 M€ et l'échelle longue viennent de core/allocation, qui est
+# aussi ce que lit l'étape 4 : elles étaient recopiées ici à l'identique, et
+# deux jeux de chiffres pour la même échelle finissent par diverger — l'étape 3
+# aurait annoncé une échelle que l'étape 4 n'aurait pas achetée.
+ECHELLE_LONGUE = list(allocation.ECHELLE_LONGUE)
+TRANCHES = allocation.TRANCHES
 
 
 def _me(v: float) -> str:
@@ -561,9 +507,6 @@ def _graphique_souverains(aaa: dict, zone: dict, estr: float) -> None:
 
 def _suite() -> None:
     """Sortie de l'étape 3 : un support par classe, rien de plus."""
-    import json
-    from pathlib import Path
-    from core import fonds
     racine = Path(__file__).resolve().parents[1] / "data"
     cl = fonds.charger()["classes"]
     cr = json.loads((racine / "fonds_credit.json").read_text(encoding="utf-8"))
@@ -586,5 +529,11 @@ def _suite() -> None:
                    viz.fr(x["frais"], "%", 2)))
     st.table(pd.DataFrame(lignes, columns=["Classe", "Support",
                                            "Frais par an"]).set_index("Classe"))
-    st.caption("Combien placer sur chacun, sous la limite de perte de "
-               "15 % : c'est l'étape 4.")
+    st.caption(
+        f"Ces {len(lignes)} supports forment l'univers de l'étape 4, qui dira "
+        f"combien placer sur chacun sous la limite de perte de 15 %. **Deux "
+        f"en recevront zéro** — le crédit court et les matières premières : "
+        f"le premier rapporte moins qu'un emprunt d'État de même durée, les "
+        f"secondes baissent en même temps que les actions. Être investissable "
+        f"n'est pas être retenu."
+    )

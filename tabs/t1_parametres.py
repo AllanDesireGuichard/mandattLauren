@@ -161,8 +161,9 @@ def render() -> None:
          "Un rendement espéré pour chaque grande classe d'actifs"),
         ("3 · Ligne à ligne",
          "Dans quoi peut-on investir ?",
-         "Noter les actions européennes sur quatre critères (valorisation, "
-         "croissance, dynamique, qualité), évaluer les obligations à partir "
+         "Noter les actions européennes sur cinq piliers (valorisation, "
+         "croissance, dynamique, qualité, résistance en crise), resserrer sur "
+         "ce que les analystes attendent, évaluer les obligations à partir "
          "des courbes de taux, appliquer les exclusions.",
          "La liste des supports retenus"),
         ("4 · Allocation",

@@ -6,7 +6,9 @@ Les rendements viennent de l'étape 2 (data/rendements.json), corrigés par ce
 que l'étape 3 a appris en choisissant les supports : les emprunts d'État sont
 achetés en direct, donc leur rendement est celui de l'échelle retenue et non
 celui du marché entier ; le crédit est un fonds court, qui rapporte moins que
-l'indice toutes durées (3,50 % − 0,11 % de défauts, pas 4,04 %).
+l'indice toutes durées (3,50 % − 0,11 % de défauts, pas 4,04 %) ; et depuis le
+2026-09-25 les actions européennes portent le rendement MESURÉ SUR LES TITRES
+RETENUS, et non celui de l'indice (voir core/actions.rendement_panier).
 
 Les séries longues (data/indices_longs.csv) viennent de
 scripts/fetch_indices.py.
@@ -19,7 +21,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from core import obligations, rendements, taux
+from core import actions, obligations, outlook, rendements, taux
 
 DATA = Path(__file__).resolve().parents[1] / "data"
 
@@ -46,6 +48,24 @@ def meta() -> dict:
         encoding="utf-8"))
 
 
+# Le panier d'actions européennes, retenu une fois par processus. La
+# sélection n'est pas réglable dans l'application (aucun déroulant depuis le
+# 2026-09-25) : elle ne peut changer qu'avec les données ou le code, donc la
+# recalculer à chaque affichage ne ferait que ralentir l'outil. Elle coûte une
+# notation de 600 titres, et `entrees()` est appelée cinq fois par rendu de
+# l'onglet 4.
+_PANIER: dict | None = None
+
+
+def rendement_panier() -> dict:
+    """Rendement espéré des actions européennes, mesuré sur les titres tenus."""
+    global _PANIER
+    if _PANIER is None:
+        _PANIER = actions.rendement_panier(
+            outlook.final(actions.selection(actions.univers())))
+    return _PANIER
+
+
 def entrees() -> pd.DataFrame:
     """Une ligne par classe : support, rendement espéré et d'où il vient."""
     r = rendements.charger()["classes"]
@@ -58,9 +78,11 @@ def entrees() -> pd.DataFrame:
     cr = json.loads((DATA / "fonds_credit.json").read_text(encoding="utf-8"))
     credit = cr["fonds"][cr["retenu"]]["rendement"] - DEFAUTS_IG
 
+    panier = rendement_panier()
     rdt = {
-        "actions_europe": (r["europe"]["central"],
-                           "Étape 2, actions européennes"),
+        "actions_europe": (panier["central"],
+                           f"Étape 3, mesuré sur les {panier['n']} titres "
+                           f"retenus"),
         "usa": (r["us"]["central"], "Étape 2, actions américaines"),
         "japon": (r["japon"]["central"], "Étape 2, actions japonaises"),
         "emergents": (r["equity_emerging"]["central"],
@@ -281,10 +303,70 @@ MONTANT = 100e6
 RETENU = "r4_marge"
 
 
+def par_ligne(poids: dict) -> dict:
+    """
+    Poids par support, la poche actions éclatée selon la clé 40/35/10/15.
+
+    Un seul endroit pour cette opération : elle était recopiée dans
+    tabs/t4_allocation.py, dans scripts/pitch/extraire.py et ici.
+    """
+    out = dict(poids)
+    poche = out.pop("poche_actions", None)
+    if poche is not None:
+        for k, m in MIX_ACTIONS.items():
+            out[k] = out.get(k, 0.0) + poche * m
+    return out
+
+
 def poids_retenus() -> dict:
     """Poids par support du portefeuille retenu, poche actions éclatée."""
-    p = dict(resultats()["scenarios"][RETENU]["poids"])
-    poche = p.pop("poche_actions")
-    for k, m in MIX_ACTIONS.items():
-        p[k] = poche * m
+    p = par_ligne(resultats()["scenarios"][RETENU]["poids"])
     return {k: p.get(k, 0.0) for k in ORDRE if k not in HORS_CALCUL}
+
+
+# ----------------------------------------------------------------------
+# Le rendement d'un jeu de poids : RECALCULÉ, jamais relu
+#
+# POURQUOI. scripts/optimiser.py écrit dans data/allocation_optim.json les
+# poids qu'il a trouvés ET le rendement espéré qui allait avec. L'application
+# lisait ce second chiffre. Résultat, constaté le 2026-09-25 : le rendement du
+# portefeuille ne bougeait pas quand la poche d'actions européennes changeait
+# de titres, puisqu'il datait de la dernière optimisation.
+#
+# Les POIDS, eux, restent ceux de l'optimisation : la retrouver demande des
+# minutes de calcul, on ne la relance pas à chaque affichage. Les deux
+# décisions se tiennent — les poids sont une décision d'allocation, datée ; le
+# rendement est une lecture de marché, qui doit suivre la sélection du jour.
+# `controle_optimisation` dit quand l'écart devient assez grand pour qu'il
+# faille relancer l'optimisation.
+
+DERIVE_MAX = 0.05          # points de rendement espéré
+
+
+def rendement(poids: dict, e: pd.DataFrame | None = None) -> float:
+    """Rendement espéré d'un jeu de poids, aux rendements espérés du jour."""
+    if e is None:
+        e = entrees()
+    return float(sum(x * e.loc[k, "rendement"]
+                     for k, x in par_ligne(poids).items() if k in e.index))
+
+
+def rendement_retenu(e: pd.DataFrame | None = None) -> float:
+    """Rendement espéré brut du portefeuille retenu."""
+    return rendement(resultats()["scenarios"][RETENU]["poids"], e)
+
+
+def controle_optimisation(e: pd.DataFrame | None = None) -> dict:
+    """
+    Les poids retenus datent-ils d'une optimisation encore valable ?
+
+    Compare le rendement du portefeuille retenu tel qu'on le calcule
+    aujourd'hui à celui que l'optimisation avait inscrit. Un écart matériel
+    signifie que les rendements espérés ont bougé depuis, et donc que les
+    poids optimaux ne sont plus forcément ceux-là.
+    """
+    res = resultats()
+    stocke = res["scenarios"][RETENU]["rendement_espere"]
+    vif = rendement_retenu(e)
+    return {"date": res["releve"], "stocke": stocke, "vif": vif,
+            "derive": vif - stocke, "a_relancer": abs(vif - stocke) > DERIVE_MAX}

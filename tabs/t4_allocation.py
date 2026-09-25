@@ -22,8 +22,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import (actions, allocation, fiches, fonds, ips, obligations,
-                  outlook, pedago, taux, viz)
+from core import (actions, allocation, fonds, ips, obligations, outlook,
+                  pedago, taux, viz)
 
 
 def _pct(v: float) -> str:
@@ -65,12 +65,30 @@ def _bloc_entrees() -> None:
     # PRODUIT. Ici, seule la lecture qu'on en tire est utile.
     calc = e[~e["hors_calcul"]]
     bat = calc[calc["rendement"] > 4]
-    calc = e[~e["hors_calcul"]]
-    bat = calc[calc["rendement"] > 4]
     st.markdown(
         f"**{len(bat)} lignes sur {len(calc)} dépassent les 4 %** : les "
         f"quatre zones d'actions et les obligations indexées (rendements "
         f"espérés détaillés à l'étape 2)."
+    )
+
+    # Le seul rendement espéré que l'étape 2 ne fournit PAS tel quel : les
+    # actions européennes sont détenues titre par titre, leur rendement est
+    # donc mesuré sur les titres retenus et non sur l'indice. C'est la
+    # correction du 2026-09-25 : avant elle, changer la sélection ne changeait
+    # pas le rendement du portefeuille.
+    pa = allocation.rendement_panier()
+    st.markdown(
+        f"**Les actions européennes ne portent pas le rendement de "
+        f"l'indice** : elles sont détenues en direct, leur rendement espéré "
+        f"est donc mesuré sur les {pa['n']} titres retenus, à la méthode de "
+        f"l'étape 2 — moyenne des rendements des bénéfices "
+        f"({_pct(pa['m1_reel'])}) et du dividende ({_pct(pa['dividende'])}) "
+        f"augmenté de la croissance réelle des bénéfices "
+        f"({_pct(pa['croissance'])}), plus les "
+        f"{viz.fr(pa['inflation'], '%', 0)} d'inflation de l'énoncé, soit "
+        f"**{_pct(pa['central'])}**. Ce n'est pas un pari de "
+        f"surperformance : c'est la même mesure, faite sur ce qu'on achète "
+        f"plutôt que sur le marché."
     )
 
     st.markdown(
@@ -353,25 +371,8 @@ def _graphique_etapes(cols: dict, noms: dict) -> None:
     st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
 
 
-def _graphique_compte(serie: pd.Series, titre: str, par_titre: float) -> None:
-    """Nombre de titres par catégorie, une seule couleur (une seule série)."""
-    v = serie.value_counts().sort_values(ascending=False)
-    fig = go.Figure(go.Bar(
-        y=v.index, x=v.values, orientation="h",
-        text=[f"{n} · {viz.fr(n * par_titre / 1e6, 'M€', 1)}" for n in v.values],
-        textposition="outside", cliponaxis=False,
-        textfont={"color": viz.INK_2},
-        marker={"color": viz.CATEGORICAL[0], "cornerradius": 4},
-        hovertemplate="%{y} : %{x} titres<extra></extra>"))
-    fig.update_layout(**viz.layout(
-        titre, height=90 + 28 * len(v), bargap=.3,
-        xaxis={"visible": False, "range": [0, v.max() * 1.45]},
-        yaxis={"autorange": "reversed", "gridcolor": "rgba(0,0,0,0)"}))
-    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
-
-
-
 def _bloc_libre() -> None:
+    e = allocation.entrees()
     res = allocation.resultats()
     sc = res["scenarios"]
     lib = sc["libre"]
@@ -386,7 +387,7 @@ def _bloc_libre() -> None:
     with c1:
         _graphique_supports(p, "Le portefeuille du calcul libre")
     with c2:
-        st.metric("Rendement espéré", _pct(lib["rendement_espere"]))
+        st.metric("Rendement espéré", _pct(allocation.rendement(p, e)))
         st.metric("Pire baisse depuis le plus haut",
                   viz.fr(lib["pire_baisse"], "%", 1))
 
@@ -416,18 +417,8 @@ def _bloc_libre() -> None:
 
 
 # ----------------------------------------------------------------------
-def _par_ligne(poids: dict) -> dict:
-    """Poids par support, la poche actions éclatée selon la clé."""
-    out = dict(poids)
-    poche = out.pop("poche_actions", None)
-    if poche is not None:
-        for k, m in allocation.MIX_ACTIONS.items():
-            out[k] = poche * m
-    return out
-
-
-
 def _bloc_regles() -> None:
+    e = allocation.entrees()
     res = allocation.resultats()
     sc = res["scenarios"]
     ordre = ["libre"] + res["etapes"]
@@ -444,33 +435,36 @@ def _bloc_regles() -> None:
                         "≤ 5 %, crédit ≤ 20 %", "Pas de concentration"),
         "r4_marge": ("Pire baisse visée : 14 %", "Marge pour les remplaçants"),
     }
+    # Les POIDS viennent de l'optimisation (data/allocation_optim.json) ; les
+    # rendements sont RECALCULÉS aux rendements espérés du jour. Voir
+    # core/allocation, section « le rendement d'un jeu de poids ».
+    rdt = {n: allocation.rendement(sc[n]["poids"], e) for n in ordre}
     lignes, prec = [], None
     for n in ordre:
         x = sc[n]
         regle, pourquoi = regles.get(n, ("Seule la limite de 15 %", "—"))
-        lignes.append((regle, pourquoi, _pct(x["rendement_espere"]),
-                       "—" if prec is None else
-                       viz.fr(x["rendement_espere"] - prec, "pt", 2),
+        lignes.append((regle, pourquoi, _pct(rdt[n]),
+                       "—" if prec is None else viz.fr(rdt[n] - prec, "pt", 2),
                        viz.fr(x["pire_baisse"], "%", 1)))
-        prec = x["rendement_espere"]
+        prec = rdt[n]
     st.table(pd.DataFrame(lignes, columns=[
         "Règle ajoutée", "Pourquoi", "Rendement espéré", "Coût",
         "Pire baisse"]).set_index("Règle ajoutée"))
 
-    cols = {n: _par_ligne(sc[n]["poids"]) for n in ordre}
+    cols = {n: allocation.par_ligne(sc[n]["poids"]) for n in ordre}
     noms = {"libre": "Libre", "r1_aaa": "+ AAA", "r2_cle": "+ clé",
             "r3_plafonds": "+ plafonds", "r4_marge": "+ marge"}
     _graphique_etapes(cols, noms)
 
-    r1, r2, r3, r4 = (sc[n] for n in res["etapes"])
-    c2, c3 = cols["r2_cle"], cols["r3_plafonds"]
+    r1, r2, r3, r4 = res["etapes"]
+    c3 = cols["r3_plafonds"]
     t3 = sum(c3[k] for k in allocation.MIX_ACTIONS)
 
-    def cout(a: dict, b: dict) -> str:
-        return viz.fr(a["rendement_espere"] - b["rendement_espere"], "pt", 2)
+    def cout(a: str, b: str) -> str:
+        return viz.fr(rdt[a] - rdt[b], "pt", 2)
 
     st.markdown(
-        f"**Les 10 M€ en AAA** ne coûtent presque rien ({cout(r1, sc['libre'])}). "
+        f"**Les 10 M€ en AAA** ne coûtent presque rien ({cout(r1, 'libre')}). "
         f"**La clé des actions** est la règle la plus chère ({cout(r2, r1)}) : "
         f"c'est le prix du renoncement au pari sur le yen. **Les plafonds** "
         f"({cout(r3, r2)}) font **remonter** les actions à {_poids(t3)}, les "
@@ -479,32 +473,14 @@ def _bloc_regles() -> None:
         f"matières premières restent à zéro partout."
     )
 
-    total = r4["rendement_espere"] - sc["libre"]["rendement_espere"]
     c = st.columns(4)
-    c[0].metric("Rendement espéré retenu", _pct(r4["rendement_espere"]))
-    c[1].metric("Au-dessus des 4 % à battre",
-                viz.fr(r4["rendement_espere"] - 4, "pt", 2))
-    c[2].metric("Coût total des règles", viz.fr(total, "pt", 2))
-    c[3].metric("Pire baisse, 2006-2026", viz.fr(r4["pire_baisse"], "%", 1))
+    c[0].metric("Rendement espéré retenu", _pct(rdt[r4]))
+    c[1].metric("Au-dessus des 4 % à battre", viz.fr(rdt[r4] - 4, "pt", 2))
+    c[2].metric("Coût total des règles",
+                viz.fr(rdt[r4] - rdt["libre"], "pt", 2))
+    c[3].metric("Pire baisse, 2006-2026",
+                viz.fr(sc[r4]["pire_baisse"], "%", 1))
 
-
-
-def _ecartes(c: dict) -> str:
-    """
-    Ce qui a fait perdre les autres candidats, et non la règle de sélection.
-
-    La règle est la même pour les cinq classes — conforme, plus de 1 Md€,
-    puis les frais les plus bas — donc la recopier dans chaque ligne
-    n'apprend rien. Ce qui diffère, c'est POURQUOI les concurrents sont
-    tombés, et data/fonds.json porte un verdict par candidat.
-    """
-    par_motif: dict[str, list[str]] = {}
-    for t, r in c["candidats"].items():
-        if t == c["retenu"]:
-            continue
-        par_motif.setdefault(r["verdict"], []).append(t.split(".")[0])
-    bouts = [f"{m} ({', '.join(sorted(v))})" for m, v in par_motif.items()]
-    return f"{len(c['candidats'])} examinés · " + " · ".join(bouts)
 
 
 def _echeance(a: float) -> str:
@@ -535,6 +511,8 @@ def _bloc_retenu() -> None:
     e = allocation.entrees()
     res = allocation.resultats()
     r4 = res["scenarios"][allocation.RETENU]
+    brut = allocation.rendement_retenu(e)
+    ctl = allocation.controle_optimisation(e)
     w = allocation.poids_retenus()
     M = allocation.MONTANT
     cl = fonds.charger()["classes"]
@@ -588,24 +566,26 @@ def _bloc_retenu() -> None:
         f"{_me(w['actions_europe'] * M, 1)} à parts égales, soit "
         f"{_me(par_titre)} par titre."
     )
-    g1, g2 = st.columns(2)
-    with g1:
-        _graphique_compte(sel["secteur"], "Par secteur (titres · M€)", par_titre)
-    with g2:
-        _graphique_compte(sel["pays"], "Par pays (titres · M€)", par_titre)
-
-    # Les quinze sont NOMMÉES ici, et pas seulement comptées par secteur et
-    # par pays. Ajouté le 2026-09-25 : les obligations et les fonds étaient
-    # détaillés ligne à ligne dans ce bloc, les actions ne l'étaient pas —
-    # alors que c'est la poche construite titre par titre. Même table qu'à
-    # l'étape 3, augmentée du montant : cet onglet répond à « ce qu'on a et
-    # ce qu'on prend », et une ligne du portefeuille sans son montant n'y
-    # répond qu'à moitié.
-    t = fiches.table(sel)
-    t.insert(2, "Montant", [_me(par_titre)] * len(t))
-    st.table(t.set_index("Société"))
-    if (manque := fiches.manquantes(sel)):
-        st.warning("Fiche à rédiger pour : " + ", ".join(manque))
+    # LES QUINZE SONT NOMMÉES ICI, avec leur montant — mais SANS leur métier
+    # ni la raison de leur présence, qui sont à l'étape 3 et n'y sont plus
+    # répétées. C'est la correction du doublon signalé par Allan : les quinze
+    # lignes apparaissaient deux fois, avec les mêmes colonnes, la seconde
+    # augmentée d'un montant identique sur les quinze lignes.
+    # Les deux graphiques de comptage par secteur et par pays ont été retirés
+    # avec elles : le tableau ci-dessous porte le secteur et le pays de chaque
+    # ligne, donc tout ce qu'ils comptaient, et il le porte nommément.
+    st.table(pd.DataFrame(
+        [(r["longName"], r["secteur"], r["pays"], _me(par_titre))
+         for _, r in sel.iterrows()],
+        columns=["Société", "Secteur", "Pays", "Montant"]
+    ).set_index("Société"))
+    st.caption(
+        f"Le métier de chaque société et la raison de sa présence sont à "
+        f"l'étape 3, qui les a choisies. Répartition : "
+        f"{sel['secteur'].nunique()} secteurs et {sel['pays'].nunique()} pays, "
+        f"au plus {outlook.MAX_SECTEUR} titres par secteur et "
+        f"{outlook.MAX_PAYS} par pays."
+    )
 
     # --- ce qu'on achète, en direct puis en fonds --------------------
     # Réécrit le 2026-09-25. Allan : « fait un truc très concret pour l'oblig
@@ -645,49 +625,26 @@ def _bloc_retenu() -> None:
         f"avant terme. Courbes de la BCE au {taux.date_fr(sv['date'])}."
     )
 
-    st.markdown("**Les fonds, pour les classes qu'on ne détient pas en direct**")
-    rows = []
-    for k in fonds.ORDRE:
-        if k not in cl or w.get(k, 0) < 0.0005:
-            continue
-        c = cl[k]
-        r = c["candidats"][c["retenu"]]
-        rows.append((
-            e.loc[k, "classe"],
-            f"{c['retenu'].split('.')[0]} · {r['nom']}",
-            r["indice"] or "Or physique, pas d'indice",
-            _me(w[k] * M, 1),
-            _pct(r["frais"]),
-            viz.fr(r["taille"] / 1000, "Md€", 1),
-            _ecartes(c),
-        ))
-    st.table(pd.DataFrame(rows, columns=[
-        "Classe", "Fonds retenu", "Indice suivi", "Montant", "Frais",
-        "Taille", "Ce qui a écarté les autres"]).set_index("Classe"))
-
+    # LE TABLEAU DES FONDS A ÉTÉ DÉPLACÉ À L'ÉTAPE 3 (tabs/t3_fonds.py), qui
+    # est l'étape qui les choisit. Il portait ici l'indice suivi, les frais, la
+    # taille et le motif d'écartement des concurrents : c'est-à-dire la
+    # DÉMONSTRATION du choix, pas le choix. Les fonds retenus et leur montant
+    # restent nommés dans le tableau du portefeuille ci-dessus, qui est ce dont
+    # l'étape 4 a besoin.
     frais = sum(w[k] * M * cl[k]["candidats"][cl[k]["retenu"]]["frais"] / 100
                 for k in fonds_de if w[k] >= 0.0005)
     part_max = max(w[k] * M / (cl[k]["candidats"][cl[k]["retenu"]]["taille"] * 1e6)
                    for k in fonds_de if w[k] >= 0.0005)
-    st.caption(
-        f"Règle de sélection, la même pour tous : filtre ESG conforme aux "
-        f"exclusions du mandat, taille supérieure à 1 Md€, puis les frais "
-        f"les plus bas. Tous sont à réplication physique et domiciliés dans "
-        f"l'Union, sauf l'or, adossé à du métal déposé en Allemagne. "
-        f"Aucune ligne ne dépasse {viz.fr(part_max * 100, '%', 2)} de son "
-        f"fonds. Frais totaux {viz.fr(frais / 1e3, 'k€', 0)} par an, soit "
-        f"{viz.fr(frais / M * 100, '%', 2)} du patrimoine."
-    )
 
     # --- brut, puis net : l'objectif du client est un objectif NET --------
     f_inst = frais / M * 100
     f_mandat = ips.FRAIS_MANDAT * 100
-    net = ips.rendement_net(r4["rendement_espere"], f_inst)
+    net = ips.rendement_net(brut, f_inst)
     seuil = ips.INFLATION_TARGET * 100
 
     st.markdown("**Du rendement brut à ce qui reste au client.**")
     st.table(pd.DataFrame([
-        ("Rendement espéré, brut", _pct(r4["rendement_espere"]),
+        ("Rendement espéré, brut", _pct(brut),
          "Somme des rendements de chaque ligne, pondérée"),
         ("− Frais des instruments", "− " + viz.fr(f_inst, "pt", 2),
          f"{viz.fr(frais / 1e3, 'k€', 0)} par an, ETF uniquement"),
@@ -699,17 +656,27 @@ def _bloc_retenu() -> None:
 
 
     c = st.columns(4)
-    c[0].metric("Rendement espéré, brut", _pct(r4["rendement_espere"]))
+    c[0].metric("Rendement espéré, brut", _pct(brut))
     c[1].metric("Rendement net", _pct(net),
                 delta=viz.fr(net - seuil, "pt", 2) + " vs inflation")
     c[2].metric("Pire baisse, 2006-2026", viz.fr(r4["pire_baisse"], "%", 1))
     c[3].metric("Rendement obtenu, 2006-2026*",
                 viz.fr(r4["realise"], "%", 2) + " / an")
     st.caption(
-        "* Rééquilibré chaque mois. Ne se compare pas au rendement espéré : "
-        "le passé comptait dix ans de taux négatifs, l'avenir part de taux "
-        "à 3 %."
+        f"* Rééquilibré chaque mois. Ne se compare pas au rendement espéré : "
+        f"le passé comptait dix ans de taux négatifs, l'avenir part de taux "
+        f"à 3 %. Les POIDS viennent de l'optimisation du "
+        f"{taux.date_fr(ctl['date'])} ; le rendement espéré est recalculé à "
+        f"l'affichage sur les rendements du jour, de sorte qu'il suit la "
+        f"sélection de la poche actions."
     )
+    if ctl["a_relancer"]:
+        st.warning(
+            f"Les rendements espérés ont bougé de "
+            f"{viz.fr(ctl['derive'], 'pt', 2)} depuis l'optimisation : les "
+            f"poids ne sont plus forcément les meilleurs. Relancer "
+            f"`scripts/optimiser.py`."
+        )
 
     st.markdown("#### Conclusion de l'étape 4")
     st.markdown(
