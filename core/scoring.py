@@ -146,6 +146,11 @@ def noter(f: pd.DataFrame) -> pd.DataFrame:
 
 VOL_QUANTILE_MAX = 0.90
 
+# En dessous de cet effectif, un secteur n'a pas assez de titres notés pour
+# qu'un percentile y veuille dire quelque chose. Même règle et même seuil que
+# le repli de `_z_secteur` : on retombe alors sur l'univers.
+VOL_SECTEUR_MIN = 5
+
 
 def plafond_volatilite(d: pd.DataFrame) -> float:
     """
@@ -153,8 +158,49 @@ def plafond_volatilite(d: pd.DataFrame) -> float:
     notés. Demande d'Allan (« des titres avec une vol okay ») : les 10 % les
     plus agités ne peuvent pas être retenus, même bien notés. Seuil MESURÉ
     sur l'univers, pas fixé à la main : il suit l'agitation des marchés.
+
+    C'est le plancher de protection, commun à tous les secteurs. Le plafond
+    réellement appliqué est celui de `plafonds_volatilite`, qui ne peut que
+    l'assouplir.
     """
     return float(d.loc[d["note"].notna(), "vol_3a"].quantile(VOL_QUANTILE_MAX))
+
+
+def plafonds_volatilite(d: pd.DataFrame) -> pd.Series:
+    """
+    Le plafond de volatilité, un par secteur : le plus large des deux
+    percentiles, celui de l'univers et celui du secteur.
+
+    POURQUOI PAR SECTEUR. La volatilité est déjà notée en ÉCART AU SECTEUR —
+    c'est un indicateur du pilier risque, il passe par `_z_secteur` comme les
+    autres. Seul le plafond était resté absolu, mesuré sur les 300 titres
+    notés ensemble. L'incohérence a un coût mesuré (relevé du 2026-09-25) :
+    le plafond sortait à 35,8 % et la TECHNOLOGIE DISPARAISSAIT ENTIÈREMENT
+    de la sélection, alors qu'elle pèse 7,4 % de l'indice. Non pas faute de
+    note — ASML est notée +0,299, au-dessus du seuil d'entrée des trente qui
+    vaut +0,250 — mais pour 36,7 % de volatilité contre 35,8 % de plafond.
+    Les semi-conducteurs sont structurellement agités : leur médiane de
+    secteur est à 34,9 %, quand la consommation de base est à 22,0 %. Un
+    plafond unique ne dit donc pas « ce titre est agité pour son métier », il
+    dit « ce métier est agité », et interdit le métier.
+
+    POURQUOI LE PLUS LARGE DES DEUX, et non le percentile du secteur seul.
+    Un percentile écarte toujours 10 % d'un groupe, même quand personne n'y
+    est agité — c'est déjà l'argument qui a fait choisir un seuil absolu pour
+    `outlook.REVISION_MIN`. Appliqué secteur par secteur, il coûtait 13 titres
+    admissibles aujourd'hui, DONT AB INBEV, retenue dans les quinze, écartée
+    pour une volatilité de 25,0 % — la plus basse de tout le tableau, mais
+    exactement le 90e percentile d'un secteur de 23 titres tous très calmes.
+    Le plafond de l'univers reste donc le plancher de protection : le mandat
+    borne une perte réelle, pas une perte relative à un métier. Le percentile
+    du secteur ne peut qu'OUVRIR, jamais fermer. Effet mesuré : 269 titres
+    admissibles deviennent 278, aucun n'est perdu.
+    """
+    v = d.loc[d["note"].notna()]
+    univers = float(v["vol_3a"].quantile(VOL_QUANTILE_MAX))
+    p = v.groupby("secteur")["vol_3a"].quantile(VOL_QUANTILE_MAX)
+    p[v.groupby("secteur")["vol_3a"].size() < VOL_SECTEUR_MIN] = univers
+    return p.clip(lower=univers)
 
 
 def selectionner(d: pd.DataFrame, n: int = 30, max_secteur: int = 4,
@@ -163,14 +209,15 @@ def selectionner(d: pd.DataFrame, n: int = 30, max_secteur: int = 4,
     Les n meilleures notes, sous trois plafonds : au plus `max_secteur`
     titres par secteur et `max_pays` par pays (sans eux, une notation
     relative peut concentrer le portefeuille sur un thème), et une volatilité
-    inférieure au plafond mesuré (voir plafond_volatilite).
+    inférieure au plafond de son secteur (voir plafonds_volatilite).
     """
-    vol_max = plafond_volatilite(d)
+    vol_max = plafonds_volatilite(d)
+    defaut = plafond_volatilite(d)
     retenus, par_secteur, par_pays = [], {}, {}
     for i, r in d.sort_values("note", ascending=False).iterrows():
         if pd.isna(r["note"]):
             continue
-        if pd.isna(r["vol_3a"]) or r["vol_3a"] > vol_max:
+        if pd.isna(r["vol_3a"]) or r["vol_3a"] > vol_max.get(r["secteur"], defaut):
             continue
         if par_secteur.get(r["secteur"], 0) >= max_secteur:
             continue

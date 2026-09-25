@@ -164,11 +164,14 @@ def _bloc_notation(d: pd.DataFrame) -> None:
     tab.columns = ["Rang", "Société", "Secteur", "Pays", "Note"]
     st.markdown("**Les 30 titres présélectionnés**")
     st.table(tab.set_index("Rang"))
+    plaf = scoring.plafonds_volatilite(d)
     st.caption(
         "Note : écart à la moyenne du secteur (0 = dans la moyenne, +1 = "
         "nettement meilleure). Au plus 4 titres par secteur et 6 par pays, "
-        "aucun parmi les 10 % les plus volatils (au-delà de "
-        f"{viz.fr(scoring.plafond_volatilite(d), '%', 1)})."
+        "et aucun parmi les plus volatils de son métier : le plafond part de "
+        f"{viz.fr(scoring.plafond_volatilite(d), '%', 1)} pour tout le monde "
+        f"et s'élargit là où l'agitation est structurelle, jusqu'à "
+        f"{viz.fr(plaf.max(), '%', 1)} dans « {plaf.idxmax()} »."
     )
     c = st.columns(3)
     c[0].metric("Secteurs représentés", sel["secteur"].nunique(), "sur 11",
