@@ -489,6 +489,29 @@ def _bloc_regles() -> None:
 
 
 
+def _ecartes(c: dict) -> str:
+    """
+    Ce qui a fait perdre les autres candidats, et non la règle de sélection.
+
+    La règle est la même pour les cinq classes — conforme, plus de 1 Md€,
+    puis les frais les plus bas — donc la recopier dans chaque ligne
+    n'apprend rien. Ce qui diffère, c'est POURQUOI les concurrents sont
+    tombés, et data/fonds.json porte un verdict par candidat.
+    """
+    par_motif: dict[str, list[str]] = {}
+    for t, r in c["candidats"].items():
+        if t == c["retenu"]:
+            continue
+        par_motif.setdefault(r["verdict"], []).append(t.split(".")[0])
+    bouts = [f"{m} ({', '.join(sorted(v))})" for m, v in par_motif.items()]
+    return f"{len(c['candidats'])} examinés · " + " · ".join(bouts)
+
+
+def _echeance(a: float) -> str:
+    """0.5 -> « 6 mois », 2.0 -> « 24 mois ». L'échelle courte se lit en mois."""
+    return viz.fr(a * 12, "mois", 0)
+
+
 def _me(v: float, dec: int = 2) -> str:
     return viz.fr(v / 1e6, "M€", dec)
 
@@ -570,25 +593,75 @@ def _bloc_retenu() -> None:
     with g2:
         _graphique_compte(sel["pays"], "Par pays (titres · M€)", par_titre)
 
-    # --- en direct et en fonds ---------------------------------------
+    # --- ce qu'on achète, en direct puis en fonds --------------------
+    # Réécrit le 2026-09-25. Allan : « fait un truc très concret pour l'oblig
+    # et les fonds, donne ce qu'il y a et décrit les fonds et pourquoi ils
+    # sont choisis [...] je veux juste ce qu'on a et ce qu'on prend, détaillé
+    # clair et synthétique ». Deux tableaux, aucun commentaire — et PAS de
+    # graphique de courbe des taux : il est déjà à l'étape 2.
     sv = taux.charger()["svensson"]
     ech = obligations.echelle(allocation.TRANCHES, sv["aaa"])
     investi = w["etats_courts"] * M
     f = investi / sum(x["cout"] for x in ech)
     par_marche = w["etats_longs"] * M / len(allocation.ECHELLE_LONGUE)
+
+    st.markdown("**Les obligations d'État, achetées en direct**")
+    lignes = [(f"AAA · {_echeance(x['echeance'])}", _me(x["cout"] * f, 2),
+               _me(x["montant"] * f, 2), _pct(x["taux"]), "—")
+              for x in ech]
+    for m in allocation.ECHELLE_LONGUE:
+        a = obligations.analyse(m, sv["toutes"])
+        # achetée au pair : le remboursement égale l'investi, le rendement
+        # vient des coupons — contrairement à l'échelle AAA, achetée sous
+        # le pair et remboursée au nominal.
+        lignes.append((f"Zone euro · {m} ans", _me(par_marche, 2),
+                       _me(par_marche, 2) + " + coupons",
+                       _pct(a["rendement"]), viz.fr(a["sensibilite"], "", 1)))
+    st.table(pd.DataFrame(lignes, columns=[
+        "Ligne", "Investi", "Ce qu'on récupère", "Taux à l'achat",
+        "Sensibilité"]).set_index("Ligne"))
+    st.caption(
+        f"L'échelle AAA couvre les 10 M€ à décaisser : {_me(investi)} "
+        f"investis rendent {_me(sum(x['montant'] for x in ech) * f)} à date "
+        f"fixe et sans rien vendre : elle est achetée sous le pair et "
+        f"remboursée au nominal. L'échelle zone euro est achetée au pair et "
+        f"détenue jusqu'à l'échéance — son rendement vient des coupons, et "
+        f"la sensibilité indique ce que la ligne perdrait en prix si les "
+        f"taux montaient d'un point, ce qui n'a d'effet que si on la vend "
+        f"avant terme. Courbes de la BCE au {taux.date_fr(sv['date'])}."
+    )
+
+    st.markdown("**Les fonds, pour les classes qu'on ne détient pas en direct**")
+    rows = []
+    for k in fonds.ORDRE:
+        if k not in cl or w.get(k, 0) < 0.0005:
+            continue
+        c = cl[k]
+        r = c["candidats"][c["retenu"]]
+        rows.append((
+            e.loc[k, "classe"],
+            f"{c['retenu'].split('.')[0]} · {r['nom']}",
+            r["indice"] or "Or physique, pas d'indice",
+            _me(w[k] * M, 1),
+            _pct(r["frais"]),
+            viz.fr(r["taille"] / 1000, "Md€", 1),
+            _ecartes(c),
+        ))
+    st.table(pd.DataFrame(rows, columns=[
+        "Classe", "Fonds retenu", "Indice suivi", "Montant", "Frais",
+        "Taille", "Ce qui a écarté les autres"]).set_index("Classe"))
+
     frais = sum(w[k] * M * cl[k]["candidats"][cl[k]["retenu"]]["frais"] / 100
                 for k in fonds_de if w[k] >= 0.0005)
     part_max = max(w[k] * M / (cl[k]["candidats"][cl[k]["retenu"]]["taille"] * 1e6)
                    for k in fonds_de if w[k] >= 0.0005)
-    st.markdown(
-        f"**Emprunts d'État en direct** : {_me(investi)} sur l'échelle AAA "
-        f"en {len(ech)} tranches de 6 à 24 mois, qui rendront "
-        f"{_me(sum(x['montant'] for x in ech) * f)} — les 10 M€ sont "
-        f"couverts. Puis {len(allocation.ECHELLE_LONGUE)} × "
-        f"{_me(par_marche)} sur l'échelle zone euro de 2 à 10 ans. "
-        f"**Fonds** : aucune ligne ne dépasse "
-        f"{viz.fr(part_max * 100, '%', 2)} de son fonds ; frais "
-        f"{viz.fr(frais / 1e3, 'k€', 0)} par an, soit "
+    st.caption(
+        f"Règle de sélection, la même pour tous : filtre ESG conforme aux "
+        f"exclusions du mandat, taille supérieure à 1 Md€, puis les frais "
+        f"les plus bas. Tous sont à réplication physique et domiciliés dans "
+        f"l'Union, sauf l'or, adossé à du métal déposé en Allemagne. "
+        f"Aucune ligne ne dépasse {viz.fr(part_max * 100, '%', 2)} de son "
+        f"fonds. Frais totaux {viz.fr(frais / 1e3, 'k€', 0)} par an, soit "
         f"{viz.fr(frais / M * 100, '%', 2)} du patrimoine."
     )
 
