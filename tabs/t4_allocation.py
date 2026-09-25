@@ -52,7 +52,6 @@ def render() -> None:
 # ----------------------------------------------------------------------
 def _bloc_entrees() -> None:
     e = allocation.entrees()
-    m = allocation.meta()
     ctl = e["controle"]
 
     st.markdown("#### Ce qui entre dans le calcul")
@@ -64,15 +63,17 @@ def _bloc_entrees() -> None:
         "elle ne rapporte rien (étape 2) et baisse avec les actions."
     )
 
-    st.markdown("**Ce que chaque support doit rapporter.**")
-    _graphique_rendements(e)
+    # Le graphique des rendements espérés par classe a été retiré le
+    # 2026-09-25 : il reproduisait à l'identique celui de l'étape 2, qui les
+    # PRODUIT. Ici, seule la lecture qu'on en tire est utile.
     calc = e[~e["hors_calcul"]]
     bat = calc[calc["rendement"] > 4]
     st.markdown(
-        f"**Lecture.** Seules {len(bat)} lignes sur {len(calc)} dépassent les "
-        f"4 % : les quatre zones d'actions et les obligations indexées. "
-        f"Chaque euro placé ailleurs devra être compensé par des actions : "
-        f"c'est la tension entre les 4 % et les 15 %."
+        f"**Ce que chaque support doit rapporter.** Seules {len(bat)} lignes "
+        f"sur {len(calc)} dépassent les 4 % : les quatre zones d'actions et "
+        f"les obligations indexées (rendements espérés détaillés à "
+        f"l'étape 2). Chaque euro placé ailleurs devra être compensé par des "
+        f"actions : c'est la tension entre les 4 % et les 15 %."
     )
 
     st.markdown(
@@ -85,37 +86,19 @@ def _bloc_entrees() -> None:
         "de la BCE. Toutes les séries partent d'octobre 2006, avant le "
         "sommet des actions de juillet 2007."
     )
-    pedago.explique(
-        "Les limites de ces remplaçants",
-        "<strong>Actions, or, matières premières</strong> : les remplaçants "
-        "suivent bien leur support (corrélation de 0,83 à 0,95). Les fonds "
-        "émergents et japonais filtrés ESG ont toutefois un peu plus baissé "
-        f"que leur remplaçant "
-        f"({viz.fr(ctl['emergents']['baisse_support'], '%', 0)} contre "
-        f"{viz.fr(ctl['emergents']['baisse_remplacant'], '%', 0)} pour les "
-        f"émergents) : 2008 et 2011 sont peut-être un peu sous-estimés sur "
-        f"ces deux lignes.",
-        "<strong>Obligations indexées</strong> : avant 2009, le remplaçant "
-        "est un emprunt d'État classique, qui a mieux tenu en 2008 que les "
-        "vraies indexées. Cette ligne est flattée.",
-        f"<strong>Crédit</strong> : la prime est reconstituée avant 2016 à "
-        f"partir des écarts de crédit américains. Le lien est faible "
-        f"(corrélation {viz.fr(ctl['credit_court']['correlation'], '', 2)}) : "
-        f"c'est la ligne la moins bien mesurée.",
-        f"<strong>Actions européennes</strong> : risque mesuré sur l'indice, "
-        f"pas sur les 30 titres. Choisis avec les données d'aujourd'hui, ils "
-        f"ont un passé flatteur par construction "
-        f"({viz.fr(ctl['actions_europe']['perf_support'], '%', 1)} par an "
-        f"depuis 2019, contre "
-        f"{viz.fr(ctl['actions_europe']['perf_remplacant'], '%', 1)} pour "
-        f"l'indice).",
-        source="Yahoo Finance (fonds et change) ; BCE, courbe des emprunts "
-               "d'État de la zone euro ; FRED, écarts de crédit ICE BofA. "
-               "Script : scripts/fetch_indices.py. Relevé du "
-               f"{pd.Timestamp(m['releve']).strftime('%d/%m/%Y')}.",
+    st.caption(
+        f"**Limites assumées.** Les remplaçants suivent bien leur support "
+        f"(corrélation de 0,83 à 0,95), sauf deux lignes. Les **indexées** "
+        f"sont flattées : avant 2009 le remplaçant est un emprunt d'État "
+        f"classique, qui a mieux tenu en 2008. Le **crédit** est la ligne la "
+        f"moins bien mesurée — sa prime est reconstituée avant 2016 sur les "
+        f"écarts américains, corrélation "
+        f"{viz.fr(ctl['credit_court']['correlation'], '', 2)}. Et le risque "
+        f"des **actions européennes** est mesuré sur l'indice, pas sur les "
+        f"titres retenus : choisis avec les données d'aujourd'hui, ils ont "
+        f"un passé flatteur par construction."
     )
-
-    st.markdown(
+st.markdown(
         "**➜ Dix supports, vingt ans d'historique.** Chacun a un rendement "
         "espéré et une série en euros qui traverse les quatre crises. "
         "Reste à savoir ce qu'ils y ont perdu, et s'ils ont perdu ensemble."
@@ -443,31 +426,6 @@ def _graphique_compte(serie: pd.Series, titre: str, par_titre: float) -> None:
 
 
 
-def _graphique_rendements(e: pd.DataFrame) -> None:
-    """Rendement espéré par support, couleur = famille, repère à 4 %."""
-    calc = e[~e["hors_calcul"]]
-    fig = go.Figure()
-    for fam, ks in FAMILLES.items():
-        ks = [k for k in ks if k in calc.index]
-        v = [calc.loc[k, "rendement"] for k in ks]
-        fig.add_trace(go.Bar(
-            y=[COURTS[k][0].upper() + COURTS[k][1:] for k in ks], x=v,
-            name=fam, orientation="h", text=[viz.fr(x, "%", 2) for x in v],
-            textposition="outside", cliponaxis=False,
-            textfont={"color": viz.INK_2},
-            marker={"color": COULEUR[fam], "cornerradius": 4},
-            hovertemplate="%{y} : %{text}<extra>" + fam + "</extra>"))
-    fig.add_vline(x=4, line={"color": viz.INK_2, "width": 1, "dash": "dot"},
-                  annotation={"text": "4 % à battre",
-                              "font": {"color": viz.INK_2, "size": 11}},
-                  annotation_position="top")
-    fig.update_layout(**viz.layout(
-        "Rendement espéré par an", height=90 + 34 * len(calc), bargap=.25,
-        xaxis={"visible": False, "range": [0, calc["rendement"].max() * 1.2]},
-        yaxis={"autorange": "reversed", "gridcolor": "rgba(0,0,0,0)"}))
-    st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
-
-
 def _bloc_libre() -> None:
     res = allocation.resultats()
     sc = res["scenarios"]
@@ -648,42 +606,80 @@ def _bloc_calcul() -> None:
 
     st.markdown("#### Comment le calcul trouve sa réponse")
     st.markdown(
-        "La pire baisse d'un portefeuille n'est pas une courbe lisse : "
-        "déplacer un poids d'un dixième de point peut faire changer la crise "
-        "qui donne le maximum de perte. Aucune formule ne donne donc "
-        "directement la solution — on **cherche**, et il faut montrer que ce "
-        "qu'on trouve ne dépend pas de l'endroit d'où l'on est parti."
+        "**La question posée au calcul tient en une phrase** : parmi tous "
+        "les partages possibles des 100 M€, lequel rapporte le plus sans "
+        "jamais avoir perdu plus que la limite ? Trois pièces, et c'est "
+        "tout."
     )
-    pedago.explique(
-        "Les quatre précautions du calcul",
-        "<strong>Partir de points admissibles.</strong> Les départs sont "
-        "tirés au hasard, mais en respectant d'emblée les plafonds : un "
-        "tirage uniforme pose en moyenne 14 % sur chaque support quand les "
-        "matières premières plafonnent à 5 %. Mesuré le 24 septembre : "
-        "3 tirages sur 200 seulement respectaient les bornes.",
-        "<strong>Garder un point de repli certain.</strong> Un portefeuille "
-        "très obligataire, construit d'avance, sert d'ancrage : on sait qu'il "
-        "tient la limite. Piège rencontré — l'ancrage naturel, tout en États "
-        "2-10 ans, est INADMISSIBLE : 100 % de ce support perd 15,3 % sur "
-        "2006-2026, au-delà de la limite du mandat. L'ancrage est donc sur "
-        "l'échelle AAA, qui ne perd que 7,1 %.",
-        "<strong>Repartir de plusieurs endroits.</strong> Seize départs, et "
-        "on garde le meilleur résultat qui respecte la limite. Avant "
-        "correction, un seul sur seize aboutissait : le résultat du dossier "
-        "tenait à un départ heureux.",
-        "<strong>Vérifier la limite pour de bon.</strong> Le solveur accepte "
-        "une contrainte à 5 pour 10 000 près, ce qui laissait passer un "
-        "portefeuille à −14,05 % pour une limite de −14 %. On ramène donc la "
-        "solution vers l'ancrage jusqu'à ce que la limite soit tenue "
-        "réellement, pas approximativement.",
-        source="scripts/optimiser.py · corrigé le 2026-09-24",
+    st.table(pd.DataFrame([
+        ("Ce qu'on maximise", "Le rendement espéré du portefeuille",
+         "La moyenne des rendements de chaque support, pondérée par son "
+         "poids. Les rendements viennent de l'étape 2 pour les actions et "
+         "les indexées, de l'étape 3 pour les obligations."),
+        ("Ce qu'on s'interdit", "Une perte au-delà de la limite",
+         f"Pour chaque partage essayé, on **rejoue les vingt ans** : on "
+         f"place les 100 M€ selon ces poids en octobre 2006, on les remet à "
+         f"ces mêmes poids **chaque mois**, et on suit la valeur semaine "
+         f"après semaine. On mesure alors la plus forte baisse depuis un "
+         f"sommet. Elle doit rester sous "
+         f"{viz.fr(allocation.LIMITE_MARGE * 100, '%', 0)}."),
+        ("Ce qui borne les poids", "Positifs, somme de 100 %, et les règles",
+         "Pas de vente à découvert ni de levier, au moins 10 % sur l'échelle "
+         "AAA pour les 10 M€ à décaisser, la clé actions 40/35/10/15, et les "
+         "plafonds par support."),
+    ], columns=["", "En un mot", "Comment c'est calculé"]).set_index(""))
+
+    st.markdown(
+        "**Pourquoi ça ne se résout pas par une formule.** Le Markowitz des "
+        "manuels a une solution fermée parce qu'il mesure le risque par la "
+        "variance, qui est lisse et convexe. Notre exigence ne l'est pas : "
+        "la pire baisse est un **minimum sur vingt ans de dates**, et "
+        "déplacer un poids d'un dixième de point peut faire basculer la date "
+        "qui la donne — 2008 devient 2020, et la contrainte saute d'un coup "
+        "au lieu de varier doucement. Aucune dérivée fiable, donc aucune "
+        "formule. **On cherche.**"
     )
+    st.markdown(
+        "**Comment on cherche.** Un solveur sous contraintes (SLSQP) part "
+        "d'un partage donné et l'améliore de proche en proche jusqu'à ne "
+        "plus pouvoir. Comme il ne trouve qu'un optimum **local**, on le "
+        "relance depuis seize points de départ différents et on garde le "
+        "meilleur résultat admissible. Quatre précautions rendent ce "
+        "procédé fiable, et chacune corrige une panne réelle :"
+    )
+    st.table(pd.DataFrame([
+        ("Partir de points déjà admissibles",
+         "Un tirage au hasard ignore les plafonds : il pose en moyenne 14 % "
+         "par support quand les matières premières plafonnent à 5 %. "
+         "3 tirages sur 200 respectaient les bornes, et SLSQP ne sait pas "
+         "revenir dans le domaine quand il en part."),
+        ("Garder un point de repli certain",
+         "Un portefeuille très obligataire, construit d'avance, dont on sait "
+         "qu'il tient la limite. Piège rencontré : le repli naturel, tout en "
+         "États 2-10 ans, est lui-même inadmissible — 100 % de ce support "
+         "perd 15,3 %. Le repli est donc sur l'échelle AAA, qui perd 7,1 %."),
+        ("Repartir de seize endroits",
+         "Avant correction, un seul départ sur seize aboutissait, et trois "
+         "graines sur huit ne trouvaient aucune solution : le résultat du "
+         "dossier tenait à un départ heureux."),
+        ("Vérifier la limite pour de bon",
+         "Le solveur accepte une contrainte à 5 pour 10 000 près, ce qui "
+         "laissait passer un portefeuille à −14,05 % pour une limite de "
+         "−14 %. On ramène la solution dans la limite avant de la comparer "
+         "aux autres, sinon on compare des rendements obtenus sous des "
+         "risques différents."),
+    ], columns=["Précaution", "Ce qu'elle corrige"]).set_index("Précaution"))
     c = st.columns(3)
     c[0].metric("Points de départ", res.get("departs", 16))
     c[1].metric("Départs qui aboutissent", "16 / 16", "1 / 16 avant correction",
                 delta_color="off")
     c[2].metric("Graines testées", "8", "même optimum pour toutes",
                 delta_color="off")
+    st.caption(
+        "Huit tirages aléatoires indépendants donnent le même portefeuille : "
+        "c'est ce qui permet d'affirmer que le résultat n'est pas un accident "
+        "de départ. Code : scripts/optimiser.py."
+    )
 
     # --- l'or : le seul poids que personne n'a choisi --------------------
     s = allocation.series_risque()

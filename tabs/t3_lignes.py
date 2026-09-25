@@ -111,30 +111,16 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
 
     _vue_sectorielle(d)
 
-    cons = d[d["niveau"] == "conservé"]
-    pedago.explique(
-        "Comment les exclusions ont été décidées",
-        "<strong>D'abord automatiquement</strong> : toutes les sociétés "
-        "classées « tabac », « aéronautique et défense » ou « charbon » sont "
-        "exclues. Pour Airbus ou Safran, la défense n'est pas le cœur de "
-        "métier, mais elle dépasse largement 5 %.",
-        "<strong>Puis au cas par cas</strong> : on cherche dans la "
-        "description de chaque société des mots comme « militaire », "
-        "« munitions » ou « lignite ». Les "
-        f"{len(cons) + len(excl[excl['niveau'] == 'décision'])} sociétés "
-        f"signalées ont été examinées une à une ; {len(cons)} sont restées "
-        "(par exemple un éditeur de logiciels qui compte l'armée parmi ses "
-        "clients). Limite : la vente de tabac par la grande distribution "
-        "n'est pas repérable de façon fiable.",
-        f"<strong>Les {len(inv)} sociétés d'investissement</strong> "
-        f"({', '.join(sorted(scoring.SOCIETES_INVESTISSEMENT.values()))}) "
-        "ne sont pas exclues mais pas notées : leur bénéfice inclut la hausse "
-        "de valeur de leurs participations, ce qui fausse PER et rentabilité.",
-        source="core/exclusions.py · classification et descriptions Yahoo "
-               "Finance",
+    st.caption(
+        "Méthode : exclusion automatique des sociétés classées « tabac », "
+        "« aéronautique et défense » ou « charbon », puis examen à la main "
+        "des sociétés dont la description contient un mot comme "
+        "« militaire » ou « lignite ». Limite assumée : la vente de tabac "
+        "par la grande distribution n'est pas repérable de façon fiable. "
+        f"Les {len(inv)} sociétés d'investissement ne sont pas exclues mais "
+        "pas notées — leur bénéfice inclut la hausse de valeur de leurs "
+        "participations, ce qui fausse PER et rentabilité."
     )
-
-
 def _vue_sectorielle(d: pd.DataFrame) -> None:
     """
     La vue du gérant : des métiers écartés par décision, et son prix affiché.
@@ -165,26 +151,14 @@ def _vue_sectorielle(d: pd.DataFrame) -> None:
         + "La sélection finale des quinze et le risque du panier sont "
         "inchangés : la vue ne coûte qu'un titre, et le dernier."
     )
-    pedago.explique(
-        "Pourquoi une décision et non une pénalité dans la note",
-        "<strong>Parce que le signe d'une pénalité n'est pas déterminé.</strong> "
-        "« Les gérants sous-pondèrent l'automobile » justifie aussi bien de "
-        "la vendre — le consensus a raison — que de l'acheter : elle est "
-        "devenue bon marché parce qu'elle est détestée.",
-        "<strong>Et nos cinq piliers disent exactement ces deux choses à la "
-        "fois.</strong> Sur les constructeurs, la Dynamique sort à −0,58 "
-        "quand la Valorisation sort à +0,62 : la note voit très bien la "
-        "difficulté du secteur, elle décide qu'elle est déjà payée par le "
-        "prix. Retrancher un malus reviendrait à casser cette compensation "
-        "sans le dire.",
-        "<strong>Une exclusion déclarée, elle, s'argumente.</strong> Elle est "
-        "datée, motivée, et son coût se mesure — y compris quand nos propres "
-        "chiffres la contredisent, ce qui est le cas de la chimie de "
-        "spécialité et qui est écrit dans le tableau.",
-        source="core/vue_secteurs.py",
+    st.caption(
+        "Pourquoi une décision et non un malus dans la note : le signe d'un "
+        "malus n'est pas déterminé. Sur les constructeurs, nos piliers "
+        "sortent à −0,58 en Dynamique et +0,62 en Valorisation — la note "
+        "voit la difficulté du secteur et juge qu'elle est déjà payée par "
+        "le prix. Un malus casserait cette compensation sans le dire ; une "
+        "exclusion déclarée, elle, est datée, motivée et chiffrable."
     )
-
-
 # --------------------------------------------------------------------------
 # Bloc 2 — la notation et les 30 titres
 # --------------------------------------------------------------------------
@@ -240,38 +214,12 @@ def _bloc_notation(d: pd.DataFrame) -> None:
         "qu'un seul thème (les mines d'or, par exemple) prenne toute la place."
     )
 
-    pedago.explique(
-        "Comment la note est calculée",
-        "Pour chaque indicateur (PER, marges, endettement, performance, "
-        "volatilité…), on mesure l'écart de la société à la moyenne de son "
-        "secteur, en écarts-types. Les ratios sont tournés pour que « plus "
-        "haut » veuille toujours dire « mieux », et les données aberrantes de "
-        "Yahoo (un PER de 1 042) sont écartées. La note d'un pilier est la "
-        "moyenne de ses indicateurs, la note finale la moyenne des cinq "
-        "piliers.",
-        "<strong>Ce que cette note ne dit pas, et pourquoi</strong> : "
-        "comparer chaque société à son propre secteur rend la note "
-        "<em>aveugle aux secteurs</em>. Elle dit qu'une banque est meilleure "
-        "que les autres banques ; elle ne dit jamais s'il faut détenir des "
-        "banques. Les 9 secteurs de la sélection finale en sont un résultat, "
-        "jamais une décision.",
-        "<strong>La vue macro de l'étape 2 ne descend donc pas jusqu'aux "
-        "secteurs, et c'est délibéré.</strong> Elle agit là où elle est "
-        "mesurable : sur la répartition entre classes d'actifs (étape 4). "
-        "C'est elle qui met le crédit à zéro parce que sa prime n'a été plus "
-        "basse que 2 % du temps en quarante ans, qui impose 15 % "
-        "d'obligations indexées contre le choc d'inflation, et qui ne retient "
-        "que 3,3 % d'or. Traduire en plus ce diagnostic en paris sectoriels "
-        "reviendrait à miser deux fois sur la même lecture : si elle se "
-        "trompe, elle se trompe sur l'allocation ET sur les titres. C'est le "
-        "même refus que celui qui fige la clé actions 40/35/10/15 plutôt que "
-        "de parier sur le yen — un pari assumé par portefeuille, pas trois.",
-        source=f"core/scoring.py · composition iShares STOXX Europe 600 au "
-               f"{d['date_composition'].iloc[0].replace('.', ' ')} · Yahoo "
-               f"Finance, relevé du {taux.date_fr(actions.releve())}",
+    st.caption(
+        "Chaque indicateur est mesuré en écarts-types à la moyenne de son "
+        "secteur, valeurs aberrantes écartées ; un pilier est la moyenne de "
+        "ses indicateurs, la note la moyenne des cinq piliers. Une société "
+        "dont moins de quatre piliers sont calculables n'est pas notée."
     )
-
-
 # --------------------------------------------------------------------------
 # Bloc 3 — ce que les analystes attendent, et le resserrement à 15 titres
 # --------------------------------------------------------------------------
@@ -341,39 +289,17 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
     )
 
     seuil = outlook.plafond_dispersion(x)
-    pedago.explique(
-        "Les trois garde-fous, et ce qu'ils coûtent",
-        "<strong>Le cours au-dessus de l'objectif, sans relais des "
-        "bénéfices</strong> : coter plus haut que son objectif de cours ne "
-        "suffit pas à faire sortir un titre, car l'objectif est lent — "
-        "l'analyste relève son estimation de bénéfice d'abord, et ne remonte "
-        "sa cible qu'ensuite. Un cours au-dessus de la cible signale donc "
-        "souvent une hausse récente que le consensus n'a pas encore "
-        "rattrapée. Le titre ne sort que si les bénéfices attendus ne suivent "
-        "pas. <strong>Au relevé du jour, aucune société n'est dans ce "
-        "cas</strong> : les huit qui cotent au-dessus de leur objectif ont "
-        "toutes un bénéfice attendu en hausse — Endesa +1,8 %, Orion +6,4 %, "
-        "Vår Energi +7,3 %.",
-        "<strong>Les prévisions en net recul</strong> : un bénéfice attendu "
-        "coupé de plus de 5 % en trois mois est un signal qu'on ne discute "
-        "pas. Norsk Hydro sort à −17 %, Rio Tinto à −5 %.",
-        "<strong>L'avenir illisible</strong> : quand les analystes ne "
-        "s'accordent pas sur le bénéfice à venir, la sélection n'a pas de "
-        f"prise. Au-delà de {viz.fr(seuil, '%', 0)} d'écart entre la "
-        "prévision la plus haute et la plus basse, le titre sort. Le seuil "
-        "n'est pas choisi : c'est le niveau des 10 % les plus dispersés. "
-        "Ce garde-fou vise surtout les pétrolières et les minières, dont le "
-        "bénéfice dépend d'un prix que personne ne sait prévoir — OMV "
-        "atteint 90 %, Rio Tinto 68 %.",
-        "<strong>Ce que ces règles coûtent, dit franchement</strong> : même "
-        "sans écarter personne à tort, resserrer trente titres en quinze "
-        "enlève de la diversification, et le panier resserré en ressort plus "
-        "agité que celui de trente. C'est le prix du choix, pas une erreur de "
-        "réglage. Le chiffrage est juste en dessous.",
-        source=f"core/outlook.py · consensus Yahoo Finance, relevé du "
-               f"{taux.date_fr(outlook.releve())}",
+    st.caption(
+        "Les trois garde-fous, en clair. **Cours au-dessus de l'objectif** : "
+        "n'écarte que si les bénéfices attendus ne suivent pas — l'objectif "
+        "est lent, l'analyste relève son estimation avant sa cible. Au "
+        "relevé du jour, aucune société n'est dans ce cas. **Prévisions en "
+        "net recul** : au-delà de −5 % en trois mois, le titre sort. "
+        f"**Avenir illisible** : au-delà de {viz.fr(seuil, '%', 0)} d'écart "
+        "entre la prévision la plus haute et la plus basse — seuil mesuré, "
+        "c'est le niveau des 10 % les plus dispersés, et il vise surtout les "
+        "pétrolières et les minières."
     )
-
     _fiche(d, sel, j)
     _panier(sel, fin)
 
@@ -699,26 +625,6 @@ def _bloc_souverains() -> None:
         f"moyenne, {viz.fr(choc, '%', 1)} si les taux montent d'un point.",
         icon=":material/lightbulb:",
     )
-
-    pedago.explique(
-        "Comment on évalue une obligation, et les mots du gérant",
-        "Une obligation est une suite de paiements connus (coupons, puis "
-        "remboursement). Son prix est la somme de ces paiements, chacun "
-        "ramené à sa valeur d'aujourd'hui avec le taux de la courbe de la "
-        "BCE à sa date.",
-        "<strong>Duration</strong> : durée de vie moyenne, coupons compris "
-        "(8,6 ans pour une obligation à 10 ans). <strong>Sensibilité</strong> : "
-        "le pourcentage de prix perdu si les taux montent d'un point. "
-        "<strong>Glissement</strong> : en vieillissant, l'obligation glisse "
-        "vers des échéances où les taux sont plus bas, et son prix monte.",
-        "<strong>AAA ou toute la zone euro ?</strong> L'écart rémunère un "
-        "risque : en 2011-2012 et en 2022, les taux italiens se sont envolés "
-        "quand les allemands baissaient. D'où l'AAA pour l'argent attendu à "
-        "date fixe, et la zone euro, diversifiée, pour la poche longue.",
-        source=f"Courbes zéro-coupon de la BCE (modèle de Svensson) au "
-               f"{taux.date_fr(sv['date'])} · core/obligations.py",
-    )
-
 
 def _graphique_souverains(aaa: dict, zone: dict, estr: float) -> None:
     fig = go.Figure()

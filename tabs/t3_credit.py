@@ -13,7 +13,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from core import obligations, pedago, rendements, taux, viz
+from core import obligations, rendements, taux, viz
 
 FICHIER = Path(__file__).resolve().parents[1] / "data" / "fonds_credit.json"
 DEFAUTS_IG = 0.11      # perte moyenne annuelle sur défauts, Moody's (étape 2)
@@ -73,19 +73,13 @@ def bloc() -> None:
         f"durées) : moins que l'échelle d'États 2-10 ans ({_pct(ech)}).",
         icon=":material/warning:",
     )
-    pedago.explique(
-        "La prime de crédit en crise",
-        "La prime rémunère deux risques : le défaut, et la hausse de la prime "
-        "elle-même, qui fait baisser le prix des obligations déjà achetées. "
-        "En 2020, les défauts sont restés rares mais la prime s'est envolée : "
-        "le fonds court a perdu trois fois plus que les États de même durée. "
-        "Plus un fonds est long, plus cette hausse fait mal.",
-        "Mars 2020 a aussi montré qu'un fonds obligataire peut coter un jour "
-        "bien sous la valeur de son contenu, faute d'acheteurs (−6 % le 18 "
-        "mars, rattrapé le lendemain). D'où des baisses mesurées sur les "
-        "cours du vendredi, et les 10 M€ à décaisser en obligations d'État "
-        "détenues en direct.",
-        source=f"Fiches iShares au {taux.date_fr(c['date'])} · courbe BCE · "
-               "méthodologie Bloomberg MSCI Euro Corporate 0-3 ESG SRI · "
-               "scripts/fetch_fonds_credit.py",
+    st.caption(
+        "La prime rémunère deux risques : le défaut, et la hausse de la "
+        "prime elle-même, qui fait baisser le prix des obligations déjà "
+        "achetées. En 2020 les défauts sont restés rares mais la prime s'est "
+        "envolée, et le fonds court a perdu trois fois plus que les États de "
+        "même durée. Mars 2020 a aussi montré qu'un fonds obligataire peut "
+        "coter un jour bien sous la valeur de son contenu, faute d'acheteurs "
+        "(−6 % le 18 mars, rattrapé le lendemain) : d'où les 10 M€ à "
+        "décaisser en obligations d'État détenues en direct."
     )

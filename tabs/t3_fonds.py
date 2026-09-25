@@ -12,7 +12,7 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from core import fonds, pedago, taux, viz
+from core import fonds, taux, viz
 
 
 def _taille(m: float | None) -> str:
@@ -76,27 +76,13 @@ def _lectures(cl: dict) -> None:
 
 
 def _pedagogie() -> None:
-    pedago.explique(
-        "Filtres, liquidité, corrections : ce qu'il faut savoir",
-        "<strong>« Screened » ne suffit pas.</strong> Ce filtre léger retire "
-        "les armes controversées, nucléaires et civiles, le tabac et le "
-        "charbon, mais <strong>pas</strong> l'armement conventionnel (avions "
-        "de combat, missiles). Or on l'a exclu des actions en direct. On "
-        "retient donc des indices « SRI », qui l'excluent dès 5 % du chiffre "
-        "d'affaires.",
-        "<strong>La liquidité d'un ETF</strong> n'est pas ce qui s'échange en "
-        "bourse (un million d'euros par jour pour le fonds américain) : pour "
-        "un gros ordre, un teneur de marché crée des parts en achetant les "
-        "actions sous-jacentes. D'où l'importance de la taille plutôt que des "
-        "volumes.",
-        "<strong>Neuf fonds mal identifiés</strong> dans l'univers hérité de "
-        "la version précédente ont été corrigés (par exemple un fonds noté "
-        "« obligations émergentes » qui était un fonds d'actions "
-        "américaines). Chaque fonds est désormais contrôlé sur deux sources, "
-        "Yahoo et justETF par son ISIN. " + " ".join(
-            f"<strong>{t}</strong> : noté « {avant} », en réalité "
-            f"« {vrai} »." for t, avant, vrai in fonds.CORRECTIONS),
-        source="Méthodologies MSCI ESG Screened, MSCI SRI, MSCI Low Carbon "
-               "SRI Selection, lues le 18/09/2026 · core/fonds.py · "
-               "data/universe.csv, colonne « correction »",
+    st.caption(
+        "Trois points de vigilance. Le filtre « Screened » ne retire **pas** "
+        "l'armement conventionnel, que nous avons exclu des actions en "
+        "direct : on retient donc des indices « SRI », qui l'excluent dès "
+        "5 % du chiffre d'affaires. La liquidité d'un ETF n'est pas son "
+        "volume de bourse mais sa taille, un teneur de marché créant des "
+        "parts à la demande. Et neuf fonds mal identifiés dans l'univers "
+        "hérité ont été corrigés, chacun contrôlé sur deux sources par son "
+        "ISIN."
     )
