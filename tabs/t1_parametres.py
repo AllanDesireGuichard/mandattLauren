@@ -92,28 +92,23 @@ def render() -> None:
     # ------------------------------------------------------------------
     st.markdown("#### Ce que cela dit du client")
 
-    pedago.explique(
-        "Le portrait qui se dégage de l'énoncé",
-        "M. Lauren a construit sa fortune en prenant un risque très élevé : "
-        "tout son patrimoine était concentré dans une seule entreprise. Il "
-        "vient de le transformer en cash, et sa demande va dans le sens "
-        "inverse de son parcours. Il ne cherche plus à faire fortune, il "
-        "cherche à la garder. C'est typique d'un entrepreneur qui vient de "
-        "céder.",
-        "Son hypothèse d'inflation à 4 % est élevée : c'est environ le double "
-        "de l'objectif de la BCE. Elle traduit une inquiétude plus qu'une "
-        "prévision. Il craint l'érosion lente de son patrimoine davantage "
-        "qu'un krach. Sa limite de perte à 15 %, elle, est modérée : il "
-        "accepte des secousses mais pas une chute qui entame durablement le "
-        "capital.",
-        "Enfin, il est méfiant à l'égard des deux grandes économies "
-        "développées et ouvert, par l'intermédiaire de son fils, à des actifs "
-        "non conventionnels. C'est un client qui attend qu'on lui explique "
-        "pourquoi, et pas seulement quoi.",
-        ouvert=True,
+    st.markdown(
+        "**Le portrait qui se dégage de l'énoncé.** M. Lauren a construit sa "
+        "fortune en prenant un risque très élevé — tout son patrimoine dans "
+        "une seule entreprise — et vient de le transformer en cash : sa "
+        "demande va dans le sens inverse de son parcours. Il ne cherche plus "
+        "à faire fortune, il cherche à la garder."
     )
-
-    # ------------------------------------------------------------------
+    st.markdown(
+        "Son hypothèse d'inflation à 4 % est élevée, environ le double de "
+        "l'objectif de la BCE : elle traduit une inquiétude plus qu'une "
+        "prévision. Sa limite de perte à 15 %, elle, est modérée — il "
+        "accepte des secousses, pas une chute qui entame le capital. Il est "
+        "enfin méfiant à l'égard des deux grandes économies développées et "
+        "ouvert, par son fils, à des actifs non conventionnels. C'est un "
+        "client qui attend qu'on lui explique pourquoi, et pas seulement quoi."
+    )
+# ------------------------------------------------------------------
     st.markdown("#### Les questions que l'énoncé laisse ouvertes")
     st.caption("Des questions qu'il faudrait poser au client. Faute de "
                "réponse, chacune appelle une hypothèse de travail, qui sera "

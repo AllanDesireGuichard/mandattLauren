@@ -86,30 +86,18 @@ def _bloc_taux() -> None:
 
     _courbe(photo)
 
-    pedago.explique(
-        "Pourquoi le taux à l'achat dit ce que rapportera une obligation",
-        "Une obligation est un prêt : si on la garde jusqu'au bout et que "
-        "l'emprunteur ne fait pas défaut, on connaît son rendement dès le "
-        "premier jour. Pour un fonds, c'est un peu moins exact, mais sur dix "
-        "ans le taux de départ reste la meilleure estimation, sans aucune "
-        "prévision économique : ce sont les chiffres les plus solides de "
-        "l'exercice.",
-        "Le revers : le montant versé est fixé une fois pour toutes. Une "
-        "obligation <strong>indexée</strong> promet au contraire un taux "
-        "<strong>réel</strong> : son capital est réévalué de l'inflation "
-        f"constatée. À {_pct(p['indexees_reel']['valeur'])} de taux réel, "
-        f"elle rapporte {_pct(p['indexees_reel']['valeur'] + 2)} si "
-        f"l'inflation est de 2 %, {_pct(indexee_nominal)} si elle est de "
-        "4 %. Si l'inflation reste basse, elle rapporte moins qu'une "
-        "obligation classique : c'est le prix de l'assurance.",
-        source=f"€STR et courbe BCE au {taux.date_fr(c['date'])} · "
-               f"fiches iShares (Core € Govt, Core € Corp, € Inflation Linked, "
-               f"taux réel au {taux.date_fr(p['indexees_reel']['date'])}) · "
-               f"data/taux_marche.json, relevé du "
-               f"{taux.date_fr(photo['releve'])}",
+    st.caption(
+        f"Une obligation est un prêt : gardée jusqu'au bout, son rendement "
+        f"est connu dès le premier jour, sans aucune prévision économique — "
+        f"ce sont les chiffres les plus solides de l'exercice. Le revers, "
+        f"c'est que le montant versé est fixé une fois pour toutes. Une "
+        f"obligation **indexée** promet au contraire un taux **réel** : à "
+        f"{_pct(p['indexees_reel']['valeur'])} de taux réel, elle rapporte "
+        f"{_pct(p['indexees_reel']['valeur'] + 2)} si l'inflation est de "
+        f"2 %, {_pct(indexee_nominal)} si elle est de 4 %. Si l'inflation "
+        f"reste basse, elle rapporte moins qu'une obligation classique : "
+        f"c'est le prix de l'assurance."
     )
-
-
 def _courbe(photo: dict) -> None:
     df = taux.courbe(photo)
     x = df["Maturité (ans)"]
@@ -187,19 +175,14 @@ def _bloc_etranger() -> None:
         icon=":material/lightbulb:",
     )
 
-    pedago.explique(
-        "Couvrir le change, et pourquoi le gain s'évapore",
-        "Couvrir, c'est s'engager dès aujourd'hui à revendre ses dollars à "
-        "un prix fixé d'avance. Ce prix intègre mécaniquement l'écart entre "
-        "les taux courts des deux zones : celui qui couvre rend donc à peu "
-        "près cet écart. Règle retenue : dans la partie obligataire, dont le "
-        "rôle est de stabiliser, on couvre le change.",
-        source=f"FRED (Trésor américain, indices ICE BofA) au "
-               f"{taux.date_fr(p['us_10a']['date'])} · euro-dollar de la "
-               f"Fed depuis {fx['debut']} · data/taux_marche.json",
+    st.caption(
+        "Couvrir le change, c'est s'engager dès aujourd'hui à revendre ses "
+        "dollars à un prix fixé d'avance. Ce prix intègre mécaniquement "
+        "l'écart entre les taux courts des deux zones, si bien que celui qui "
+        "couvre rend à peu près cet écart — le gain apparent s'évapore. "
+        "Règle retenue : dans la partie obligataire, dont le rôle est de "
+        "stabiliser, on couvre le change."
     )
-
-
 def _synthese(photo: dict, cout: float) -> None:
     """Tous les placements de taux, ramenés en euros, face au seuil."""
     p = photo["points"]
@@ -341,25 +324,16 @@ def _bloc_cycle() -> None:
         icon=":material/lightbulb:",
     )
 
-    pedago.explique(
-        "Comment se lit la chaîne, et les trois indicateurs clés",
-        "Quand l'économie croît, le chômage baisse et les prix montent ; la "
-        "banque centrale relève alors son taux pour tenir l'inflation près "
-        "de 2 %, et les taux de marché suivent. Quand les taux montent, "
-        "obligations et actions baissent.",
-        "<strong>L'inflation hors énergie et alimentation</strong> montre la "
-        "tendance de fond : si la totale monte et qu'elle ne bouge pas, c'est "
-        "un choc qui peut retomber. <strong>Le taux à 2 ans</strong> reflète "
-        "ce que le marché attend de la banque centrale : au-dessus de son "
-        "taux, il anticipe des hausses. <strong>L'indicateur avancé de "
-        "l'OCDE</strong> : au-dessus de 100 et en hausse, l'activité "
-        "accélère sur les six à neuf prochains mois.",
-        source=f"FRED, BCE, Eurostat, FMI (Perspectives de l'économie "
-               f"mondiale), OCDE · data/macro.json, relevé du "
-               f"{taux.date_fr(m['releve'])} · scripts/fetch_macro.py",
+    st.caption(
+        "La chaîne : quand l'économie croît, le chômage baisse et les prix "
+        "montent ; la banque centrale relève son taux, les taux de marché "
+        "suivent, obligations et actions baissent. Les trois indicateurs qui "
+        "la lisent — **l'inflation hors énergie et alimentation** donne la "
+        "tendance de fond (si la totale monte sans elle, c'est un choc qui "
+        "peut retomber) ; **le taux à 2 ans** dit ce que le marché attend de "
+        "la banque centrale ; **l'indicateur avancé de l'OCDE**, au-dessus "
+        "de 100 et en hausse, annonce une accélération sur six à neuf mois."
     )
-
-
 def _graphique_inflation(us: dict, ea: dict) -> None:
     fig = make_subplots(rows=1, cols=2, shared_yaxes=True,
                         subplot_titles=("États-Unis", "Zone euro"),
@@ -436,20 +410,15 @@ def _bloc_credit() -> None:
         icon=":material/lightbulb:",
     )
 
-    pedago.explique(
-        "Les limites de ces chiffres",
-        "Les indices ICE ne sont plus diffusés gratuitement que sur trois "
-        "ans, sans aucune crise dedans. On s'appuie donc sur la série de "
-        "Moody's (depuis 1986) et l'historique américain depuis 2010. Il "
-        "n'existe pas de série longue gratuite pour l'Europe, mais sa prime "
-        f"suit de près l'américaine (corrélation de "
-        f"{viz.fr(lien['niveaux'], '', 2)} en niveau) : un repère, pas une "
-        f"mesure.",
-        source=f"FRED (BAA10Y de Moody's, indices ICE BofA) · relevé du "
-               f"{taux.date_fr(c['releve'])} · scripts/fetch_credit.py",
+    st.caption(
+        f"**Limite assumée.** Les indices ICE ne sont plus diffusés "
+        f"gratuitement que sur trois ans, sans aucune crise dedans. On "
+        f"s'appuie donc sur la série de Moody's depuis 1986 et l'historique "
+        f"américain depuis 2010. Il n'existe pas de série longue gratuite "
+        f"pour l'Europe ; sa prime suit de près l'américaine (corrélation "
+        f"{viz.fr(lien['niveaux'], '', 2)} en niveau), mais c'est un repère, "
+        f"pas une mesure."
     )
-
-
 def _graphique_credit() -> None:
     h = credit.histo()
     m = h[["BAA10Y", "BAMLH0A0HYM2"]].resample("ME").mean()
@@ -568,19 +537,12 @@ def _bloc_marches() -> None:
         "devenu plus cher. Le bloc suivant mesure les valorisations.",
         icon=":material/lightbulb:",
     )
-    pedago.explique(
-        "Pourquoi regarder ce qui a monté",
+    st.caption(
         "Sur trois à douze mois, ce qui a monté a tendance à continuer "
         "(l'effet « momentum ») ; sur plusieurs années, l'effet s'inverse. "
         "La dynamique sert donc à ajuster une allocation à la marge, jamais "
-        "à la fonder.",
-        source=f"ETF cotés à Francfort en euros, dividendes réinvestis, noms "
-               f"et devises vérifiés, prix aberrants retirés · "
-               f"data/marches.json, relevé du {taux.date_fr(m['releve'])} · "
-               f"Yahoo Finance",
+        "à la fonder."
     )
-
-
 def _graphique_marches(m: dict) -> None:
     choix = [("SXR8.DE", "États-Unis"), ("EXSA.DE", "Europe"),
              ("XMME.DE", "Émergents"), ("4GLD.DE", "Or")]
@@ -618,7 +580,6 @@ def _bloc_rendements() -> None:
     r = rendements.charger()
     C = r["classes"]
     g = r["croissance"]
-    src = r["sources"]
 
     st.markdown("#### Ce qu'on peut attendre de chaque classe d'actifs")
     st.markdown(
@@ -656,27 +617,21 @@ def _bloc_rendements() -> None:
     )
 
     us = C["us"]["detail"]
-    pedago.explique(
-        "Comment on estime ce que rapportera une action",
-        "Deux mesures qui se recoupent. <strong>Le rendement des "
-        "bénéfices</strong> (l'inverse du PER : à un PER de 20, on achète 5 % "
-        "de bénéfices par an). <strong>Le dividende plus la croissance des "
-        f"bénéfices</strong>, mesurée depuis 1900 à "
-        f"{viz.fr(g['central'], '%', 1)} par an au-delà de l'inflation. On "
-        "fait la moyenne des deux, puis on ajoute l'inflation de l'énoncé. "
-        "Plus un marché est cher, moins il rapporte ensuite : d'où les "
-        f"États-Unis (PER {viz.fr(us['per_ishares'], '', 1)}) attendus plus "
-        "bas que l'Europe.",
-        "<strong>Contrôle</strong> : une fois corrigées de leur inflation à "
-        "2 %, les hypothèses de J.P. Morgan sont à moins d'un point des "
-        "nôtres. <strong>Limites</strong> : ce sont des moyennes sur dix "
-        "ans, pas des promesses (une classe attendue à 9 % peut perdre 20 % "
-        "une année), hors frais, fiscalité et effet de change.",
-        source=f"data/rendements.json · relevé du "
-               f"{taux.date_fr(r['releve'])} · scripts/estimer_rendements.py "
-               f"· {src['moodys']} · {src['jpm']} · {g['source']}",
+    st.caption(
+        f"**La méthode, en deux mesures qui se recoupent.** Le rendement des "
+        f"bénéfices (l'inverse du PER : à un PER de 20, on achète 5 % de "
+        f"bénéfices par an), et le dividende plus la croissance des "
+        f"bénéfices, mesurée depuis 1900 à {viz.fr(g['central'], '%', 1)} "
+        f"par an au-delà de l'inflation. On fait la moyenne des deux, puis "
+        f"on ajoute l'inflation de l'énoncé. Plus un marché est cher, moins "
+        f"il rapporte ensuite : d'où les États-Unis (PER "
+        f"{viz.fr(us['per_ishares'], '', 1)}) attendus plus bas que "
+        f"l'Europe. **Contrôle** : corrigées de leur inflation à 2 %, les "
+        f"hypothèses de J.P. Morgan sont à moins d'un point des nôtres. "
+        f"**Limites** : ce sont des moyennes sur dix ans et non des "
+        f"promesses — une classe attendue à 9 % peut perdre 20 % une année — "
+        f"hors frais, fiscalité et effet de change."
     )
-
     st.markdown("#### Conclusion de l'étape 2")
     st.markdown(
         "Inflation qui remonte avec l'énergie, banques centrales qui "

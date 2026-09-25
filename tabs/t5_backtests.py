@@ -71,7 +71,6 @@ def render() -> None:
 # ----------------------------------------------------------------------
 def _bloc_parcours(d: dict) -> None:
     v, ep, t = d["v"], d["ep"], d["t"]
-    M = allocation.MONTANT
     ans = (v.index[-1] - v.index[0]).days / 365.25
     cagr = ((v.iloc[-1] / v.iloc[0]) ** (1 / ans) - 1) * 100
 
@@ -276,21 +275,16 @@ def _bloc_var(d: dict) -> None:
         f"haut : une limite fixée sur un an aurait laissé passer ces "
         f"baisses."
     )
-    pedago.explique(
-        "Ce que valent ces chiffres",
-        f"Les {len(r)} années glissantes se chevauchent : deux années qui "
-        f"commencent à un mois d'écart partagent onze mois. Vingt ans de "
-        f"données ne contiennent en réalité qu'une vingtaine d'années "
-        f"indépendantes, dont une seule « année sur vingt ». La VaR à 95 % "
-        f"repose donc sur une poignée d'épisodes, surtout 2008 et 2022, et "
-        f"la VaR à 99 % sur un seul.",
-        "Ces chiffres ne sont pas une prévision : ils décrivent ce qu'aurait "
-        "vécu ce portefeuille sur une période qui a servi à le construire.",
-        source="Rendements sur douze mois du portefeuille retenu, "
-               "rééquilibré chaque mois, calculés en fin de mois.",
+    st.caption(
+        f"**Ce que valent ces chiffres.** Les {len(r)} années glissantes se "
+        f"chevauchent : deux années qui commencent à un mois d'écart "
+        f"partagent onze mois. Vingt ans de données ne contiennent qu'une "
+        f"vingtaine d'années indépendantes, dont une seule « année sur "
+        f"vingt » — la VaR à 95 % repose donc sur une poignée d'épisodes, "
+        f"surtout 2008 et 2022, et la VaR à 99 % sur un seul. Ce ne sont pas "
+        f"des prévisions : elles décrivent ce qu'aurait vécu ce portefeuille "
+        f"sur une période qui a servi à le construire."
     )
-
-
 def _graphique_annees(r: pd.Series, v95: float, c95: float) -> None:
     fig = go.Figure()
     fig.add_trace(go.Histogram(

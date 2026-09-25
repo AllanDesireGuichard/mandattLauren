@@ -1,5 +1,11 @@
 """
-Encadres pedagogiques depliables.
+Encadres pedagogiques.
+
+`explique()`, qui les rendait DEPLIABLES, a ete retiree le 2026-09-25 :
+Allan a demande d'alleger les onglets, et cacher derriere un clic ce qui
+porte un argument ou avoue une limite l'affaiblit plutot qu'il ne l'allege.
+Ce qui y vivait est devenu du texte visible, ou a ete supprime. Le style
+`.peda` reste : `etape()` et `formule()` s'en servent.
 
 Un seul point de passage, pour deux raisons.
 
@@ -38,23 +44,6 @@ def _poser_css() -> None:
     if not _css_pose:
         st.markdown(CSS, unsafe_allow_html=True)
         _css_pose = True
-
-
-def explique(titre: str, *paragraphes: str, source: str | None = None,
-             ouvert: bool = False) -> None:
-    """
-    Encadre depliable : un titre, des paragraphes rediges, une source.
-
-    Chaque argument positionnel est UN paragraphe. Pas de puces : une puce
-    enonce, un paragraphe explique, et c'est d'explications qu'il s'agit ici.
-    """
-    _poser_css()
-    with st.expander(titre, expanded=ouvert):
-        corps = "".join(f"<p>{p.strip()}</p>" for p in paragraphes if p.strip())
-        st.markdown(f'<div class="peda">{corps}</div>', unsafe_allow_html=True)
-        if source:
-            st.markdown(f'<div class="peda-source">{source}</div>',
-                        unsafe_allow_html=True)
 
 
 def formule(latex: str, traduction: str) -> None:
