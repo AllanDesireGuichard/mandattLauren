@@ -22,8 +22,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import (actions, allocation, fonds, ips, obligations, outlook,
-                  pedago, taux, viz)
+from core import (actions, allocation, fiches, fonds, ips, obligations,
+                  outlook, pedago, taux, viz)
 
 
 def _pct(v: float) -> str:
@@ -593,6 +593,19 @@ def _bloc_retenu() -> None:
         _graphique_compte(sel["secteur"], "Par secteur (titres · M€)", par_titre)
     with g2:
         _graphique_compte(sel["pays"], "Par pays (titres · M€)", par_titre)
+
+    # Les quinze sont NOMMÉES ici, et pas seulement comptées par secteur et
+    # par pays. Ajouté le 2026-09-25 : les obligations et les fonds étaient
+    # détaillés ligne à ligne dans ce bloc, les actions ne l'étaient pas —
+    # alors que c'est la poche construite titre par titre. Même table qu'à
+    # l'étape 3, augmentée du montant : cet onglet répond à « ce qu'on a et
+    # ce qu'on prend », et une ligne du portefeuille sans son montant n'y
+    # répond qu'à moitié.
+    t = fiches.table(sel)
+    t.insert(2, "Montant", [_me(par_titre)] * len(t))
+    st.table(t.set_index("Société"))
+    if (manque := fiches.manquantes(sel)):
+        st.warning("Fiche à rédiger pour : " + ", ".join(manque))
 
     # --- ce qu'on achète, en direct puis en fonds --------------------
     # Réécrit le 2026-09-25. Allan : « fait un truc très concret pour l'oblig
