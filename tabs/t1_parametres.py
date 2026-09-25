@@ -93,20 +93,15 @@ def render() -> None:
     st.markdown("#### Ce que cela dit du client")
 
     st.markdown(
-        "**Le portrait qui se dégage de l'énoncé.** M. Lauren a construit sa "
-        "fortune en prenant un risque très élevé — tout son patrimoine dans "
-        "une seule entreprise — et vient de le transformer en cash : sa "
-        "demande va dans le sens inverse de son parcours. Il ne cherche plus "
-        "à faire fortune, il cherche à la garder."
+        "**Le portrait.** M. Lauren a bâti sa fortune sur un risque très "
+        "concentré, vient de la transformer en cash, et cherche désormais à "
+        "la garder plutôt qu'à la faire croître."
     )
     st.markdown(
-        "Son hypothèse d'inflation à 4 % est élevée, environ le double de "
-        "l'objectif de la BCE : elle traduit une inquiétude plus qu'une "
-        "prévision. Sa limite de perte à 15 %, elle, est modérée — il "
-        "accepte des secousses, pas une chute qui entame le capital. Il est "
-        "enfin méfiant à l'égard des deux grandes économies développées et "
-        "ouvert, par son fils, à des actifs non conventionnels. C'est un "
-        "client qui attend qu'on lui explique pourquoi, et pas seulement quoi."
+        "Son hypothèse d'inflation à 4 % est le double de la cible de la "
+        "BCE ; sa limite de perte à 15 % est modérée. Il est méfiant envers "
+        "les deux grandes économies développées et ouvert aux actifs non "
+        "conventionnels."
     )
 # ------------------------------------------------------------------
     st.markdown("#### Les questions que l'énoncé laisse ouvertes")

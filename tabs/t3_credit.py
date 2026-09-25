@@ -48,19 +48,18 @@ def bloc() -> None:
     echelle = [obligations.analyse(m, zone)["rendement"] for m in (2, 3, 5, 7, 10)]
     ech = sum(echelle) / len(echelle)
     st.markdown(
-        f"- **Quel crédit ?** Seulement les entreprises bien notées. Défauts "
-        f"déduits, le haut rendement rapporte "
-        f"{_pct(r['hy_euro']['central'])}, **moins que les États** "
-        f"({_pct(r['govt_bonds_eur']['central'])}).\n"
-        f"- **Quelle durée ?** Courte. Du fonds le plus court au plus long, "
-        f"la prime passe de {viz.fr(p_court, 'point', 2)} à environ "
+        f"- **Quel crédit ?** Bien noté seulement. Défauts déduits, le haut "
+        f"rendement rapporte {_pct(r['hy_euro']['central'])}, **moins que "
+        f"les États** ({_pct(r['govt_bonds_eur']['central'])}).\n"
+        f"- **Quelle durée ?** Courte : allonger fait passer la prime de "
+        f"{viz.fr(p_court, 'point', 2)} à "
         f"{viz.fr(max(x['rendement'] - _etat(x['maturite'], zone) for x in longs), 'point', 2)}, "
         f"mais la perte de 2022 de "
         f"{viz.fr(-c['pires_baisses']['2022'], '%', 1)} à "
         f"{viz.fr(-min(x['pires_baisses']['2022'] for x in longs), '%', 1)}.\n"
-        f"- **Quel fonds ?** Même règle que les autres fonds : **{ret.split('.')[0]}** "
-        f"({c['nom']}), durée {viz.fr(c['duree'], 'ans', 1)}, frais "
-        f"{_pct(c['frais'])}, {viz.fr(c['taille'] / 1000, 'Md€', 1)}."
+        f"- **Quel fonds ?** **{ret.split('.')[0]}** ({c['nom']}), durée "
+        f"{viz.fr(c['duree'], 'ans', 1)}, frais {_pct(c['frais'])}, "
+        f"{viz.fr(c['taille'] / 1000, 'Md€', 1)}."
     )
     st.warning(
         f"**Le crédit court rapporte à peine plus que l'État** : "
@@ -74,12 +73,7 @@ def bloc() -> None:
         icon=":material/warning:",
     )
     st.caption(
-        "La prime rémunère deux risques : le défaut, et la hausse de la "
-        "prime elle-même, qui fait baisser le prix des obligations déjà "
-        "achetées. En 2020 les défauts sont restés rares mais la prime s'est "
-        "envolée, et le fonds court a perdu trois fois plus que les États de "
-        "même durée. Mars 2020 a aussi montré qu'un fonds obligataire peut "
-        "coter un jour bien sous la valeur de son contenu, faute d'acheteurs "
-        "(−6 % le 18 mars, rattrapé le lendemain) : d'où les 10 M€ à "
-        "décaisser en obligations d'État détenues en direct."
+        "La prime rémunère le défaut et la hausse de la prime elle-même. En "
+        "2020 les défauts sont restés rares mais la prime s'est envolée : le "
+        "fonds court a perdu trois fois plus que les États de même durée."
     )

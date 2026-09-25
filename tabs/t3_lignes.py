@@ -22,8 +22,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import (actions, obligations, outlook, pedago, scoring, taux,
-                  viz, vue_secteurs)
+from core import (actions, fiches, obligations, outlook, pedago, scoring,
+                  taux, viz, vue_secteurs)
 from tabs import t3_credit, t3_fonds
 
 
@@ -86,10 +86,8 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
 
     st.markdown(f"#### De 600 valeurs à {NB_FINAL} : l'entonnoir")
     st.markdown(
-        "Point de départ : le **STOXX Europe 600**, les 600 plus grandes "
-        "entreprises cotées d'Europe. On ne garde que les **grandes "
-        "capitalisations (10 Md€ et plus)**, suivies par de nombreux analystes "
-        "et faciles à acheter ou vendre, même en crise."
+        "Point de départ : le **STOXX Europe 600**. On ne garde que les "
+        "capitalisations de **10 Md€ et plus**."
     )
     pedago.fil([
         (f"{n} valeurs", "le STOXX Europe 600"),
@@ -112,14 +110,12 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
     _vue_sectorielle(d)
 
     st.caption(
-        "Méthode : exclusion automatique des sociétés classées « tabac », "
-        "« aéronautique et défense » ou « charbon », puis examen à la main "
-        "des sociétés dont la description contient un mot comme "
-        "« militaire » ou « lignite ». Limite assumée : la vente de tabac "
-        "par la grande distribution n'est pas repérable de façon fiable. "
-        f"Les {len(inv)} sociétés d'investissement ne sont pas exclues mais "
-        "pas notées — leur bénéfice inclut la hausse de valeur de leurs "
-        "participations, ce qui fausse PER et rentabilité."
+        "Exclusion automatique par industrie, puis examen à la main des "
+        "sociétés dont la description contient « militaire », « lignite » "
+        "ou équivalent. Limite : la vente de tabac par la grande "
+        f"distribution n'est pas repérable. Les {len(inv)} sociétés "
+        "d'investissement sont notées à part — leur bénéfice inclut la "
+        "hausse de valeur de leurs participations."
     )
 def _vue_sectorielle(d: pd.DataFrame) -> None:
     """
@@ -129,10 +125,6 @@ def _vue_sectorielle(d: pd.DataFrame) -> None:
     sont une contrainte du mandat, celle-là un arbitrage qu'il faut défendre.
     """
     c = vue_secteurs.cout(d)
-    sans = actions.selection(d, vue=False)
-    avec = actions.selection(d)
-    perdus = sorted(set(sans["longName"]) - set(avec["longName"]))
-    gagnes = sorted(set(avec["longName"]) - set(sans["longName"]))
 
     st.markdown(
         "**Notre vue sectorielle**, qui n'est pas une contrainte du client "
@@ -140,24 +132,11 @@ def _vue_sectorielle(d: pd.DataFrame) -> None:
         f"soit {c['titres_notes']} sociétés notées."
     )
     st.table(vue_secteurs.table().set_index("Industrie"))
-    trentieme = avec.nsmallest(1, "note").iloc[0]
     st.caption(
-        "Ce que la décision coûte : le meilleur titre écarté est "
-        f"**{court(c['meilleur_titre'])}**, noté "
-        f"{_pilier_fr(c['meilleure_note'])}. "
-        + (f"Sans cette vue il serait présélectionné — il était trentième — "
-           f"et {court(gagnes[0])} ({_pilier_fr(trentieme['note'])}) "
-           f"sortirait à sa place. " if perdus and gagnes else "")
-        + "La sélection finale des quinze et le risque du panier sont "
-        "inchangés : la vue ne coûte qu'un titre, et le dernier."
-    )
-    st.caption(
-        "Pourquoi une décision et non un malus dans la note : le signe d'un "
-        "malus n'est pas déterminé. Sur les constructeurs, nos piliers "
-        "sortent à −0,58 en Dynamique et +0,62 en Valorisation — la note "
-        "voit la difficulté du secteur et juge qu'elle est déjà payée par "
-        "le prix. Un malus casserait cette compensation sans le dire ; une "
-        "exclusion déclarée, elle, est datée, motivée et chiffrable."
+        f"Coût de la décision : {c['titres_notes']} sociétés notées sortent "
+        f"de l'univers. La meilleure, {court(c['meilleur_titre'])} "
+        f"({_pilier_fr(c['meilleure_note'])}), était la trentième. "
+        f"Sélection finale et risque du panier inchangés."
     )
 # --------------------------------------------------------------------------
 # Bloc 2 — la notation et les 30 titres
@@ -176,14 +155,11 @@ def _bloc_notation(d: pd.DataFrame) -> None:
 
     st.markdown("#### La notation : les 30 titres présélectionnés")
     st.markdown(
-        "Chaque société reçoit une note sur cinq piliers à poids égaux, en "
-        "comparaison avec **les sociétés de son propre secteur** (une banque "
-        "face aux banques) :\n"
-        "- **Valorisation** : est-elle bon marché ?\n"
-        "- **Croissance** : ses résultats progressent-ils ?\n"
-        "- **Dynamique** : le marché la soutient-il ?\n"
-        "- **Qualité** : est-elle solide et rentable ?\n"
-        "- **Résistance** : tient-elle bon quand le marché chute ?"
+        "Cinq piliers à poids égaux, chaque société comparée aux sociétés "
+        "de **son propre secteur** : **valorisation** (bon marché ?), "
+        "**croissance**, **dynamique** (le marché la soutient ?), "
+        "**qualité** (solide et rentable ?), **résistance** (tient-elle en "
+        "crise ?)."
     )
 
     tab = sel.assign(Rang=range(1, len(sel) + 1),
@@ -193,13 +169,12 @@ def _bloc_notation(d: pd.DataFrame) -> None:
     st.markdown("**Les 30 titres présélectionnés**")
     st.table(tab.set_index("Rang"))
     plaf = scoring.plafonds_volatilite(d)
+    plaf = scoring.plafonds_volatilite(d)
     st.caption(
-        "Note : écart à la moyenne du secteur (0 = dans la moyenne, +1 = "
-        "nettement meilleure). Au plus 4 titres par secteur et 6 par pays, "
-        "et aucun parmi les plus volatils de son métier : le plafond part de "
-        f"{viz.fr(scoring.plafond_volatilite(d), '%', 1)} pour tout le monde "
-        f"et s'élargit là où l'agitation est structurelle, jusqu'à "
-        f"{viz.fr(plaf.max(), '%', 1)} dans « {plaf.idxmax()} »."
+        f"Note : écart à la moyenne du secteur en écarts-types. Au plus 4 "
+        f"titres par secteur et 6 par pays ; volatilité plafonnée dans son "
+        f"métier, de {viz.fr(scoring.plafond_volatilite(d), '%', 1)} à "
+        f"{viz.fr(plaf.max(), '%', 1)} selon le secteur."
     )
     c = st.columns(3)
     c[0].metric("Secteurs représentés", sel["secteur"].nunique(), "sur 11",
@@ -208,18 +183,11 @@ def _bloc_notation(d: pd.DataFrame) -> None:
     c[2].metric("Part de l'indice STOXX 600",
                 viz.fr(sel["poids"].sum(), "%", 1),
                 "poids cumulé dans l'indice", delta_color="off")
-    st.markdown(
-        "La sélection ne ressemble pas à l'indice, et c'est voulu : la note "
-        "ignore la taille, et les plafonds par secteur et par pays évitent "
-        "qu'un seul thème (les mines d'or, par exemple) prenne toute la place."
+    st.caption(
+        "La note ignore la taille des sociétés : la sélection ne ressemble "
+        "pas à l'indice, et c'est voulu."
     )
 
-    st.caption(
-        "Chaque indicateur est mesuré en écarts-types à la moyenne de son "
-        "secteur, valeurs aberrantes écartées ; un pilier est la moyenne de "
-        "ses indicateurs, la note la moyenne des cinq piliers. Une société "
-        "dont moins de quatre piliers sont calculables n'est pas notée."
-    )
 # --------------------------------------------------------------------------
 # Bloc 3 — ce que les analystes attendent, et le resserrement à 15 titres
 # --------------------------------------------------------------------------
@@ -233,32 +201,17 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
 
     st.markdown(f"#### De 30 à {NB_FINAL} : ce que les analystes attendent")
     st.markdown(
-        "Les cinq piliers mesurent ce que ces sociétés **sont** : leurs "
-        "comptes, leurs marges, leur comportement dans les crises passées. "
-        "Tout y est constaté. Reste la question qu'un gérant pose ensuite : "
-        "**où vont-elles ?** On interroge pour cela le consensus des "
-        "analystes qui suivent chaque titre — entre 5 et 25 selon la société."
+        "Les cinq piliers mesurent ce que ces sociétés **sont**. Ce second "
+        "étage mesure **où elles vont**, et resserre les 30 en "
+        f"{NB_FINAL}."
     )
     st.markdown(
-        "Quatre mesures, et aucune n'est l'avis « acheter / conserver / "
-        "vendre » :\n"
-        "- **La révision** : de combien le bénéfice attendu a bougé en trois "
-        "mois. C'est le **sens** dans lequel le consensus se déplace ;\n"
-        "- **Le solde des révisions** : sur le dernier mois, quelle part des "
-        "analystes qui ont changé d'avis l'ont fait à la hausse ;\n"
-        "- **Le potentiel** : l'objectif de cours moyen, comparé au cours "
-        "d'aujourd'hui ;\n"
-        "- **La dispersion** : l'écart entre la prévision la plus optimiste "
-        "et la plus pessimiste. Elle mesure si l'avenir de la société est "
-        "**lisible**."
-    )
-    st.markdown(
-        "**Pourquoi écarter l'avis lui-même.** Il est presque toujours "
-        "positif — les analystes recommandent rarement de vendre — donc il "
-        "sépare mal. Et il manque purement et simplement sur 7 des 30 "
-        "sociétés, dont des groupes suivis par 14 à 16 analystes. En faire "
-        "un critère les écarterait pour une raison technique. Il est affiché "
-        "dans le tableau, il ne décide de rien."
+        "**Classent** : la révision du bénéfice attendu sur 90 jours, et le "
+        "solde des révisions du mois. **Éliminent seulement** : le "
+        "potentiel (cours face à l'objectif) et la dispersion des "
+        "estimations. L'avis « acheter / conserver / vendre » est affiché, "
+        "jamais noté — il manque sur 6 des 30, dont des sociétés suivies "
+        "par 14 analystes."
     )
 
     _nuage(j, retenus)
@@ -289,19 +242,31 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
     )
 
     seuil = outlook.plafond_dispersion(x)
+    seuil = outlook.plafond_dispersion(x)
     st.caption(
-        "Les trois garde-fous, en clair. **Cours au-dessus de l'objectif** : "
-        "n'écarte que si les bénéfices attendus ne suivent pas — l'objectif "
-        "est lent, l'analyste relève son estimation avant sa cible. Au "
-        "relevé du jour, aucune société n'est dans ce cas. **Prévisions en "
-        "net recul** : au-delà de −5 % en trois mois, le titre sort. "
-        f"**Avenir illisible** : au-delà de {viz.fr(seuil, '%', 0)} d'écart "
-        "entre la prévision la plus haute et la plus basse — seuil mesuré, "
-        "c'est le niveau des 10 % les plus dispersés, et il vise surtout les "
-        "pétrolières et les minières."
+        f"Seuils : bénéfice attendu coupé de plus de 5 % en trois mois ; "
+        f"dispersion au-delà de {viz.fr(seuil, '%', 0)}, mesurée comme le "
+        f"niveau des 10 % les plus dispersés ; cours au-dessus de "
+        f"l'objectif **et** bénéfices qui ne suivent pas."
     )
+    _bloc_fiches(fin)
     _fiche(d, sel, j)
     _panier(sel, fin)
+
+
+def _bloc_fiches(fin: pd.DataFrame) -> None:
+    """
+    Les titres retenus, un par ligne : le métier, et pourquoi il est là.
+
+    Demande d'Allan du 2026-09-25. Le tableau des mesures répond à « sur quoi
+    les a-t-on choisis » ; celui-ci répond à la question qu'un client pose en
+    premier, « qu'est-ce que j'achète, et pourquoi celui-là ». Le texte vit
+    dans core/fiches.py ; les chiffres cités y sont recalculés à l'affichage.
+    """
+    st.markdown(f"**Les {len(fin)} titres retenus : le métier, et pourquoi**")
+    st.table(fiches.table(fin).set_index("Société"))
+    if (manque := fiches.manquantes(fin)):
+        st.warning("Fiche à rédiger pour : " + ", ".join(manque))
 
 
 def _nuage(j: pd.DataFrame, retenus: set) -> None:
@@ -331,22 +296,10 @@ def _nuage(j: pd.DataFrame, retenus: set) -> None:
         xaxis={"gridcolor": viz.GRID, "title": "Note des cinq piliers"},
         yaxis={"gridcolor": viz.GRID, "title": "Note d'avenir"}))
     st.plotly_chart(fig, width="stretch", config={"displayModeBar": False})
-    st.markdown(
-        "**Lecture.**\n"
-        "- **En haut** : le consensus se redresse. **En bas** : il se "
-        "dégrade. La ligne pointillée est le point mort.\n"
-        "- **À droite** : les mieux notées sur le passé et le présent.\n"
-        "- Les deux mesures ne se recouvrent pas — c'est tout l'intérêt de "
-        "poser la seconde question. argenx est la mieux notée des trente "
-        "**et** bien orientée : elle est retenue sans discussion. Endesa est "
-        "deuxième au classement et mieux orientée encore ; elle cote pourtant "
-        "16 % au-dessus de son objectif de cours, parce que ses bénéfices "
-        "attendus montent plus vite que la cible des analystes.\n"
-        "- Un point en bas à droite est le piège que cette étape sert à "
-        "éviter : une société qui a tout pour elle **sauf** la suite. "
-        "United Utilities est cinquième des trente sur les cinq piliers et "
-        "dernière sur l'avenir — son bénéfice attendu recule de 2 % et aucun "
-        "analyste ne relève. Elle ne passe pas."
+    st.caption(
+        "En haut : le consensus se redresse. À droite : la société est bien "
+        "notée sur les cinq piliers. Les retenus sont en haut à droite, "
+        "sous les plafonds de 2 par secteur et 4 par pays."
     )
 
 
@@ -370,14 +323,10 @@ def _table_avenir(j: pd.DataFrame, retenus: set) -> None:
     st.table(tab.set_index("Société"))
     st.caption(
         "Révision : variation du bénéfice attendu sur trois mois. Solde : "
-        "part des révisions du dernier mois qui vont à la hausse, tenue pour "
-        "neutre en dessous de trois révisions — sur une seule, elle ne "
-        "pourrait valoir que −100 ou +100 %. Potentiel : objectif de cours "
-        "moyen comparé au cours. Dispersion : écart entre la prévision la "
-        "plus haute et la plus basse. La note d'avenir ne retient que la "
-        "révision et le solde ; le potentiel et la dispersion servent de "
-        f"garde-fous. Au plus {outlook.MAX_SECTEUR} titres par secteur et "
-        f"{outlook.MAX_PAYS} par pays."
+        "part des révisions du mois qui vont dans le bon sens, tenue pour "
+        "neutre sous trois révisions. Potentiel : objectif de cours "
+        "consensus face au cours. Dispersion : écart entre la prévision la "
+        "plus haute et la plus basse."
     )
 
 
@@ -395,10 +344,8 @@ def _panier(sel: pd.DataFrame, fin: pd.DataFrame) -> None:
     st.markdown("**Ce que le resserrement change : les deux paniers face à "
                 "l'indice**")
     st.markdown(
-        "Plus la poche d'actions baisse modérément en crise, plus on peut en "
-        "détenir sous la limite de 15 %. Passer de 30 à "
-        f"{len(fin)} titres doit donc être payé, ou gagné, en risque — voici "
-        "le prix."
+        f"Les {len(fin)} titres à parts égales, en euros, face aux "
+        f"{len(sel)} présélectionnés et au STOXX Europe 600."
     )
     mesures = [("Volatilité sur 3 ans", "vol_3a"),
                ("Perte maximale en 2020", "dd_2020"),
@@ -410,26 +357,12 @@ def _panier(sel: pd.DataFrame, fin: pd.DataFrame) -> None:
                "Indice STOXX Europe 600"],
         columns=[nom for nom, _ in mesures]))
 
-    ecart_vol = a["vol_3a"] - b["vol_3a"]
-    ecart_2020 = a["dd_2020"] - b["dd_2020"]
-    st.markdown(
-        f"**Lecture.** Resserrer à {len(fin)} titres rend le panier "
-        f"**{viz.fr(abs(ecart_vol), 'point', 2)} "
-        + ("plus" if ecart_vol > 0 else "moins")
-        + " agité** au quotidien et lui fait perdre "
-        f"**{viz.fr(abs(ecart_2020), 'points', 1)} de "
-        + ("plus" if ecart_2020 < 0 else "moins")
-        + " en 2020**. La raison est identifiable : le garde-fou de "
-        "l'objectif de cours frappe surtout les valeurs **défensives**, qui "
-        "cotent souvent au-dessus de leur cible quand elles sont chères — "
-        "des services aux collectivités et de la santé. Chercher l'avenir "
-        "coûte de la protection, c'est un arbitrage assumé.\n\n"
-        "Il reste moins agité que l'indice, et l'ordre de grandeur compte : "
-        "les actions européennes pèsent environ un huitième du portefeuille "
-        "final, si bien que cet écart y vaut moins d'un cinquième de point. "
-        "Le panier perd de toute façon bien plus que 15 % en crise : c'est le "
-        "dosage avec les obligations et l'or, à l'étape 4, qui tiendra la "
-        "limite."
+    st.caption(
+        f"Le resserrement coûte {viz.fr(a['vol_3a'] - b['vol_3a'], 'pt', 2)} "
+        f"de volatilité et {viz.fr(a['dd_2020'] - b['dd_2020'], 'pt', 1)} "
+        f"en 2020 : le garde-fou du potentiel frappe les défensives, qui "
+        f"cotent souvent au-dessus de leur objectif. La poche vaut 12,2 % du "
+        f"patrimoine, l'écart y pèse 0,16 point."
     )
 
     fig = go.Figure()
@@ -449,11 +382,9 @@ def _panier(sel: pd.DataFrame, fin: pd.DataFrame) -> None:
         yaxis={"gridcolor": viz.GRID}, xaxis={"gridcolor": viz.GRID}))
     st.plotly_chart(fig, width="stretch")
     st.caption(
-        "Ce graphique ne mesure pas la méthode : les titres ont été choisis "
-        "aujourd'hui, leur passé est flatteur par construction — et le "
-        "resserrement repose sur des attentes d'analystes d'aujourd'hui, qui "
-        "n'existaient pas en 2019. Il ne sert qu'à vérifier le comportement "
-        "des deux paniers en crise."
+        "Les titres ont été choisis avec les données d'aujourd'hui : leur "
+        "passé est flatteur par construction. Seule leur tenue en crise est "
+        "informative."
     )
 
 

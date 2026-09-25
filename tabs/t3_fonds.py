@@ -33,13 +33,8 @@ def bloc() -> None:
 
     st.markdown("#### Les fonds pour les autres classes d'actifs")
     st.markdown(
-        "Pour les autres classes (des centaines d'actions américaines ou "
-        "émergentes, des lingots, des contrats sur matières premières), on "
-        "passe par des fonds cotés (ETF). Pour chaque classe, trois ou quatre "
-        "fonds cotés à Francfort en euros sont comparés selon une règle "
-        "simple : **exclusions conformes au mandat → taille d'au moins "
-        "1 Md€ → frais les plus bas**. L'écart de performance avec un fonds "
-        "de référence sert de contrôle."
+        "Pour les autres classes, on passe par des fonds indiciels : filtre "
+        "ESG conforme au mandat, frais bas, taille suffisante."
     )
     st.markdown(
         "Les actions hors Europe sont prises en deux fonds, **États-Unis** et "
@@ -55,34 +50,22 @@ def bloc() -> None:
 def _lectures(cl: dict) -> None:
     em = cl["emergents"]
     xzem = em["candidats"][em["retenu"]]
-    ayem = em["candidats"]["AYEM.DE"]
     rizd = cl["infrastructure"]["candidats"]["RIZD.DE"]
     st.markdown(
-        f"**Lecture.**\n"
-        f"- Le filtre éloigne peu du marché, **sauf pour les émergents** : le "
-        f"seul fonds conforme a fait {_signe(xzem['ecart_moyen'], 'points')} "
-        f"par an face au marché sur {viz.fr(xzem['fenetre'], 'ans', 0)}, son "
-        f"indice étant bien plus strict que le mandat. Le fonds « Screened » "
-        f"colle au marché ({_signe(ayem['ecart_moyen'], 'point')}) mais laisse "
-        f"passer l'armement. On garde le conforme, et l'écart sera annoncé au "
-        f"client.\n"
+        f"- Le filtre éloigne peu du marché, **sauf pour les émergents** : "
+        f"le seul fonds conforme a fait "
+        f"{_signe(xzem['ecart_moyen'], 'points')} par an face au marché sur "
+        f"{viz.fr(xzem['fenetre'], 'ans', 0)}. On le garde, et l'écart est "
+        f"annoncé au client.\n"
         f"- **L'infrastructure est retirée** : le seul fonds filtré ne pèse "
-        f"que {_taille(rizd['taille'])}, les gros fonds ne filtrent rien "
-        f"(producteurs d'électricité au charbon). Pas d'exception au mandat.\n"
-        f"- **Les frais mesurés confirment les frais annoncés** : l'écart de "
-        f"frais entre deux fonds se retrouve presque entièrement dans leurs "
-        f"performances."
+        f"que {_taille(rizd['taille'])}, et les gros fonds ne filtrent rien."
     )
 
 
 def _pedagogie() -> None:
     st.caption(
-        "Trois points de vigilance. Le filtre « Screened » ne retire **pas** "
-        "l'armement conventionnel, que nous avons exclu des actions en "
-        "direct : on retient donc des indices « SRI », qui l'excluent dès "
-        "5 % du chiffre d'affaires. La liquidité d'un ETF n'est pas son "
-        "volume de bourse mais sa taille, un teneur de marché créant des "
-        "parts à la demande. Et neuf fonds mal identifiés dans l'univers "
-        "hérité ont été corrigés, chacun contrôlé sur deux sources par son "
-        "ISIN."
+        "Le filtre « Screened » ne retire pas l'armement conventionnel, que "
+        "nous avons exclu des actions en direct : on retient donc des "
+        "indices « SRI ». Neuf fonds mal identifiés dans l'univers hérité "
+        "ont été corrigés, chacun contrôlé sur deux sources par son ISIN."
     )

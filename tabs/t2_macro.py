@@ -54,11 +54,8 @@ def _bloc_taux() -> None:
 
     st.markdown("#### Ce que rapportent aujourd'hui les placements en euros")
     st.markdown(
-        "Avant de parler de cycle économique, on regarde ce que le marché "
-        "paie. Pour une obligation, c'est presque tout ce qu'il faut savoir : "
-        "son taux à l'achat est ce qu'elle rapportera si on la garde. On "
-        "compare chaque placement au seuil de l'énoncé, une inflation de "
-        f"**{viz.fr(SEUIL, '%', 0)}**."
+        "Ce que le marché paie aujourd'hui, sans prévision : les taux "
+        "observables au jour du relevé."
     )
 
     court_min, court_max = c["toutes"][0], c["toutes"][2]
@@ -87,16 +84,12 @@ def _bloc_taux() -> None:
     _courbe(photo)
 
     st.caption(
-        f"Une obligation est un prêt : gardée jusqu'au bout, son rendement "
-        f"est connu dès le premier jour, sans aucune prévision économique — "
-        f"ce sont les chiffres les plus solides de l'exercice. Le revers, "
-        f"c'est que le montant versé est fixé une fois pour toutes. Une "
-        f"obligation **indexée** promet au contraire un taux **réel** : à "
-        f"{_pct(p['indexees_reel']['valeur'])} de taux réel, elle rapporte "
-        f"{_pct(p['indexees_reel']['valeur'] + 2)} si l'inflation est de "
-        f"2 %, {_pct(indexee_nominal)} si elle est de 4 %. Si l'inflation "
-        f"reste basse, elle rapporte moins qu'une obligation classique : "
-        f"c'est le prix de l'assurance."
+        f"Gardée jusqu'au bout, une obligation a un rendement connu dès le "
+        f"premier jour : ce sont les chiffres les plus solides du dossier. "
+        f"Une **indexée** promet un taux **réel** — à "
+        f"{_pct(p['indexees_reel']['valeur'])}, elle rapporte "
+        f"{_pct(p['indexees_reel']['valeur'] + 2)} sous 2 % d'inflation et "
+        f"{_pct(indexee_nominal)} sous 4 %."
     )
 def _courbe(photo: dict) -> None:
     df = taux.courbe(photo)
@@ -255,12 +248,8 @@ def _bloc_cycle() -> None:
 
     st.markdown("#### Où en est l'économie : de la croissance aux taux")
     st.markdown(
-        "Les taux vus plus haut ne tombent pas du ciel. Ils sont le dernier "
-        "maillon d'une chaîne : l'activité fait l'emploi, l'emploi et les "
-        "matières premières font l'inflation, l'inflation décide de ce que "
-        "fait la banque centrale, et la banque centrale entraîne les taux. "
-        "Lire cette chaîne dit dans quel sens les taux vont plutôt aller, et "
-        "donc quels placements le contexte favorise."
+        "D'où viennent ces taux : croissance, emploi, inflation, décision "
+        "de banque centrale."
     )
     pedago.fil([
         ("Activité", "croissance, emploi"),
@@ -296,23 +285,21 @@ def _bloc_cycle() -> None:
     st.markdown(f"**Ce qu'on en lit, au {taux.date_fr(m['releve'])}**")
     ch, ind = em["avance"]["chine"], em["avance"]["inde"]
     st.markdown(
-        f"- **États-Unis** : l'activité tient (chômage "
-        f"{viz.fr(us['chomage']['valeur'], '%', 1)}). L'inflation totale "
-        f"passe de {viz.fr(us['inflation']['avant'], '%', 1)} à "
-        f"{viz.fr(us['inflation']['valeur'], '%', 1)}, la sous-jacente reste "
-        f"à {viz.fr(us['inflation_sj']['valeur'], '%', 1)} : la hausse vient "
-        f"de l'énergie. La Fed n'a pas bougé, mais le taux à 2 ans "
-        f"({_pct(us['taux_2a']['valeur'])}) annonce des hausses.\n"
-        f"- **Zone euro** : croissance faible "
-        f"({viz.fr(ea['pib']['valeur'], '%', 1)}), même schéma d'inflation "
-        f"({viz.fr(ea['inflation']['valeur'], '%', 1)}, sous-jacente "
-        f"{viz.fr(ea['inflation_sj']['valeur'], '%', 1)}). La BCE a déjà "
-        f"monté son taux à {_pct(ea['banque_centrale']['valeur'])}, et le "
-        f"marché en attend d'autres.\n"
-        f"- **Émergents** : {viz.fr(em['croissance']['OEMDC']['2026'], '%', 1)} "
-        f"de croissance prévue en 2026, mais la Chine ralentit (indicateur "
-        f"avancé {viz.fr(ch['valeur'], '', 1)}) quand l'Inde accélère "
-        f"({viz.fr(ind['valeur'], '', 1)}). Ils se regardent pays par pays."
+        f"- **États-Unis** : chômage "
+        f"{viz.fr(us['chomage']['valeur'], '%', 1)}, inflation "
+        f"{viz.fr(us['inflation']['valeur'], '%', 1)} dont sous-jacente "
+        f"{viz.fr(us['inflation_sj']['valeur'], '%', 1)} — la hausse vient "
+        f"de l'énergie. Taux à 2 ans {_pct(us['taux_2a']['valeur'])}.\n"
+        f"- **Zone euro** : croissance "
+        f"{viz.fr(ea['pib']['valeur'], '%', 1)}, inflation "
+        f"{viz.fr(ea['inflation']['valeur'], '%', 1)} dont sous-jacente "
+        f"{viz.fr(ea['inflation_sj']['valeur'], '%', 1)}. BCE à "
+        f"{_pct(ea['banque_centrale']['valeur'])}.\n"
+        f"- **Émergents** : "
+        f"{viz.fr(em['croissance']['OEMDC']['2026'], '%', 1)} prévus en "
+        f"2026, Chine en ralentissement "
+        f"({viz.fr(ch['valeur'], '', 1)}), Inde en accélération "
+        f"({viz.fr(ind['valeur'], '', 1)})."
     )
 
     st.info(
@@ -325,14 +312,10 @@ def _bloc_cycle() -> None:
     )
 
     st.caption(
-        "La chaîne : quand l'économie croît, le chômage baisse et les prix "
-        "montent ; la banque centrale relève son taux, les taux de marché "
-        "suivent, obligations et actions baissent. Les trois indicateurs qui "
-        "la lisent — **l'inflation hors énergie et alimentation** donne la "
-        "tendance de fond (si la totale monte sans elle, c'est un choc qui "
-        "peut retomber) ; **le taux à 2 ans** dit ce que le marché attend de "
-        "la banque centrale ; **l'indicateur avancé de l'OCDE**, au-dessus "
-        "de 100 et en hausse, annonce une accélération sur six à neuf mois."
+        "**Inflation hors énergie et alimentation** : la tendance de fond. "
+        "**Taux à 2 ans** : ce que le marché attend de la banque centrale. "
+        "**Indicateur avancé de l'OCDE** : au-dessus de 100 et en hausse, "
+        "l'activité accélère sur six à neuf mois."
     )
 def _graphique_inflation(us: dict, ea: dict) -> None:
     fig = make_subplots(rows=1, cols=2, shared_yaxes=True,
@@ -519,16 +502,11 @@ def _bloc_marches() -> None:
 
     _graphique_marches(m)
 
-    st.markdown(
-        f"**Lecture.**\n"
-        f"- Sur un an, presque tout a monté (pays développés {p('EUNL.DE')}, "
-        f"émergents {p('XMME.DE')}), sauf la Chine ({p('XCS6.DE')}) et l'Inde "
-        f"({p('QDV5.DE')}).\n"
-        f"- **L'énergie mène** ({p('XDW0.DE')}) : le marché confirme que "
-        f"l'inflation vient de là. La consommation discrétionnaire recule "
-        f"({p('XDWC.DE')}), des ménages dont l'énergie ampute le budget.\n"
-        f"- Sur un mois, l'élan faiblit en Europe ({p('EXSA.DE', '1 mois')}) "
-        f"et dans l'industrie ({p('XDWI.DE', '1 mois')}) : à surveiller."
+    st.caption(
+        f"Sur un an : développés {p('EUNL.DE')}, émergents {p('XMME.DE')}, "
+        f"Chine {p('XCS6.DE')}, Inde {p('QDV5.DE')}. **L'énergie mène** "
+        f"({p('XDW0.DE')}), la consommation discrétionnaire recule "
+        f"({p('XDWC.DE')})."
     )
     st.info(
         "**Les marchés confirment le diagnostic : l'énergie mène, la "
@@ -616,21 +594,14 @@ def _bloc_rendements() -> None:
         icon=":material/lightbulb:",
     )
 
-    us = C["us"]["detail"]
     st.caption(
-        f"**La méthode, en deux mesures qui se recoupent.** Le rendement des "
-        f"bénéfices (l'inverse du PER : à un PER de 20, on achète 5 % de "
-        f"bénéfices par an), et le dividende plus la croissance des "
-        f"bénéfices, mesurée depuis 1900 à {viz.fr(g['central'], '%', 1)} "
-        f"par an au-delà de l'inflation. On fait la moyenne des deux, puis "
-        f"on ajoute l'inflation de l'énoncé. Plus un marché est cher, moins "
-        f"il rapporte ensuite : d'où les États-Unis (PER "
-        f"{viz.fr(us['per_ishares'], '', 1)}) attendus plus bas que "
-        f"l'Europe. **Contrôle** : corrigées de leur inflation à 2 %, les "
-        f"hypothèses de J.P. Morgan sont à moins d'un point des nôtres. "
-        f"**Limites** : ce sont des moyennes sur dix ans et non des "
-        f"promesses — une classe attendue à 9 % peut perdre 20 % une année — "
-        f"hors frais, fiscalité et effet de change."
+        f"Méthode : moyenne de deux mesures — le rendement des bénéfices "
+        f"(l'inverse du PER) et le dividende plus la croissance des "
+        f"bénéfices ({viz.fr(g['central'], '%', 1)} par an depuis 1900) — "
+        f"puis on ajoute l'inflation de l'énoncé. Contrôle : corrigées de "
+        f"leur inflation à 2 %, les hypothèses de J.P. Morgan sont à moins "
+        f"d'un point des nôtres. Ce sont des moyennes sur dix ans, hors "
+        f"frais, fiscalité et change."
     )
     st.markdown("#### Conclusion de l'étape 2")
     st.markdown(
@@ -640,15 +611,10 @@ def _bloc_rendements() -> None:
         "fourchette. Reste à choisir les supports (étape 3), puis les "
         "proportions (étape 4)."
     )
-    st.markdown(
-        "**Où cette lecture agit, et où elle n'agit pas.** Ces rendements "
-        "espérés sont l'entrée directe du calcul de l'étape 4 : c'est cette "
-        "lecture macro qui décide des proportions entre classes d'actifs. "
-        "Elle ne descend en revanche **pas** jusqu'au choix des titres de "
-        "l'étape 3, dont la notation compare chaque société à son propre "
-        "secteur et reste donc aveugle aux secteurs. Ce n'est pas un oubli : "
-        "en tirer aussi des paris sectoriels reviendrait à miser deux fois "
-        "sur le même diagnostic. Un portefeuille, un pari."
+    st.caption(
+        "Ces rendements espérés sont l'entrée directe du calcul de "
+        "l'étape 4. La lecture macro fixe des rendements, jamais des poids, "
+        "et ne descend pas jusqu'aux secteurs."
     )
 
 

@@ -104,18 +104,13 @@ def _bloc_parcours(d: dict) -> None:
     e22 = ep[ep["sommet"].dt.year == 2021].iloc[0]
     e08 = ep[ep["sommet"].dt.year == 2007].iloc[0]
     e20 = ep[ep["sommet"].dt.year == 2020].iloc[0]
-    st.markdown(
-        f"**Lecture.** Les deux baisses les plus profondes, 2008 et 2020, "
-        f"sont de même taille ({_pct(e08.perte * 100)} et "
-        f"{_pct(e20.perte * 100)}), mais pas de même durée : "
-        f"{_mois(backtests.mois(e20.sommet, e20.retour))} pour se remettre "
-        f"du krach de 2020, {_mois(backtests.mois(e08.sommet, e08.retour))} "
-        f"pour 2008. La plus longue n'est pas la plus profonde : en 2022, le "
-        f"portefeuille est resté "
-        f"{_mois(backtests.mois(e22.sommet, e22.retour))} sous son plus "
-        f"haut, parce que les obligations, qui font les deux tiers du "
-        f"portefeuille, ont baissé avec les actions puis ont mis deux ans à "
-        f"se reconstituer."
+    st.caption(
+        f"2008 et 2020 sont de même profondeur ({_pct(e08.perte * 100)} et "
+        f"{_pct(e20.perte * 100)}) mais pas de même durée : "
+        f"{_mois(backtests.mois(e20.sommet, e20.retour))} contre "
+        f"{_mois(backtests.mois(e08.sommet, e08.retour))} pour revenir au "
+        f"plus haut. La plus longue est 2022 : "
+        f"{_mois(backtests.mois(e22.sommet, e22.retour))}."
     )
     st.table(pd.DataFrame([
         ("À plus de 1 % sous son plus haut", _pct(t["sous"], 0)),
@@ -170,13 +165,10 @@ def _bloc_seuil(d: dict, cagr: float) -> None:
     )
 
     c5 = inf["fenetres"]["5 ans"]["annuel"]
-    st.markdown(
-        f"**Et l'hypothèse du client n'est pas absurde.** L'étape 1 notait "
-        f"que {_pct(enonce, 0)} valait le double de la cible de la BCE. "
-        f"C'est vrai sur longue période — {_pct(bt['annuel'], 2)} par an "
-        f"depuis 2006 — mais **sur les cinq dernières années la zone euro a "
-        f"vécu {_pct(c5, 2)} d'inflation par an**. M. Lauren ne projette pas "
-        f"une crainte : il extrapole ce qu'il vient de vivre."
+    st.caption(
+        f"L'hypothèse du client n'est pas absurde : {_pct(bt['annuel'], 2)} "
+        f"par an depuis 2006, mais {_pct(c5, 2)} sur les cinq dernières "
+        f"années. Il extrapole ce qu'il vient de vivre."
     )
     st.caption(f"Source : {inf['source']}, dernier point "
                f"{pd.Timestamp(inf['dernier_point']).strftime('%m/%Y')}. "
@@ -220,12 +212,8 @@ def _bloc_var(d: dict) -> None:
 
     st.markdown("#### Une mauvaise année : VaR et CVaR")
     st.markdown(
-        "On regarde maintenant le résultat sur douze mois, à chaque fin de "
-        f"mois depuis octobre 2007 : {len(r)} années glissantes. Deux "
-        "chiffres résument les mauvaises : la **VaR**, la perte qui n'est "
-        "dépassée qu'une année sur vingt, et la **CVaR**, la perte moyenne "
-        "de ces années-là. Ce sont des chiffres de lecture : la règle du "
-        "mandat reste la baisse depuis le plus haut."
+        "Le résultat sur douze mois glissants, à chaque fin de mois depuis "
+        "2006."
     )
     c = st.columns(4)
     c[0].metric("VaR 95 % à un an", _pct(v95))
@@ -267,23 +255,17 @@ def _bloc_var(d: dict) -> None:
     )
 
     st.markdown(
-        f"**Lecture.** Sur un an, le portefeuille n'a jamais perdu plus de "
+        f"Sur un an, le portefeuille n'a jamais perdu plus de "
         f"{_pct(-r.min())}, alors que sa pire baisse depuis le plus haut "
-        f"atteint {_pct(-d['t']['pire'])}. L'écart vient des baisses longues : "
-        f"en 2008 comme en 2022, la perte s'est accumulée sur plus d'un an. "
-        f"C'est pour cela que l'étape 4 a retenu la mesure depuis le plus "
-        f"haut : une limite fixée sur un an aurait laissé passer ces "
-        f"baisses."
+        f"atteint {_pct(-d['t']['pire'])} : en 2008 comme en 2022, la perte "
+        f"s'est accumulée sur plus d'un an. D'où la mesure depuis le plus "
+        f"haut retenue à l'étape 4."
     )
     st.caption(
-        f"**Ce que valent ces chiffres.** Les {len(r)} années glissantes se "
-        f"chevauchent : deux années qui commencent à un mois d'écart "
-        f"partagent onze mois. Vingt ans de données ne contiennent qu'une "
-        f"vingtaine d'années indépendantes, dont une seule « année sur "
-        f"vingt » — la VaR à 95 % repose donc sur une poignée d'épisodes, "
-        f"surtout 2008 et 2022, et la VaR à 99 % sur un seul. Ce ne sont pas "
-        f"des prévisions : elles décrivent ce qu'aurait vécu ce portefeuille "
-        f"sur une période qui a servi à le construire."
+        f"Les {len(r)} années glissantes se chevauchent : vingt ans ne "
+        f"contiennent qu'une vingtaine d'années indépendantes. La VaR à "
+        f"95 % repose sur une poignée d'épisodes, celle à 99 % sur un seul. "
+        f"Ce ne sont pas des prévisions."
     )
 def _graphique_annees(r: pd.Series, v95: float, c95: float) -> None:
     fig = go.Figure()

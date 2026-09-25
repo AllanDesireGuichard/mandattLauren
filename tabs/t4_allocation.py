@@ -45,7 +45,6 @@ def render() -> None:
     _bloc_risque()
     _bloc_libre()
     _bloc_regles()
-    _bloc_calcul()
     _bloc_retenu()
 
 
@@ -56,11 +55,9 @@ def _bloc_entrees() -> None:
 
     st.markdown("#### Ce qui entre dans le calcul")
     st.markdown(
-        "**La règle.** L'étape 1 laissait les 15 % à préciser ; on retient "
-        "la lecture la plus exigeante : une perte mesurée **depuis le plus "
-        "haut**, sur **les 100 M€ ensemble**, qui ne dépasse jamais 15 % "
-        "dans **les crises de 2008, 2011, 2020 et 2022**. Pas de crypto : "
-        "elle ne rapporte rien (étape 2) et baisse avec les actions."
+        "**La règle retenue** : une perte mesurée **depuis le plus haut**, "
+        "sur **les 100 M€ ensemble**, qui ne dépasse jamais 15 % dans les "
+        "crises de 2008, 2011, 2020 et 2022. Pas de crypto."
     )
 
     # Le graphique des rendements espérés par classe a été retiré le
@@ -68,40 +65,26 @@ def _bloc_entrees() -> None:
     # PRODUIT. Ici, seule la lecture qu'on en tire est utile.
     calc = e[~e["hors_calcul"]]
     bat = calc[calc["rendement"] > 4]
+    calc = e[~e["hors_calcul"]]
+    bat = calc[calc["rendement"] > 4]
     st.markdown(
-        f"**Ce que chaque support doit rapporter.** Seules {len(bat)} lignes "
-        f"sur {len(calc)} dépassent les 4 % : les quatre zones d'actions et "
-        f"les obligations indexées (rendements espérés détaillés à "
-        f"l'étape 2). Chaque euro placé ailleurs devra être compensé par des "
-        f"actions : c'est la tension entre les 4 % et les 15 %."
+        f"**{len(bat)} lignes sur {len(calc)} dépassent les 4 %** : les "
+        f"quatre zones d'actions et les obligations indexées (rendements "
+        f"espérés détaillés à l'étape 2)."
     )
 
     st.markdown(
-        "**L'historique.** Pour savoir si un portefeuille aurait tenu en "
-        "2008, il faut l'historique de chaque support. Or la plupart des "
-        "fonds retenus datent de 2018-2019. On prend donc **le vrai support "
-        "dès qu'il existe, et avant lui un remplaçant** qui suit le même "
-        "marché : un fonds plus ancien converti en euros, ou, pour les "
-        "emprunts d'État, une obligation recalculée sur la courbe des taux "
-        "de la BCE. Toutes les séries partent d'octobre 2006, avant le "
-        "sommet des actions de juillet 2007."
+        "**L'historique** : le vrai support dès qu'il existe, et avant lui "
+        "un remplaçant qui suit le même marché. Toutes les séries partent "
+        "d'octobre 2006, avant le sommet des actions de juillet 2007."
     )
     st.caption(
-        f"**Limites assumées.** Les remplaçants suivent bien leur support "
-        f"(corrélation de 0,83 à 0,95), sauf deux lignes. Les **indexées** "
-        f"sont flattées : avant 2009 le remplaçant est un emprunt d'État "
-        f"classique, qui a mieux tenu en 2008. Le **crédit** est la ligne la "
-        f"moins bien mesurée — sa prime est reconstituée avant 2016 sur les "
-        f"écarts américains, corrélation "
-        f"{viz.fr(ctl['credit_court']['correlation'], '', 2)}. Et le risque "
-        f"des **actions européennes** est mesuré sur l'indice, pas sur les "
-        f"titres retenus : choisis avec les données d'aujourd'hui, ils ont "
-        f"un passé flatteur par construction."
-    )
-st.markdown(
-        "**➜ Dix supports, vingt ans d'historique.** Chacun a un rendement "
-        "espéré et une série en euros qui traverse les quatre crises. "
-        "Reste à savoir ce qu'ils y ont perdu, et s'ils ont perdu ensemble."
+        f"Limites assumées : les **indexées** sont flattées avant 2009 (leur "
+        f"remplaçant est un emprunt d'État classique, qui a mieux tenu en "
+        f"2008) ; le **crédit** est la ligne la moins bien mesurée "
+        f"(corrélation {viz.fr(ctl['credit_court']['correlation'], '', 2)}) ; "
+        f"le risque des **actions européennes** est mesuré sur l'indice, pas "
+        f"sur les titres retenus."
     )
 
 
@@ -140,10 +123,8 @@ def _bloc_risque() -> None:
 
     st.markdown("#### Le risque de chaque support")
     st.markdown(
-        "Deux questions : combien chaque support a perdu dans les crises, et "
-        "s'il a perdu **en même temps** que les actions. Les actions forment "
-        "désormais **une seule poche**, répartie selon une clé fixée à "
-        "l'avance : Europe 40 %, États-Unis 35 %, Japon 10 %, émergents 15 %."
+        "Ce que chaque support a perdu dans les quatre crises, et s'il a "
+        "perdu **en même temps** que les actions."
     )
     lignes = [[_nom(k, e)] + [_v(pertes.loc[k, c]) for c in crises]
               for k in pertes.index if k not in allocation.MIX_ACTIONS]
@@ -154,38 +135,20 @@ def _bloc_risque() -> None:
                "c'est la règle. Bitcoin : cotations depuis 2014.")
     pa = pertes.loc["poche_actions", "2008"]
     st.markdown(
-        f"**Lecture.** Les actions perdent jusqu'à {viz.fr(-pa, '%', 0)}. "
-        f"Sans amortisseur, on ne pourrait donc pas en détenir plus de "
-        f"{viz.fr(15 / -pa * 100, '%', 0)} (15 ÷ {viz.fr(-pa, '', 0)}). Pour "
-        f"aller au-delà, il faut des supports qui tiennent quand elles "
-        f"baissent :"
+        f"**Les actions perdent jusqu'à {viz.fr(-pa, '%', 0)}.** Sans "
+        f"amortisseur, on ne pourrait donc en détenir que "
+        f"{viz.fr(15 / -pa * 100, '%', 0)} du patrimoine."
     )
     st.markdown(
-        f"- **2008 et 2011, crises de récession** : les emprunts d'État "
-        f"montent ({_v(p.loc['etats_longs', '2008'], True)} en 2008), l'or "
-        f"aussi ({_v(p.loc['or', '2008'], True)}).\n"
-        f"- **2022, crise d'inflation** : plus d'amortisseur. États "
-        f"{_v(p.loc['etats_longs', '2022'])}, indexées "
-        f"{_v(p.loc['indexees', '2022'])}, avec les actions. C'est le régime "
-        f"décrit à l'étape 2.\n"
-        f"- **L'or** est le seul à tenir dans les quatre crises.\n"
-        f"- **Matières premières et bitcoin** baissent avec les actions."
+        "**2008 et 2011** (récession) : les emprunts d'État montent, ils "
+        "amortissent. **2022** (inflation) : ils baissent avec les actions, "
+        "l'amortisseur disparaît. **L'or est le seul à tenir dans les "
+        "quatre.**"
     )
     _graphique_baisses(r["s"])
 
     _correlations(r)
-    st.markdown(
-        "Comme ce lien change d'une crise à l'autre, le calcul ne s'appuie "
-        "pas sur une corrélation moyenne. Il fait traverser à chaque "
-        "portefeuille candidat les vingt années, jour après jour, et mesure "
-        "directement sa pire baisse."
-    )
 
-    st.markdown(
-        "**➜ Les États amortissent les récessions, pas l'inflation ; l'or "
-        "tient partout.** Reste à trouver la répartition qui rapporte le plus "
-        "sans jamais perdre plus de 15 %."
-    )
 
 
 # Libelles courts : dans deux graphiques cote a cote, les noms complets
@@ -229,12 +192,8 @@ def _correlations(r: dict) -> None:
     n = r["semaines"]
     st.markdown("#### Les supports bougent-ils ensemble ?")
     st.markdown(
-        "Le tableau précédent dit combien chacun a perdu. Celui-ci dit s'ils "
-        "perdent **en même temps**. Deux supports à 100 font la même chose ; "
-        "à 0 ils sont indépendants ; en dessous de 0, l'un monte quand "
-        "l'autre baisse. La mesure est faite deux fois : sur les semaines "
-        "ordinaires, puis sur les seules semaines de crise — parce que c'est "
-        "là, et seulement là, que la question compte."
+        "Corrélations hors crise, puis pendant les crises : 100 = les deux "
+        "supports bougent ensemble, −100 = en sens contraire."
     )
     g, d = st.columns(2)
     with g:
@@ -258,27 +217,13 @@ def _correlations(r: dict) -> None:
     ecarts = (crise - hors).drop(index=a, columns=a)
     for k in ecarts.index:
         ecarts.loc[k, k] = float("nan")
-    pire = ecarts.stack().idxmax()
     st.markdown(
-        f"**Lecture.** Face aux actions, deux supports se retournent quand la "
-        f"crise arrive :\n"
-        f"- **L'échelle AAA** passe de {_v(hors.loc[a, 'etats_courts'] * 100)} "
-        f"à {_v(crise.loc[a, 'etats_courts'] * 100)} : elle ne suit pas les "
-        f"actions en temps normal, et s'y oppose franchement quand elles "
-        f"chutent.\n"
-        f"- **L'or** fait le même chemin, de "
+        f"**Face aux actions, deux supports se retournent quand la crise "
+        f"arrive** : l'échelle AAA passe de "
+        f"{_v(hors.loc[a, 'etats_courts'] * 100)} à "
+        f"{_v(crise.loc[a, 'etats_courts'] * 100)}, l'or de "
         f"{_v(hors.loc[a, 'or'] * 100, True)} à "
-        f"{_v(crise.loc[a, 'or'] * 100, True)}. C'est ce qui le rend utile "
-        f"malgré un rendement espéré de 4 % seulement.\n"
-        f"- **Les matières premières** restent le support le plus lié aux "
-        f"actions ({_v(crise.loc[a, 'matieres'] * 100, True)} en crise) : "
-        f"elles diversifient peu, d'où la place réduite qu'elles prendront.\n"
-        f"- **Le revers, et il est réel** : la poche défensive se resserre "
-        f"sur elle-même. {CORR_NOMS[pire[0]]} et {CORR_NOMS[pire[1]]} "
-        f"passent de {_v(hors.loc[pire] * 100)} à {_v(crise.loc[pire] * 100)}. "
-        f"Les amortisseurs deviennent un seul pari au moment où on compte "
-        f"sur eux — c'est la raison de ne pas concentrer le défensif sur une "
-        f"seule maturité."
+        f"{_v(crise.loc[a, 'or'] * 100, True)}."
     )
 
 
@@ -434,11 +379,8 @@ def _bloc_libre() -> None:
 
     st.markdown("#### Ce que propose un calcul sans garde-fou")
     st.markdown(
-        "On demande la répartition qui rapporte le plus, avec une seule "
-        "exigence : jamais plus de 15 % de baisse entre 2006 et aujourd'hui "
-        "(portefeuille remis à ses poids chaque mois). Aucune autre règle, "
-        "pas même les 10 M€. Ce n'est pas une proposition : c'est pour voir "
-        "ce que fait le calcul quand on le laisse seul."
+        "Répartition qui rapporte le plus sous la **seule** limite de 15 %, "
+        "sans aucune autre règle."
     )
     c1, c2 = st.columns([3, 2])
     with c1:
@@ -450,46 +392,27 @@ def _bloc_libre() -> None:
 
     top = sorted(p, key=p.get, reverse=True)[:2]
     st.markdown(
-        f"**Lecture.** Deux supports font "
+        f"Deux supports font "
         f"{viz.fr((p[top[0]] + p[top[1]]) * 100, '%', 0)} du portefeuille : "
-        f"les obligations indexées et les actions japonaises. La limite est "
-        f"respectée, le rendement est élevé, et pourtant ce portefeuille est "
-        f"inutilisable."
+        f"les indexées et les actions japonaises. La limite est respectée, "
+        f"le rendement est élevé, **et ce portefeuille est inutilisable**."
     )
 
-    mj, ju = sc["moins_japon"], sc["japon_egal_usa"]
-    jp = _risque()["pendant"]
     st.markdown(
-        f"**Pourquoi ces deux-là ?** Pas pour leur rendement. Ramené à "
-        f"{_pct(mj['variante']['rendement'])}, sous l'Europe, le Japon reste "
-        f"à {_poids(mj['poids']['japon'])} ; il ne tombe à "
-        f"{_poids(ju['poids']['japon'])} qu'au niveau des États-Unis. Le "
-        f"calcul le garde pour sa **tenue en crise** "
-        f"({_v(jp.loc['japon', '2020'])} en 2020, contre "
-        f"{_v(jp.loc['actions_europe', '2020'])} pour l'Europe), en partie "
-        # yen / euro : EURJPY=X (Yahoo), du sommet au creux des actions,
-        # relevé le 2026-09-18 : +35 % en 2008, −8 % en 2022
-        f"grâce au yen, +35 % contre l'euro en 2008 mais −8 % en 2022. Les "
-        f"indexées sont les seules obligations au-dessus de 4 %, et leur "
-        f"2008 est flatté par le remplaçant. Le calcul a **appris le passé "
-        f"par cœur**."
+        f"Le calcul ne les garde pas pour leur rendement mais pour leur "
+        f"tenue en crise : ramené au niveau de l'Europe, le Japon reste à "
+        f"{_poids(sc['moins_japon']['poids']['japon'])}. Il a **appris le "
+        f"passé par cœur**."
     )
     st.markdown(
-        f"**Ce qu'il ignore.**\n"
-        f"- Le besoin de 10 M€ : {_poids(p['etats_courts'])} seulement sur "
-        f"l'échelle AAA.\n"
-        f"- La diversification : deux supports pour près de 90 %.\n"
-        f"- La qualité des données : il charge la ligne la moins bien "
-        f"mesurée en 2008.\n"
-        f"- La clé des actions : l'Europe à zéro, alors que c'est la poche "
+        f"**Ce qu'il ignore** : le besoin de 10 M€ "
+        f"({_poids(p['etats_courts'])} sur l'échelle AAA), la "
+        f"diversification (deux supports pour près de 90 %), la qualité des "
+        f"données (il charge la ligne la moins bien mesurée en 2008), et la "
+        f"clé des actions — l'Europe à zéro, alors que c'est la poche "
         f"construite titre par titre à l'étape 3."
     )
 
-    st.markdown(
-        f"**➜ {_pct(lib['rendement_espere'])} sur le papier, mais "
-        f"inutilisable.** Les quatre défauts se corrigent par des règles, une "
-        f"à une, en chiffrant ce que chacune coûte."
-    )
 
 
 # ----------------------------------------------------------------------
@@ -505,7 +428,6 @@ def _par_ligne(poids: dict) -> dict:
 
 
 def _bloc_regles() -> None:
-    e = allocation.entrees()
     res = allocation.resultats()
     sc = res["scenarios"]
     ordre = ["libre"] + res["etapes"]
@@ -542,33 +464,19 @@ def _bloc_regles() -> None:
 
     r1, r2, r3, r4 = (sc[n] for n in res["etapes"])
     c2, c3 = cols["r2_cle"], cols["r3_plafonds"]
-    t2 = sum(c2[k] for k in allocation.MIX_ACTIONS)
     t3 = sum(c3[k] for k in allocation.MIX_ACTIONS)
-    t4 = sum(cols["r4_marge"][k] for k in allocation.MIX_ACTIONS)
-    jp = _risque()["pendant"]
 
     def cout(a: dict, b: dict) -> str:
         return viz.fr(a["rendement_espere"] - b["rendement_espere"], "pt", 2)
 
     st.markdown(
-        f"**Lecture.**\n"
-        f"- **Les 10 M€ en AAA** ne coûtent presque rien ({cout(r1, sc['libre'])}).\n"
-        f"- **La clé des actions** est la règle la plus chère "
-        f"({cout(r2, r1)}) : privé du Japon, le calcul se replie sur les "
-        f"indexées ({_poids(c2['indexees'])}) et réduit les actions à "
-        f"{_poids(t2)}.\n"
-        f"- **Les plafonds** ({cout(r3, r2)}) remplacent les indexées par "
-        f"des États à 2-10 ans, et les actions **remontent** à {_poids(t3)} : "
-        f"en 2020, les indexées avaient baissé avec les actions "
-        f"({_v(jp.loc['indexees', '2020'])}), les États presque pas "
-        f"({_v(jp.loc['etats_longs', '2020'])}).\n"
-        f"- **La marge** ({cout(r4, r3)}) retire un point de perte ; les "
-        f"actions passent à {_poids(t4)}.\n\n"
-        f"Crédit et matières premières restent à zéro partout : le crédit "
-        f"court rapporte moins que les États "
-        f"({_pct(e.loc['credit_court', 'rendement'])} contre "
-        f"{_pct(e.loc['etats_longs', 'rendement'])}), les matières premières "
-        f"baissent avec les actions."
+        f"**Les 10 M€ en AAA** ne coûtent presque rien ({cout(r1, sc['libre'])}). "
+        f"**La clé des actions** est la règle la plus chère ({cout(r2, r1)}) : "
+        f"c'est le prix du renoncement au pari sur le yen. **Les plafonds** "
+        f"({cout(r3, r2)}) font **remonter** les actions à {_poids(t3)}, les "
+        f"États 2-10 ans amortissant mieux 2020 que les indexées. **La "
+        f"marge** ({cout(r4, r3)}) retire un point de perte. Crédit et "
+        f"matières premières restent à zéro partout."
     )
 
     total = r4["rendement_espere"] - sc["libre"]["rendement_espere"]
@@ -579,209 +487,8 @@ def _bloc_regles() -> None:
     c[2].metric("Coût total des règles", viz.fr(total, "pt", 2))
     c[3].metric("Pire baisse, 2006-2026", viz.fr(r4["pire_baisse"], "%", 1))
 
-    st.markdown(
-        f"**➜ Les règles coûtent {viz.fr(-total, 'point', 2)} et laissent "
-        f"{viz.fr(r4['rendement_espere'] - 4, 'point', 2)} au-dessus des "
-        f"4 %.** Reste à passer des pourcentages aux millions d'euros."
-    )
 
 
-# ----------------------------------------------------------------------
-# Bloc 4 bis — comment le calcul trouve sa réponse, et le cas de l'or
-# ----------------------------------------------------------------------
-def _bloc_calcul() -> None:
-    """
-    La mécanique de l'optimisation, et l'or comme cas d'école.
-
-    Ajouté le 2026-09-25 : Allan a demandé « comment l'optimisateur s'en
-    sort » et « pourquoi on se retrouve avec 3 % de gold ». Les deux
-    questions n'en font qu'une — l'or est le meilleur endroit pour montrer
-    ce que le calcul fait vraiment, parce que c'est le seul poids que
-    personne n'a choisi et qu'aucune contrainte ne fixe.
-    """
-    res = allocation.resultats()
-    w = allocation.poids_retenus()
-    e = allocation.entrees()
-    part_act = sum(w[k] for k in allocation.MIX_ACTIONS)
-
-    st.markdown("#### Comment le calcul trouve sa réponse")
-    st.markdown(
-        "**La question posée au calcul tient en une phrase** : parmi tous "
-        "les partages possibles des 100 M€, lequel rapporte le plus sans "
-        "jamais avoir perdu plus que la limite ? Trois pièces, et c'est "
-        "tout."
-    )
-    st.table(pd.DataFrame([
-        ("Ce qu'on maximise", "Le rendement espéré du portefeuille",
-         "La moyenne des rendements de chaque support, pondérée par son "
-         "poids. Les rendements viennent de l'étape 2 pour les actions et "
-         "les indexées, de l'étape 3 pour les obligations."),
-        ("Ce qu'on s'interdit", "Une perte au-delà de la limite",
-         f"Pour chaque partage essayé, on **rejoue les vingt ans** : on "
-         f"place les 100 M€ selon ces poids en octobre 2006, on les remet à "
-         f"ces mêmes poids **chaque mois**, et on suit la valeur semaine "
-         f"après semaine. On mesure alors la plus forte baisse depuis un "
-         f"sommet. Elle doit rester sous "
-         f"{viz.fr(allocation.LIMITE_MARGE * 100, '%', 0)}."),
-        ("Ce qui borne les poids", "Positifs, somme de 100 %, et les règles",
-         "Pas de vente à découvert ni de levier, au moins 10 % sur l'échelle "
-         "AAA pour les 10 M€ à décaisser, la clé actions 40/35/10/15, et les "
-         "plafonds par support."),
-    ], columns=["", "En un mot", "Comment c'est calculé"]).set_index(""))
-
-    st.markdown(
-        "**Pourquoi ça ne se résout pas par une formule.** Le Markowitz des "
-        "manuels a une solution fermée parce qu'il mesure le risque par la "
-        "variance, qui est lisse et convexe. Notre exigence ne l'est pas : "
-        "la pire baisse est un **minimum sur vingt ans de dates**, et "
-        "déplacer un poids d'un dixième de point peut faire basculer la date "
-        "qui la donne — 2008 devient 2020, et la contrainte saute d'un coup "
-        "au lieu de varier doucement. Aucune dérivée fiable, donc aucune "
-        "formule. **On cherche.**"
-    )
-    st.markdown(
-        "**Comment on cherche.** Un solveur sous contraintes (SLSQP) part "
-        "d'un partage donné et l'améliore de proche en proche jusqu'à ne "
-        "plus pouvoir. Comme il ne trouve qu'un optimum **local**, on le "
-        "relance depuis seize points de départ différents et on garde le "
-        "meilleur résultat admissible. Quatre précautions rendent ce "
-        "procédé fiable, et chacune corrige une panne réelle :"
-    )
-    st.table(pd.DataFrame([
-        ("Partir de points déjà admissibles",
-         "Un tirage au hasard ignore les plafonds : il pose en moyenne 14 % "
-         "par support quand les matières premières plafonnent à 5 %. "
-         "3 tirages sur 200 respectaient les bornes, et SLSQP ne sait pas "
-         "revenir dans le domaine quand il en part."),
-        ("Garder un point de repli certain",
-         "Un portefeuille très obligataire, construit d'avance, dont on sait "
-         "qu'il tient la limite. Piège rencontré : le repli naturel, tout en "
-         "États 2-10 ans, est lui-même inadmissible — 100 % de ce support "
-         "perd 15,3 %. Le repli est donc sur l'échelle AAA, qui perd 7,1 %."),
-        ("Repartir de seize endroits",
-         "Avant correction, un seul départ sur seize aboutissait, et trois "
-         "graines sur huit ne trouvaient aucune solution : le résultat du "
-         "dossier tenait à un départ heureux."),
-        ("Vérifier la limite pour de bon",
-         "Le solveur accepte une contrainte à 5 pour 10 000 près, ce qui "
-         "laissait passer un portefeuille à −14,05 % pour une limite de "
-         "−14 %. On ramène la solution dans la limite avant de la comparer "
-         "aux autres, sinon on compare des rendements obtenus sous des "
-         "risques différents."),
-    ], columns=["Précaution", "Ce qu'elle corrige"]).set_index("Précaution"))
-    c = st.columns(3)
-    c[0].metric("Points de départ", res.get("departs", 16))
-    c[1].metric("Départs qui aboutissent", "16 / 16", "1 / 16 avant correction",
-                delta_color="off")
-    c[2].metric("Graines testées", "8", "même optimum pour toutes",
-                delta_color="off")
-    st.caption(
-        "Huit tirages aléatoires indépendants donnent le même portefeuille : "
-        "c'est ce qui permet d'affirmer que le résultat n'est pas un accident "
-        "de départ. Code : scripts/optimiser.py."
-    )
-
-    # --- l'or : le seul poids que personne n'a choisi --------------------
-    s = allocation.series_risque()
-    perfs = {}
-    for nom, (a, b, _lib) in allocation.CRISES.items():
-        x = s["or"][a:b].dropna()
-        y = s["poche_actions"][a:b].dropna()
-        perfs[nom] = ((x.iloc[-1] / x.iloc[0] - 1) * 100,
-                      (y.iloc[-1] / y.iloc[0] - 1) * 100)
-
-    or_pct = viz.fr(w["or"] * 100, "%", 1)
-    st.markdown(f"#### Pourquoi seulement {or_pct} d'or ?")
-    st.markdown(
-        f"**Parce que personne n'a choisi ce chiffre.** C'est un résidu de "
-        f"calcul, et c'est ce qui le rend intéressant : le plafond autorise "
-        f"{_poids(allocation.PLAFONDS['or'])} et le calcul n'en prend que "
-        f"{or_pct}. **Le plafond n'est donc pas la contrainte qui "
-        f"mord** — si on le relevait, rien ne bougerait."
-    )
-    st.table(pd.DataFrame(
-        [(nom, viz.fr(o, "%", 1), viz.fr(a, "%", 1))
-         for nom, (o, a) in perfs.items()],
-        columns=["Crise", "L'or", "La poche d'actions"]).set_index("Crise"))
-    st.caption(
-        "Performance sur les fenêtres de crise datées au bloc 2, en euros. "
-        "L'or est le seul support du portefeuille à finir positif sur les "
-        "quatre. À ne pas confondre avec la table des pires baisses du "
-        "bloc 2 : l'or a bien reculé de 25,7 % à l'intérieur de la fenêtre "
-        "2008, avant de la finir en hausse."
-    )
-    st.markdown(
-        f"**Ce que le calcul arbitre.** L'or a le rendement espéré le plus "
-        f"faible du modèle, {_pct(e.loc['or', 'rendement'])}, à peine au-"
-        f"dessus des {_pct(e.loc['etats_longs', 'rendement'])} des emprunts "
-        f"d'État à 2-10 ans. On ne le détient donc pas pour ce qu'il "
-        f"rapporte, mais pour sa tenue en crise : c'est de la protection "
-        f"achetée avec du rendement. Le calcul en prend **juste ce qu'il "
-        f"faut** pour que la poche d'actions puisse atteindre "
-        f"{viz.fr(part_act * 100, '%', 2)} sous la limite de perte. Au-delà, chaque euro "
-        f"d'or supplémentaire coûte du rendement sans acheter assez de "
-        f"protection pour financer une action de plus."
-    )
-    st.markdown(
-        f"**Et c'est stable** : huit tirages aléatoires différents donnent "
-        f"tous {or_pct}. Ce n'est pas un artefact du hasard."
-    )
-
-
-# ----------------------------------------------------------------------
-def _lien_macro(w: dict, r4: dict) -> None:
-    """
-    Ce que la lecture macro de l'étape 2 décide, et ce qu'elle ne décide pas.
-
-    Ajouté le 2026-09-25 à la demande d'Allan. Le dossier annonce que chaque
-    étape nourrit la suivante, mais il n'écrivait nulle part PAR QUEL CANAL
-    la macro arrive dans l'allocation — et le deck l'écrivait faux, en lui
-    attribuant le crédit à zéro, qui est une mesure de marché de l'étape 3.
-    """
-    e = allocation.entrees()
-    st.markdown("#### Ce que la macro décide ici, et ce qu'elle ne décide pas")
-    st.markdown(
-        "**La lecture macro ne choisit aucun poids.** Elle fixe les "
-        "rendements espérés de chaque classe, et c'est le calcul qui les "
-        "convertit en poids sous la limite de perte. La distinction n'est "
-        "pas cosmétique : elle explique pourquoi une erreur de diagnostic "
-        "macro ne déforme pas le portefeuille dans les mêmes proportions."
-    )
-    st.table(pd.DataFrame([
-        ("Combien d'actions au total", "OUI",
-         f"Par les rendements espérés des quatre zones "
-         f"({_pct(e.loc['actions_europe', 'rendement'])} en Europe contre "
-         f"{_pct(e.loc['etats_longs', 'rendement'])} pour les États 2-10 ans)"),
-        ("Quelle zone d'actions", "NON",
-         "La clé 40 / 35 / 10 / 15 est fixée d'avance, précisément pour que "
-         "la vue de zone ne devienne pas un pari"),
-        ("Quels secteurs", "NON",
-         "La note de l'étape 3 compare chaque société à son propre secteur : "
-         "elle est aveugle aux secteurs par construction"),
-        ("Combien d'indexées", "OUI",
-         f"L'inflation de l'énoncé les porte à "
-         f"{_pct(e.loc['indexees', 'rendement'])}, le meilleur rendement "
-         f"obligataire du tableau : le calcul sature leur plafond de 15 %"),
-        ("Combien de crédit", "NON",
-         f"Zéro, mais par une mesure de marché de l'étape 3 : "
-         f"{_pct(e.loc['credit_court', 'rendement'])} défauts déduits, sous "
-         f"les {_pct(e.loc['etats_longs', 'rendement'])} des États"),
-    ], columns=["Décision", "La macro tranche ?", "Par quel canal"]
-    ).set_index("Décision"))
-    st.markdown(
-        f"**Et la contrainte qui commande tout le reste n'est pas macro.** "
-        f"Des dix bornes du problème, deux seulement mordent — le plancher "
-        f"de 10 % en AAA, qui vient du besoin de liquidité du client, et le "
-        f"plafond de 15 % sur les indexées. L'or s'arrête à "
-        f"{viz.fr(w['or'] * 100, '%', 1)} pour un plafond de 10 %, les "
-        f"matières premières à zéro pour un plafond de 5 %. Ce qui borne "
-        f"vraiment le portefeuille, c'est la limite de perte : elle est "
-        f"atteinte à {viz.fr(r4['pire_baisse'], '%', 2)}, exactement la "
-        f"valeur visée. Tout le reste s'ajuste autour d'elle."
-    )
-
-
-# ----------------------------------------------------------------------
 def _me(v: float, dec: int = 2) -> str:
     return viz.fr(v / 1e6, "M€", dec)
 
@@ -874,15 +581,15 @@ def _bloc_retenu() -> None:
     part_max = max(w[k] * M / (cl[k]["candidats"][cl[k]["retenu"]]["taille"] * 1e6)
                    for k in fonds_de if w[k] >= 0.0005)
     st.markdown(
-        f"**Les emprunts d'État en direct** : {_me(investi)} sur l'échelle "
-        f"AAA, en {len(ech)} tranches de 6 à 24 mois, qui rendront "
-        f"{_me(sum(x['montant'] for x in ech) * f)} ; les 10 M€ sont couverts. "
-        f"Puis {len(allocation.ECHELLE_LONGUE)} × {_me(par_marche)} sur "
-        f"l'échelle zone euro de 2 à 10 ans.\n\n"
-        f"**Les fonds** : aucune ligne ne dépasse "
-        f"{viz.fr(part_max * 100, '%', 2)} de son fonds, on entre et sort "
-        f"sans peser sur les prix. Frais : {viz.fr(frais / 1e3, 'k€', 0)} "
-        f"par an, soit {viz.fr(frais / M * 100, '%', 2)} du patrimoine."
+        f"**Emprunts d'État en direct** : {_me(investi)} sur l'échelle AAA "
+        f"en {len(ech)} tranches de 6 à 24 mois, qui rendront "
+        f"{_me(sum(x['montant'] for x in ech) * f)} — les 10 M€ sont "
+        f"couverts. Puis {len(allocation.ECHELLE_LONGUE)} × "
+        f"{_me(par_marche)} sur l'échelle zone euro de 2 à 10 ans. "
+        f"**Fonds** : aucune ligne ne dépasse "
+        f"{viz.fr(part_max * 100, '%', 2)} de son fonds ; frais "
+        f"{viz.fr(frais / 1e3, 'k€', 0)} par an, soit "
+        f"{viz.fr(frais / M * 100, '%', 2)} du patrimoine."
     )
 
     # --- brut, puis net : l'objectif du client est un objectif NET --------
@@ -903,14 +610,6 @@ def _bloc_retenu() -> None:
          "**C'est lui qui doit battre l'inflation**"),
     ], columns=["", "Taux", "D'où il vient"]).set_index(""))
 
-    st.markdown(
-        f"**Pourquoi ce détour.** L'objectif du client n'est pas de produire "
-        f"{_pct(seuil)} bruts, c'est de **conserver** son pouvoir d'achat : "
-        f"ce qui doit battre l'inflation, c'est ce qui reste dans sa poche. "
-        f"Comparer un rendement brut à un seuil net surévalue la marge de "
-        f"{viz.fr(f_inst + f_mandat, 'point', 2)}. La fiscalité, hors "
-        f"périmètre de cet exercice, en retirerait encore environ 0,30."
-    )
 
     c = st.columns(4)
     c[0].metric("Rendement espéré, brut", _pct(r4["rendement_espere"]))
@@ -920,25 +619,17 @@ def _bloc_retenu() -> None:
     c[3].metric("Rendement obtenu, 2006-2026*",
                 viz.fr(r4["realise"], "%", 2) + " / an")
     st.caption(
-        "* Rééquilibré chaque mois sur les séries du bloc 1. Ne se compare "
-        "pas au rendement espéré : le passé comptait dix ans de taux "
-        "négatifs, l'avenir part de taux à 3 %. Et il s'est déroulé sous une "
-        "autre inflation que les 4 % de l'énoncé — l'étape 5 le juge contre "
-        "l'inflation réellement constatée."
+        "* Rééquilibré chaque mois. Ne se compare pas au rendement espéré : "
+        "le passé comptait dix ans de taux négatifs, l'avenir part de taux "
+        "à 3 %."
     )
-
-    _lien_macro(w, r4)
 
     st.markdown("#### Conclusion de l'étape 4")
     st.markdown(
         f"100 M€ : {_poids(part_act)} d'actions en quatre zones, dont "
-        f"{len(sel)} titres européens en direct ; "
-        f"{_poids(oblig)} d'obligations d'État, "
-        f"dont deux échelles en direct ; {_poids(w['or'])} d'or. Rendement "
-        f"espéré {_pct(r4['rendement_espere'])} brut, soit {_pct(net)} net "
-        f"de frais — {viz.fr(net - seuil, 'point', 2)} au-dessus de "
-        f"l'inflation de l'énoncé. Pire baisse "
-        f"{viz.fr(r4['pire_baisse'], '%', 1)}. Question que le calcul ne "
-        f"s'est pas posée : combien de temps reste-t-il sous son plus haut ? "
-        f"C'est l'étape 5."
+        f"{len(sel)} titres européens en direct ; {_poids(oblig)} "
+        f"d'obligations d'État ; {viz.fr(w['or'] * 100, '%', 1)} d'or. "
+        f"Rendement espéré {_pct(net)} net de frais, "
+        f"{viz.fr(net - seuil, 'point', 2)} au-dessus de l'inflation de "
+        f"l'énoncé. Pire baisse {viz.fr(r4['pire_baisse'], '%', 1)}."
     )
