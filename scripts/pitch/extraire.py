@@ -228,6 +228,11 @@ def main() -> None:
     # des règles doit pouvoir dire lesquels sont SATURÉS et lesquels ne le
     # sont pas — c'est ce qui explique le 3,3 % d'or (plafond 10 %).
     out["plafonds"] = {k: v * 100 for k, v in allocation.PLAFONDS.items()}
+    # Les deux limites de perte : celle du mandat et celle réellement visée,
+    # d'un point en dessous. Exportées plutôt que recopiées dans build.js.
+    out["limites"] = {"mandat": allocation.LIMITE * 100,
+                      "visee": allocation.LIMITE_MARGE * 100,
+                      "min_aaa": allocation.MIN_AAA * 100}
 
     res = allocation.resultats()
     out["scenarios"] = {n: {"rdt": x["rendement_espere"], "pire": x["pire_baisse"],
