@@ -22,7 +22,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from core import actions, obligations, outlook, pedago, scoring, taux, viz
+from core import (actions, obligations, outlook, pedago, scoring, taux,
+                  viz, vue_secteurs)
 from tabs import t3_credit, t3_fonds
 
 
@@ -96,6 +97,7 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
         (f"− {len(inv)} non notables", "sociétés d'investissement"),
         (f"− {len(petites)} trop petites", "moins de 10 Md€"),
         (f"{len(notes)} notées", "sur cinq piliers"),
+        (f"− {len(notes[vue_secteurs.ecartees(notes)])} écartées", "vue sectorielle du gérant"),
         (f"{len(sel)} présélectionnées", "les meilleures notes, diversifiées"),
         (f"{NB_FINAL} retenues", "ce que les analystes attendent"),
     ])
@@ -106,6 +108,8 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
         for motif, g in excl.groupby("exclusion"))
     st.markdown("**Les exclusions**, au seuil du mandat (5 % du chiffre "
                 "d'affaires, 0 % pour la production de tabac) :\n" + lignes)
+
+    _vue_sectorielle(d)
 
     cons = d[d["niveau"] == "conservé"]
     pedago.explique(
@@ -128,6 +132,56 @@ def _bloc_entonnoir(d: pd.DataFrame) -> None:
         "de valeur de leurs participations, ce qui fausse PER et rentabilité.",
         source="core/exclusions.py · classification et descriptions Yahoo "
                "Finance",
+    )
+
+
+def _vue_sectorielle(d: pd.DataFrame) -> None:
+    """
+    La vue du gérant : des métiers écartés par décision, et son prix affiché.
+
+    Séparée des exclusions du client juste au-dessus, et à dessein : celles-ci
+    sont une contrainte du mandat, celle-là un arbitrage qu'il faut défendre.
+    """
+    c = vue_secteurs.cout(d)
+    sans = actions.selection(d, vue=False)
+    avec = actions.selection(d)
+    perdus = sorted(set(sans["longName"]) - set(avec["longName"]))
+    gagnes = sorted(set(avec["longName"]) - set(sans["longName"]))
+
+    st.markdown(
+        "**Notre vue sectorielle**, qui n'est pas une contrainte du client "
+        "mais une décision de gestion : nous nous interdisons quatre métiers, "
+        f"soit {c['titres_notes']} sociétés notées."
+    )
+    st.table(vue_secteurs.table().set_index("Industrie"))
+    trentieme = avec.nsmallest(1, "note").iloc[0]
+    st.caption(
+        "Ce que la décision coûte : le meilleur titre écarté est "
+        f"**{court(c['meilleur_titre'])}**, noté "
+        f"{_pilier_fr(c['meilleure_note'])}. "
+        + (f"Sans cette vue il serait présélectionné — il était trentième — "
+           f"et {court(gagnes[0])} ({_pilier_fr(trentieme['note'])}) "
+           f"sortirait à sa place. " if perdus and gagnes else "")
+        + "La sélection finale des quinze et le risque du panier sont "
+        "inchangés : la vue ne coûte qu'un titre, et le dernier."
+    )
+    pedago.explique(
+        "Pourquoi une décision et non une pénalité dans la note",
+        "<strong>Parce que le signe d'une pénalité n'est pas déterminé.</strong> "
+        "« Les gérants sous-pondèrent l'automobile » justifie aussi bien de "
+        "la vendre — le consensus a raison — que de l'acheter : elle est "
+        "devenue bon marché parce qu'elle est détestée.",
+        "<strong>Et nos cinq piliers disent exactement ces deux choses à la "
+        "fois.</strong> Sur les constructeurs, la Dynamique sort à −0,58 "
+        "quand la Valorisation sort à +0,62 : la note voit très bien la "
+        "difficulté du secteur, elle décide qu'elle est déjà payée par le "
+        "prix. Retrancher un malus reviendrait à casser cette compensation "
+        "sans le dire.",
+        "<strong>Une exclusion déclarée, elle, s'argumente.</strong> Elle est "
+        "datée, motivée, et son coût se mesure — y compris quand nos propres "
+        "chiffres la contredisent, ce qui est le cas de la chimie de "
+        "spécialité et qui est écrit dans le tableau.",
+        source="core/vue_secteurs.py",
     )
 
 

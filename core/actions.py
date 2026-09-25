@@ -5,6 +5,10 @@ Lit data/actions/ (produit par scripts/fetch_actions.py), applique les
 exclusions (core/exclusions.py), écarte de la notation les sociétés
 d'investissement, puis note (core/scoring.py). Tout est recalculé à la
 lecture : la notation est instantanée, et c'est ce qui la rend lisible.
+
+La vue sectorielle du gérant (core/vue_secteurs.py) agit APRÈS la notation,
+dans `selection` et non dans `univers` : les titres qu'elle écarte gardent
+leur note, sans quoi on ne pourrait pas dire ce que la décision coûte.
 """
 from __future__ import annotations
 
@@ -12,7 +16,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from core import exclusions, scoring
+from core import exclusions, scoring, vue_secteurs
 
 DOSSIER = Path(__file__).resolve().parents[1] / "data" / "actions"
 
@@ -64,8 +68,16 @@ def univers() -> pd.DataFrame:
     return d
 
 
-def selection(d: pd.DataFrame, n: int = 30) -> pd.DataFrame:
-    return scoring.selectionner(d[d["note"].notna()], n=n)
+def selection(d: pd.DataFrame, n: int = 30, vue: bool = True) -> pd.DataFrame:
+    """
+    Les n titres présélectionnés. `vue` applique la vue sectorielle du
+    gérant ; le passer à False sert à mesurer ce qu'elle coûte, pas à s'en
+    passer en production.
+    """
+    notes = d[d["note"].notna()]
+    if vue:
+        notes = notes[~vue_secteurs.ecartees(notes)]
+    return scoring.selectionner(notes, n=n)
 
 
 def panier_face_indice(sel: pd.DataFrame) -> dict:
