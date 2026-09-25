@@ -811,11 +811,14 @@ def _bloc_retenu() -> None:
     fonds_de = ("usa", "japon", "emergents", "indexees", "or", "matieres")
 
     st.markdown("#### Le portefeuille retenu, en millions d'euros")
-    g1, g2 = st.columns([2, 3])
+    # Le graphique par support a été retiré le 2026-09-25 : il donnait les
+    # mêmes montants en M€ que le tableau juste en dessous, à la même maille,
+    # alors que le tableau ajoute le nom du support et son rendement espéré.
+    # Le camembert reste : il agrège en quatre familles, ce que le tableau ne
+    # fait pas, et donne la forme du portefeuille d'un coup d'œil.
+    g1, _ = st.columns([3, 2])
     with g1:
         _graphique_familles(w, "Par grande famille")
-    with g2:
-        _graphique_supports(w, "Par support, en % et en M€", montant=M)
 
     lignes, contrib = [], 0.0
     for k, x in w.items():
