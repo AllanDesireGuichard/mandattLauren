@@ -4,6 +4,8 @@
 Construite bloc par bloc, comme les onglets 2 et 3. Plan validé avec Allan
 le 2026-09-18 : 1 les entrées ; 2 le risque ; 3 l'optimisation libre ;
 4 les contraintes et leur coût ; 5 le portefeuille retenu, en M€.
+Bloc 4 bis ajouté le 2026-09-25, à la demande d'Allan : comment le calcul
+trouve sa réponse, et pourquoi il ne retient que 3,3 % d'or.
 
 Décisions d'Allan (2026-09-18) :
   - la perte de 15 % se mesure DEPUIS LE PLUS HAUT, sur les 100 M€
@@ -36,12 +38,14 @@ def render() -> None:
         "Combien placer sur chaque support pour rapporter au moins 4 % par an "
         "sans jamais perdre plus de 15 %. Cinq temps : les ingrédients, le "
         "risque de chaque support, un calcul sans garde-fou, les garde-fous "
-        "et leur coût, puis le portefeuille en millions d'euros.",
+        "et leur coût, comment le calcul s'y prend, puis le portefeuille en "
+        "millions d'euros.",
     )
     _bloc_entrees()
     _bloc_risque()
     _bloc_libre()
     _bloc_regles()
+    _bloc_calcul()
     _bloc_retenu()
 
 
@@ -625,13 +629,179 @@ def _bloc_regles() -> None:
 
 
 # ----------------------------------------------------------------------
+# Bloc 4 bis — comment le calcul trouve sa réponse, et le cas de l'or
+# ----------------------------------------------------------------------
+def _bloc_calcul() -> None:
+    """
+    La mécanique de l'optimisation, et l'or comme cas d'école.
+
+    Ajouté le 2026-09-25 : Allan a demandé « comment l'optimisateur s'en
+    sort » et « pourquoi on se retrouve avec 3 % de gold ». Les deux
+    questions n'en font qu'une — l'or est le meilleur endroit pour montrer
+    ce que le calcul fait vraiment, parce que c'est le seul poids que
+    personne n'a choisi et qu'aucune contrainte ne fixe.
+    """
+    res = allocation.resultats()
+    w = allocation.poids_retenus()
+    e = allocation.entrees()
+    part_act = sum(w[k] for k in allocation.MIX_ACTIONS)
+
+    st.markdown("#### Comment le calcul trouve sa réponse")
+    st.markdown(
+        "La pire baisse d'un portefeuille n'est pas une courbe lisse : "
+        "déplacer un poids d'un dixième de point peut faire changer la crise "
+        "qui donne le maximum de perte. Aucune formule ne donne donc "
+        "directement la solution — on **cherche**, et il faut montrer que ce "
+        "qu'on trouve ne dépend pas de l'endroit d'où l'on est parti."
+    )
+    pedago.explique(
+        "Les quatre précautions du calcul",
+        "<strong>Partir de points admissibles.</strong> Les départs sont "
+        "tirés au hasard, mais en respectant d'emblée les plafonds : un "
+        "tirage uniforme pose en moyenne 14 % sur chaque support quand les "
+        "matières premières plafonnent à 5 %. Mesuré le 24 septembre : "
+        "3 tirages sur 200 seulement respectaient les bornes.",
+        "<strong>Garder un point de repli certain.</strong> Un portefeuille "
+        "très obligataire, construit d'avance, sert d'ancrage : on sait qu'il "
+        "tient la limite. Piège rencontré — l'ancrage naturel, tout en États "
+        "2-10 ans, est INADMISSIBLE : 100 % de ce support perd 15,3 % sur "
+        "2006-2026, au-delà de la limite du mandat. L'ancrage est donc sur "
+        "l'échelle AAA, qui ne perd que 7,1 %.",
+        "<strong>Repartir de plusieurs endroits.</strong> Seize départs, et "
+        "on garde le meilleur résultat qui respecte la limite. Avant "
+        "correction, un seul sur seize aboutissait : le résultat du dossier "
+        "tenait à un départ heureux.",
+        "<strong>Vérifier la limite pour de bon.</strong> Le solveur accepte "
+        "une contrainte à 5 pour 10 000 près, ce qui laissait passer un "
+        "portefeuille à −14,05 % pour une limite de −14 %. On ramène donc la "
+        "solution vers l'ancrage jusqu'à ce que la limite soit tenue "
+        "réellement, pas approximativement.",
+        source="scripts/optimiser.py · corrigé le 2026-09-24",
+    )
+    c = st.columns(3)
+    c[0].metric("Points de départ", res.get("departs", 16))
+    c[1].metric("Départs qui aboutissent", "16 / 16", "1 / 16 avant correction",
+                delta_color="off")
+    c[2].metric("Graines testées", "8", "même optimum pour toutes",
+                delta_color="off")
+
+    # --- l'or : le seul poids que personne n'a choisi --------------------
+    s = allocation.series_risque()
+    perfs = {}
+    for nom, (a, b, _lib) in allocation.CRISES.items():
+        x = s["or"][a:b].dropna()
+        y = s["poche_actions"][a:b].dropna()
+        perfs[nom] = ((x.iloc[-1] / x.iloc[0] - 1) * 100,
+                      (y.iloc[-1] / y.iloc[0] - 1) * 100)
+
+    or_pct = viz.fr(w["or"] * 100, "%", 1)
+    st.markdown(f"#### Pourquoi seulement {or_pct} d'or ?")
+    st.markdown(
+        f"**Parce que personne n'a choisi ce chiffre.** C'est un résidu de "
+        f"calcul, et c'est ce qui le rend intéressant : le plafond autorise "
+        f"{_poids(allocation.PLAFONDS['or'])} et le calcul n'en prend que "
+        f"{or_pct}. **Le plafond n'est donc pas la contrainte qui "
+        f"mord** — si on le relevait, rien ne bougerait."
+    )
+    st.table(pd.DataFrame(
+        [(nom, viz.fr(o, "%", 1), viz.fr(a, "%", 1))
+         for nom, (o, a) in perfs.items()],
+        columns=["Crise", "L'or", "La poche d'actions"]).set_index("Crise"))
+    st.caption(
+        "Performance sur les fenêtres de crise datées au bloc 2, en euros. "
+        "L'or est le seul support du portefeuille à finir positif sur les "
+        "quatre. À ne pas confondre avec la table des pires baisses du "
+        "bloc 2 : l'or a bien reculé de 25,7 % à l'intérieur de la fenêtre "
+        "2008, avant de la finir en hausse."
+    )
+    st.markdown(
+        f"**Ce que le calcul arbitre.** L'or a le rendement espéré le plus "
+        f"faible du modèle, {_pct(e.loc['or', 'rendement'])}, à peine au-"
+        f"dessus des {_pct(e.loc['etats_longs', 'rendement'])} des emprunts "
+        f"d'État à 2-10 ans. On ne le détient donc pas pour ce qu'il "
+        f"rapporte, mais pour sa tenue en crise : c'est de la protection "
+        f"achetée avec du rendement. Le calcul en prend **juste ce qu'il "
+        f"faut** pour que la poche d'actions puisse atteindre "
+        f"{viz.fr(part_act * 100, '%', 2)} sous la limite de perte. Au-delà, chaque euro "
+        f"d'or supplémentaire coûte du rendement sans acheter assez de "
+        f"protection pour financer une action de plus."
+    )
+    st.markdown(
+        f"**Et c'est stable** : huit tirages aléatoires différents donnent "
+        f"tous {or_pct}. Ce n'est pas un artefact du hasard."
+    )
+
+
+# ----------------------------------------------------------------------
+def _lien_macro(w: dict, r4: dict) -> None:
+    """
+    Ce que la lecture macro de l'étape 2 décide, et ce qu'elle ne décide pas.
+
+    Ajouté le 2026-09-25 à la demande d'Allan. Le dossier annonce que chaque
+    étape nourrit la suivante, mais il n'écrivait nulle part PAR QUEL CANAL
+    la macro arrive dans l'allocation — et le deck l'écrivait faux, en lui
+    attribuant le crédit à zéro, qui est une mesure de marché de l'étape 3.
+    """
+    e = allocation.entrees()
+    st.markdown("#### Ce que la macro décide ici, et ce qu'elle ne décide pas")
+    st.markdown(
+        "**La lecture macro ne choisit aucun poids.** Elle fixe les "
+        "rendements espérés de chaque classe, et c'est le calcul qui les "
+        "convertit en poids sous la limite de perte. La distinction n'est "
+        "pas cosmétique : elle explique pourquoi une erreur de diagnostic "
+        "macro ne déforme pas le portefeuille dans les mêmes proportions."
+    )
+    st.table(pd.DataFrame([
+        ("Combien d'actions au total", "OUI",
+         f"Par les rendements espérés des quatre zones "
+         f"({_pct(e.loc['actions_europe', 'rendement'])} en Europe contre "
+         f"{_pct(e.loc['etats_longs', 'rendement'])} pour les États 2-10 ans)"),
+        ("Quelle zone d'actions", "NON",
+         "La clé 40 / 35 / 10 / 15 est fixée d'avance, précisément pour que "
+         "la vue de zone ne devienne pas un pari"),
+        ("Quels secteurs", "NON",
+         "La note de l'étape 3 compare chaque société à son propre secteur : "
+         "elle est aveugle aux secteurs par construction"),
+        ("Combien d'indexées", "OUI",
+         f"L'inflation de l'énoncé les porte à "
+         f"{_pct(e.loc['indexees', 'rendement'])}, le meilleur rendement "
+         f"obligataire du tableau : le calcul sature leur plafond de 15 %"),
+        ("Combien de crédit", "NON",
+         f"Zéro, mais par une mesure de marché de l'étape 3 : "
+         f"{_pct(e.loc['credit_court', 'rendement'])} défauts déduits, sous "
+         f"les {_pct(e.loc['etats_longs', 'rendement'])} des États"),
+    ], columns=["Décision", "La macro tranche ?", "Par quel canal"]
+    ).set_index("Décision"))
+    st.markdown(
+        f"**Et la contrainte qui commande tout le reste n'est pas macro.** "
+        f"Des dix bornes du problème, deux seulement mordent — le plancher "
+        f"de 10 % en AAA, qui vient du besoin de liquidité du client, et le "
+        f"plafond de 15 % sur les indexées. L'or s'arrête à "
+        f"{viz.fr(w['or'] * 100, '%', 1)} pour un plafond de 10 %, les "
+        f"matières premières à zéro pour un plafond de 5 %. Ce qui borne "
+        f"vraiment le portefeuille, c'est la limite de perte : elle est "
+        f"atteinte à {viz.fr(r4['pire_baisse'], '%', 2)}, exactement la "
+        f"valeur visée. Tout le reste s'ajuste autour d'elle."
+    )
+
+
+# ----------------------------------------------------------------------
 def _me(v: float, dec: int = 2) -> str:
     return viz.fr(v / 1e6, "M€", dec)
 
 
 @st.cache_data(show_spinner="Sélection des 30 titres…")
-def _trente() -> pd.DataFrame:
-    return actions.selection(actions.univers())
+def _lignes_actions() -> pd.DataFrame:
+    """
+    Les titres RÉELLEMENT détenus, c'est-à-dire la sélection finale de
+    l'étape 3 — pas les trente présélectionnés. Le 2026-09-25 cette fonction
+    renvoyait encore les trente : le tableau du portefeuille annonçait
+    « 15 titres en direct » et les deux graphiques juste en dessous
+    répartissaient la même poche sur trente lignes, à 405 k€ au lieu de
+    811 k€. Troisième fois que ce nombre est faux quelque part ; il ne doit
+    venir que d'ici, et d'ici que de core/outlook.
+    """
+    return outlook.final(actions.selection(actions.univers()))
 
 
 
@@ -680,12 +850,13 @@ def _bloc_retenu() -> None:
         f"obligations tiennent la limite de 15 %."
     )
 
-    # --- les 30 actions européennes ----------------------------------
-    sel = _trente()
+    # --- les actions européennes en direct ---------------------------
+    sel = _lignes_actions()
     par_titre = w["actions_europe"] * M / len(sel)
     st.markdown(
-        f"**Les 30 actions européennes** : {_me(w['actions_europe'] * M, 1)} "
-        f"à parts égales, soit {_me(par_titre)} par titre."
+        f"**Les {len(sel)} actions européennes** : "
+        f"{_me(w['actions_europe'] * M, 1)} à parts égales, soit "
+        f"{_me(par_titre)} par titre."
     )
     g1, g2 = st.columns(2)
     with g1:
@@ -757,10 +928,13 @@ def _bloc_retenu() -> None:
         "l'inflation réellement constatée."
     )
 
+    _lien_macro(w, r4)
+
     st.markdown("#### Conclusion de l'étape 4")
     st.markdown(
-        f"100 M€ : {_poids(part_act)} d'actions en quatre zones, dont 30 "
-        f"titres européens en direct ; {_poids(oblig)} d'obligations d'État, "
+        f"100 M€ : {_poids(part_act)} d'actions en quatre zones, dont "
+        f"{len(sel)} titres européens en direct ; "
+        f"{_poids(oblig)} d'obligations d'État, "
         f"dont deux échelles en direct ; {_poids(w['or'])} d'or. Rendement "
         f"espéré {_pct(r4['rendement_espere'])} brut, soit {_pct(net)} net "
         f"de frais — {viz.fr(net - seuil, 'point', 2)} au-dessus de "
