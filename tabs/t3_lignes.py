@@ -153,7 +153,7 @@ def _pilier_fr(v: float) -> str:
 def _bloc_notation(d: pd.DataFrame) -> None:
     sel = actions.selection(d)
 
-    st.markdown("#### La notation : les 30 titres présélectionnés")
+    st.markdown(f"#### La notation : {len(sel)} titres présélectionnés")
     st.markdown(
         "Cinq piliers à poids égaux, chaque société comparée aux sociétés "
         "de **son propre secteur** : **valorisation** (bon marché ?), "
@@ -162,13 +162,6 @@ def _bloc_notation(d: pd.DataFrame) -> None:
         "crise ?)."
     )
 
-    tab = sel.assign(Rang=range(1, len(sel) + 1),
-                     Note=sel["note"].map(_pilier_fr))[
-        ["Rang", "longName", "secteur", "pays", "Note"]]
-    tab.columns = ["Rang", "Société", "Secteur", "Pays", "Note"]
-    st.markdown("**Les 30 titres présélectionnés**")
-    st.table(tab.set_index("Rang"))
-    plaf = scoring.plafonds_volatilite(d)
     plaf = scoring.plafonds_volatilite(d)
     st.caption(
         f"Note : écart à la moyenne du secteur en écarts-types. Au plus 4 "
@@ -185,7 +178,8 @@ def _bloc_notation(d: pd.DataFrame) -> None:
                 "poids cumulé dans l'indice", delta_color="off")
     st.caption(
         "La note ignore la taille des sociétés : la sélection ne ressemble "
-        "pas à l'indice, et c'est voulu."
+        "pas à l'indice, et c'est voulu. Les 30 titres et leurs notes sont "
+        "sur le nuage de points du bloc suivant."
     )
 
 # --------------------------------------------------------------------------
@@ -215,7 +209,6 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
     )
 
     _nuage(j, retenus)
-    _table_avenir(j, retenus)
 
     ecartes = j[j["motif"].notna()]
     # Chaque titre compte sous TOUS les motifs qui s'appliquent, pas sous le
@@ -241,7 +234,6 @@ def _bloc_avenir(d: pd.DataFrame) -> None:
         "secteur ou un pays déjà complet."
     )
 
-    seuil = outlook.plafond_dispersion(x)
     seuil = outlook.plafond_dispersion(x)
     st.caption(
         f"Seuils : bénéfice attendu coupé de plus de 5 % en trois mois ; "
@@ -301,34 +293,6 @@ def _nuage(j: pd.DataFrame, retenus: set) -> None:
         "notée sur les cinq piliers. Les retenus sont en haut à droite, "
         "sous les plafonds de 2 par secteur et 4 par pays."
     )
-
-
-def _table_avenir(j: pd.DataFrame, retenus: set) -> None:
-    t = j.sort_values("note_avenir", ascending=False)
-    tab = pd.DataFrame({
-        "Société": [court(n) for n in t["longName"]],
-        "Note": t["note"].map(_pilier_fr),
-        "Suivi par": t["analystes"].map(
-            lambda v: "—" if pd.isna(v) else f"{int(v)} analystes"),
-        "Avis": t["avis"],
-        "Révision": t["revision"].map(lambda v: viz.fr(v, "%", 1)),
-        "Solde": t["solde"].map(lambda v: viz.fr(v, "%", 0)),
-        "Potentiel": t["potentiel"].map(lambda v: viz.fr(v, "%", 1)),
-        "Dispersion": t["dispersion"].map(lambda v: viz.fr(v, "%", 0)),
-        "Avenir": t["note_avenir"].map(_pilier_fr),
-        "Retenu": ["Oui" if k in retenus else "—" for k in t["ticker"]],
-        "Motif de sortie": t["motif"].fillna("—"),
-    })
-    st.markdown("**Les 30 présélectionnés, classés sur l'avenir**")
-    st.table(tab.set_index("Société"))
-    st.caption(
-        "Révision : variation du bénéfice attendu sur trois mois. Solde : "
-        "part des révisions du mois qui vont dans le bon sens, tenue pour "
-        "neutre sous trois révisions. Potentiel : objectif de cours "
-        "consensus face au cours. Dispersion : écart entre la prévision la "
-        "plus haute et la plus basse."
-    )
-
 
 def _panier(sel: pd.DataFrame, fin: pd.DataFrame) -> None:
     """
