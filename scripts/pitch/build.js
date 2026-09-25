@@ -351,16 +351,16 @@ dark("Analyse ligne à ligne", "Avec quoi investir : des titres en direct pour l
   .addNotes("Troisième étape : choisir les supports. Des actions européennes et des obligations d'État en direct, et les meilleurs fonds pour les autres classes.");
 
 {
-  const s = base(3, "De 600 valeurs européennes à 30 titres", { kicker: "Point de départ : le STOXX Europe 600 · on ne garde que les grandes capitalisations (10 Md€ et plus)" });
   const E = D.entonnoir;
-  const steps = [[`${E.n}`, "valeurs du STOXX 600"], [`− ${E.excl}`, "exclues : tabac, armement, charbon"], [`− ${E.inv}`, "sociétés d'investissement, non notables"], [`− ${E.petites}`, "trop petites (< 10 Md€)"], [`${E.notees}`, "notées sur cinq piliers"], [`${E.sel}`, "retenues"]];
+  const s = base(3, `De 600 valeurs européennes à ${E.final} titres`, { kicker: "Point de départ : le STOXX Europe 600 · on ne garde que les grandes capitalisations (10 Md€ et plus)" });
+  const steps = [[`${E.n}`, "valeurs du STOXX 600"], [`− ${E.excl}`, "exclues : tabac, armement, charbon"], [`− ${E.inv}`, "sociétés d'investissement, non notables"], [`− ${E.petites}`, "trop petites (< 10 Md€)"], [`${E.notees}`, "notées sur cinq piliers"], [`− ${E.vue}`, "écartées par notre vue sectorielle"], [`${E.sel}`, "présélectionnées"], [`${E.final}`, "retenues sur les attentes des analystes"]];
   steps.forEach(([n, l], i) => {
-    const w = 11.6 - i * 1.55, x = (W - w) / 2, y = 1.6 + i * 0.8;
+    const w = 11.9 - i * 1.18, x = (W - w) / 2, y = 1.52 + i * 0.63;
     const fill = i === steps.length - 1 ? GOLD : i === 0 ? INK : "3B5A80";
-    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h: 0.68, fill: { color: fill }, line: { color: fill }, rectRadius: 0.06 });
-    s.addText([{ text: n + "  ", options: { bold: true, fontSize: 20, fontFace: HF } }, { text: l, options: { fontSize: 14 } }], { x, y, w, h: 0.68, align: "center", valign: "middle", color: WHITE, fontFace: BF, margin: 0, isTextBox: true });
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h: 0.55, fill: { color: fill }, line: { color: fill }, rectRadius: 0.06 });
+    s.addText([{ text: n + "  ", options: { bold: true, fontSize: 17, fontFace: HF } }, { text: l, options: { fontSize: 12.5 } }], { x, y, w, h: 0.55, align: "center", valign: "middle", color: WHITE, fontFace: BF, margin: 0, isTextBox: true });
   });
-  s.addNotes(`Pour les actions européennes, on part des 600 plus grandes valeurs d'Europe. On retire d'abord les ${E.excl} sociétés touchées par les exclusions du client : ${E.excl_motifs.armement} dans l'armement, ${E.excl_motifs.tabac} dans le tabac, ${E.excl_motifs.charbon} dans le charbon, au seuil de 5 % du chiffre d'affaires. On écarte les sociétés d'investissement, que la notation ne sait pas mesurer, et les sociétés de moins de 10 milliards, moins suivies et moins liquides. Il en reste ${E.notees}, que l'on note ; on en retient 30.`);
+  s.addNotes(`Pour les actions européennes, on part des 600 plus grandes valeurs d'Europe. On retire d'abord les ${E.excl} sociétés touchées par les exclusions du client : ${E.excl_motifs.armement} dans l'armement, ${E.excl_motifs.tabac} dans le tabac, ${E.excl_motifs.charbon} dans le charbon, au seuil de 5 % du chiffre d'affaires. On écarte les sociétés d'investissement, que la notation ne sait pas mesurer, et les sociétés de moins de 10 milliards, moins suivies et moins liquides. Il en reste ${E.notees}, que l'on note. Deux étages ensuite : notre vue sectorielle en écarte ${E.vue}, la note en retient ${E.sel}, et les attentes des analystes resserrent ces ${E.sel} en ${E.final}. Deux questions différentes, dans cet ordre : ce que les sociétés SONT, puis où elles VONT.`);
 }
 
 {
@@ -378,16 +378,30 @@ dark("Analyse ligne à ligne", "Avec quoi investir : des titres en direct pour l
   para(s, 6.55, 2.15, 5.95, 1.7, rich("Plus la poche d'actions baisse modérément en crise, plus on peut en détenir sous la limite de 15 %. On note donc aussi **la volatilité, les pertes de 2020 et 2022, et le bêta**."), 13.5);
   card(s, 6.3, 4.15, 6.43, 2.65);
   s.addText("Garde-fous de diversification", { x: 6.55, y: 4.27, w: 6, h: 0.4, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
-  para(s, 6.55, 4.72, 5.95, 2.0, bullets(["**4 titres** au plus par secteur, **6** par pays", "Aucun titre parmi les **10 % les plus volatils**", "Données aberrantes écartées (un PER de 1 042…)"]), 13.5, { paraSpaceAfter: 7 });
+  para(s, 6.55, 4.72, 5.95, 2.0, bullets(["**4 titres** au plus par secteur, **6** par pays", `Volatilité plafonnée **dans son métier** : ${fr(D.vol_plafond.univers, 1)} % pour tous, jusqu'à ${fr(D.vol_plafond.max, 1)} % là où l'agitation est structurelle`, "Données aberrantes écartées (un PER de 1 042…)"]), 12.5, { paraSpaceAfter: 6 });
   // Le corollaire de « face à son propre secteur » : la note est aveugle aux
   // secteurs, donc la macro de l'étape 2 ne descend pas jusqu'ici. Dit sur la
   // slide parce qu'un jury le demande, et que le deck l'annonçait nulle part.
   para(s, M, 6.42, 5.5, 0.55, rich("**La note ne dit donc rien d'un secteur**, seulement d'une société face à ses concurrentes : la vue macro agit à l'étape 4, pas ici."), 12);
-  s.addNotes("Chaque société reçoit une note sur cinq piliers à poids égaux, toujours comparée aux sociétés de son propre secteur : c'est ce qui permet de comparer une banque, dont le PER est naturellement bas, à un éditeur de logiciels. Le cinquième pilier, la résistance, est propre à ce mandat : plus la poche d'actions baisse modérément en crise, plus on peut en détenir sous la limite de 15 %. Enfin, des plafonds par secteur et par pays évitent qu'un seul thème ne prenne toute la place. Détail technique si on me le demande : chaque indicateur est mesuré en écarts-types par rapport à la moyenne du secteur, après avoir écarté les données aberrantes. SI ON ME DEMANDE OÙ EST LA VUE SECTORIELLE, ou pourquoi la macro de l'étape 2 ne se retrouve pas dans le choix des titres : il n'y en a pas, et c'est voulu. Comparer chaque société à son propre secteur rend la note aveugle aux secteurs — elle dit qu'une banque est meilleure que les autres banques, jamais s'il faut détenir des banques. Les secteurs de la sélection sont un résultat, pas une décision. La lecture macro agit là où elle est mesurable, sur la répartition entre classes d'actifs : c'est elle qui met le crédit à zéro, qui impose 15 % d'indexées contre l'inflation, et qui ne retient que 3,3 % d'or. En tirer EN PLUS des paris sectoriels reviendrait à miser deux fois sur le même diagnostic : s'il est faux, il est faux sur l'allocation et sur les titres. C'est le même refus que celui qui fige la clé actions 40/35/10/15 plutôt que de parier sur le yen. Un portefeuille, un pari.");
+  s.addNotes("Chaque société reçoit une note sur cinq piliers à poids égaux, toujours comparée aux sociétés de son propre secteur : c'est ce qui permet de comparer une banque, dont le PER est naturellement bas, à un éditeur de logiciels. Le cinquième pilier, la résistance, est propre à ce mandat : plus la poche d'actions baisse modérément en crise, plus on peut en détenir sous la limite de 15 %. Détail technique si on me le demande : chaque indicateur est mesuré en écarts-types par rapport à la moyenne du secteur, après avoir écarté les données aberrantes. SUR LE PLAFOND DE VOLATILITÉ, il est mesuré DANS le métier et non sur tout l'univers, et c'est une correction du 25 septembre : un plafond unique ne dit pas « ce titre est agité pour son métier », il dit « ce métier est agité », et il interdisait le métier. La technologie disparaissait entièrement de la sélection alors qu'elle pèse 7,4 % de l'indice — ASML sortait pour moins d'un point de volatilité, alors que sa note passait le seuil. Elle est aujourd'hui la première des quinze sur les attentes des analystes. SI ON ME DEMANDE OÙ EST LA VUE SECTORIELLE : elle existe, mais elle n'est pas dans la note — elle a sa propre slide. La note, elle, est aveugle aux secteurs par construction : comparer chaque société à son propre secteur la fait dire qu'une banque est meilleure que les autres banques, jamais s'il faut détenir des banques. Les secteurs de la sélection sont donc un résultat, pas une décision, et notre vue sectorielle agit à côté, en écartant des métiers, pas en pondérant. SI ON ME DEMANDE OÙ AGIT LA MACRO : sur la répartition entre classes d'actifs, et par un seul canal — elle fixe les rendements espérés, et c'est le calcul de l'étape 4 qui les convertit en poids. Elle tranche combien d'actions au total et combien d'indexées ; elle ne tranche ni la zone, figée par la clé 40/35/10/15, ni le secteur. Attention à une formulation que j'ai corrigée : le crédit à zéro n'est PAS une décision macro, c'est une mesure de marché de l'étape 3 — 3,39 % défauts déduits contre 3,63 % pour les emprunts d'État. Tirer EN PLUS des paris sectoriels de la macro reviendrait à miser deux fois sur le même diagnostic. Un portefeuille, un pari.");
 }
 
 {
-  const s = base(3, "Les 30 titres retenus", { kicker: "À parts égales · note = écart à la moyenne du secteur (+1 = nettement meilleure)", source: "Composition iShares STOXX Europe 600 · données Yahoo Finance relevées en septembre 2026" });
+  // Ajoutée le 2026-09-25. Une décision discrétionnaire doit avoir sa slide :
+  // elle ne peut pas vivre dans une note de bas de page ni dans un coefficient.
+  const V = D.vue;
+  const s = base(3, "Notre vue sectorielle, et ce qu'elle coûte", { kicker: `Quatre métiers que nous nous interdisons · décision de gestion, pas contrainte du client · depuis le ${V.depuis.split("-").reverse().join("/")}` });
+  const rows = [["Métier écarté", "Pourquoi", "Ce que disent nos données"],
+    ...V.industries.map(([i, these, don]) => [i, these, don])];
+  table(s, rows, M, 1.5, W - 2 * M, [2.2, 5.3, 5.0], { fontSize: 9, rowH: 0.3 });
+  card(s, M, 5.55, W - 2 * M, 1.25);
+  s.addText("Ce que la décision coûte", { x: M + 0.25, y: 5.67, w: 6, h: 0.35, fontFace: HF, fontSize: 15, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, M + 0.25, 6.05, W - 2 * M - 0.5, 0.65, rich(`**${V.titres} sociétés notées** sortent de l'univers. La meilleure d'entre elles, ${V.meilleur}, était notée **${fr(V.meilleure_note, 2)}** : elle était la dernière des présélectionnés. La sélection finale et le risque du panier sont **inchangés** — la vue ne coûte qu'un titre, et le dernier.`), 12.5);
+  s.addNotes(`Une précision de méthode, et j'insiste dessus parce qu'elle sépare deux choses que l'on confond souvent. Les exclusions tabac, armement et charbon sont des contraintes du client : elles sont subies, non négociables, et leur respect se constate. Ce que vous voyez ici est l'inverse : c'est notre décision de gérant, assumée et révisable, et c'est à nous de la défendre. D'où une slide séparée. POURQUOI UNE EXCLUSION ET NON UN MALUS DANS LA NOTE, si on me le demande : parce que le signe d'un malus n'est pas déterminé. Dire que les gérants sous-pondèrent l'automobile justifie aussi bien de la vendre, si le consensus a raison, que de l'acheter, puisqu'elle est devenue bon marché parce qu'elle est détestée. Nos cinq piliers disent d'ailleurs exactement ces deux choses à la fois : sur les constructeurs, la Dynamique sort à moins 0,58 quand la Valorisation sort à plus 0,62, et la note finale ressort à la médiane de l'univers. La note ne rate donc pas la difficulté du secteur — le momentum médian des constructeurs est à moins 15,9 % quand l'univers est à plus 15,5 % — elle juge qu'elle est DÉJÀ PAYÉE par le prix. Retrancher un malus reviendrait à casser cette compensation sans le dire. Une exclusion déclarée, elle, est datée, motivée, et son coût se mesure. DERNIER POINT, et je le dis avant qu'on me le demande : la colonne de droite dit ce que NOS données pensent de chaque thèse, y compris quand elles la contredisent. Sur la chimie de spécialité, elles la contredisent — quinze titres, milieu de classement. La vue y anticipe une dégradation que les chiffres n'enregistrent pas encore, et c'est aussi le seul cas qui nous coûte un titre. C'est écrit dans le tableau plutôt que caché.`);
+}
+
+{
+  const s = base(3, `Les ${D.entonnoir.sel} présélectionnés`, { kicker: "Premier étage : ce que les sociétés SONT · note = écart à la moyenne du secteur (+1 = nettement meilleure)", source: "Composition iShares STOXX Europe 600 · données Yahoo Finance relevées en septembre 2026" });
   const t = D.trente;
   const name = (n) => n.replace(/,?\s+(plc|p\.l\.c\.|s\.a\.|s\.p\.a\.|sa|ag|se|n\.v\.|asa|ab|\(publ\)|holdings?|société anonyme|aktiengesellschaft|group|limited|oyj|a\/s)\.?$/i, "").replace(/,?\s+(plc|s\.a\.|ag|se|sa|n\.v\.)\.?$/i, "");
   const half = (a) => [["#", "Société", "Secteur", "Pays", "Note"], ...a.map((r, i) => [String(r.i + 1), name(r[0]).slice(0, 30), r[1], r[2], "+" + fr(r[3], 2)])];
@@ -395,22 +409,65 @@ dark("Analyse ligne à ligne", "Avec quoi investir : des titres en direct pour l
   const cw = [0.35, 2.35, 1.75, 1.0, 0.6];
   table(s, half(rows.slice(0, 15)), M, 1.55, 6.05, cw, { fontSize: 9.5, rowH: 0.305 });
   table(s, half(rows.slice(15)), 6.68, 1.55, 6.05, cw, { fontSize: 9.5, rowH: 0.305 });
-  s.addNotes(`Voici les 30 titres retenus, investis à parts égales. Ils couvrent ${Object.keys(D.secteurs).length} secteurs sur 11 et ${Object.keys(D.pays).length} pays. La sélection ne ressemble pas à l'indice, et c'est voulu : la note ignore la taille des sociétés, elle ne regarde que leurs qualités face à leurs concurrentes. Je peux ouvrir la fiche de n'importe quel titre dans l'application.`);
+  s.addNotes(`Voici les ${D.entonnoir.sel} titres que la notation retient : ils couvrent ${Object.keys(D.secteurs30).length} secteurs sur 11. Ce n'est PAS encore le portefeuille — c'est le premier étage, celui du constaté : bilan, marges, valorisation, comportement en crise. Tout y est mesuré sur le passé et le présent. La slide suivante pose la question d'après, celle de l'avenir, et resserre ces ${D.entonnoir.sel} en ${D.entonnoir.final}. La sélection ne ressemble pas à l'indice, et c'est voulu : la note ignore la taille des sociétés, elle ne regarde que leurs qualités face à leurs concurrentes. Je peux ouvrir la fiche de n'importe quel titre dans l'application.`);
+}
+
+{
+  // Deuxième étage, ajouté au deck le 2026-09-25 : il existait dans
+  // l'application depuis le 24 septembre, le deck n'en disait rien.
+  const A = D.avenir;
+  const s = base(3, `Deuxième étage : où vont-elles ?`, { kicker: `Les ${D.entonnoir.sel} présélectionnés resserrés en ${D.entonnoir.final} · ce que le consensus des analystes ATTEND, relevé du ${A.releve.split("-").reverse().join("/")}`, source: "Objectifs de cours et estimations de bénéfice · Yahoo Finance" });
+  s.addText("Deux mesures qui classent", { x: M, y: 1.5, w: 6, h: 0.38, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, M, 1.92, 5.9, 1.75, bullets([
+    "**La révision** : de combien le bénéfice attendu a bougé en 90 jours. Le SENS dans lequel le consensus se déplace, qui vaut mieux que son niveau",
+    "**Le solde des révisions** : la part des analystes qui relèvent, moins ceux qui abaissent",
+  ]), 12.5, { paraSpaceAfter: 7 });
+  s.addText("Deux mesures qui éliminent", { x: M, y: 3.8, w: 6, h: 0.38, fontFace: HF, fontSize: 16, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, M, 4.22, 5.9, 1.75, bullets([
+    `**Le potentiel** (cours face à l'objectif). Écarte un titre **seulement** s'il cote au-dessus de sa cible ET que les bénéfices ne suivent pas`,
+    `**La dispersion** des estimations : au-delà de ${fr(A.plafond_dispersion, 0)} %, l'avenir de la société est jugé illisible`,
+  ]), 12.5, { paraSpaceAfter: 7 });
+  card(s, 6.85, 1.5, W - M - 6.85, 2.5);
+  s.addText("Les garde-fous, et pourquoi ces seuils", { x: 7.1, y: 1.62, w: 5.5, h: 0.38, fontFace: HF, fontSize: 15, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, 7.1, 2.05, W - M - 7.35, 1.85, bullets([
+    `Bénéfice attendu coupé de plus de **${fr(-A.revision_min, 0)} %** : écarté. Seuil **absolu** et non en percentile — un percentile écarte toujours 10 % des titres, même quand aucun ne va mal`,
+    `Solde ignoré en dessous de **${A.revisions_min} révisions** : sur une seule, il ne peut valoir que −100 ou +100`,
+    `Au plus **${A.max_secteur} titres par secteur** et **${A.max_pays} par pays** : sur 15 lignes, les plafonds du premier étage laisseraient 6 espagnols faire 40 % du panier`,
+  ]), 11.5, { paraSpaceAfter: 5 });
+  card(s, 6.85, 4.2, W - M - 6.85, 1.77);
+  s.addText(`Écartés par les garde-fous`, { x: 7.1, y: 4.32, w: 5.5, h: 0.38, fontFace: HF, fontSize: 15, bold: true, color: INK, margin: 0, isTextBox: true });
+  para(s, 7.1, 4.75, W - M - 7.35, 1.1, rich(D.ecartes.map(([n, , m]) => `**${n.split(/[ ,]/)[0]}** — ${m.toLowerCase()}`).join("  ·  ")), 11);
+  para(s, M, 6.25, W - 2 * M, 0.6, rich("**Pourquoi pas l'avis « acheter / conserver / vendre »** : le biais acheteur est structurel, et l'objectif de cours monte mécaniquement quand un titre baisse. Il manquait en plus sur 6 des 30, dont des sociétés suivies par 14 analystes. Affiché, jamais noté."), 12);
+  s.addNotes(`Le premier étage mesure ce que les sociétés SONT : tout y est constaté, sur le passé et le présent. Ce deuxième étage pose la question d'après — où vont-elles ? C'est une décision de méthode que je revendique : trente lignes, pour du stock picking, c'est beaucoup, et surtout c'est un portefeuille qu'on n'a pas vraiment choisi. QUATRE INDICATEURS, et deux usages distincts. Deux classent : la révision du bénéfice attendu sur 90 jours, et le solde des révisions du mois. Deux éliminent seulement : le potentiel et la dispersion. Pourquoi cette séparation ? Parce que la valeur exacte d'un potentiel n'est pas un signal — l'objectif de cours bouge plus lentement que le cours, donc un fort potentiel signale souvent une chute récente plutôt qu'un bon dossier. Et la dispersion est structurellement sectorielle : une pétrolière dépend d'un prix que personne ne prévoit, donc la noter reviendrait à noter le secteur. TROIS SEUILS QUE J'AI DÛ CORRIGER, et je préfère les dire : le solde était d'abord rapporté au nombre d'analystes, un champ incohérent chez Yahoo, ce qui plaçait argenx première pour cette seule raison ; sans plancher de qualité, la sélection raclait le fond dès qu'un secteur se vidait, et retenait Norsk Hydro avec une révision de moins 17 % ; et sur une ou deux révisions le solde ne peut valoir que moins 100 ou plus 100, ce qui faisait sortir Airtel à moins 100 pour UN analyste. Les trois sont corrigés, et c'est écrit dans le code. DERNIER POINT si on me le demande : le garde-fou du potentiel est CONDITIONNEL. Il excluait d'abord tout titre cotant au-dessus de sa cible, ce qui contredisait mon propre argument. Mesuré : les huit titres concernés avaient TOUS un bénéfice révisé à la hausse. La règle ne sanctionnait pas la cherté, elle sanctionnait la bonne dynamique.`);
+}
+
+{
+  const Q = D.quinze;
+  const s = base(3, `Les ${D.entonnoir.final} titres retenus`, { kicker: `À parts égales · ${Object.keys(D.secteurs).length} secteurs et ${Object.keys(D.pays).length} pays · note = le constaté, avenir = l'attendu`, source: "Composition iShares STOXX Europe 600 · Yahoo Finance, septembre 2026" });
+  const name = (n) => n.replace(/,?\s+(plc|p\.l\.c\.|s\.a\.|s\.p\.a\.|sa|ag|se|n\.v\.|asa|ab|\(publ\)|holdings?|société anonyme|aktiengesellschaft|group|limited|oyj|a\/s)\.?$/i, "").replace(/,?\s+(plc|s\.a\.|ag|se|sa|n\.v\.)\.?$/i, "");
+  const rows = [["#", "Société", "Secteur", "Pays", "Note", "Avenir", "Bénéfice attendu, 90 j"],
+    ...Q.map((r, i) => [String(i + 1), name(r[0]).slice(0, 26), r[1], r[2], (r[3] >= 0 ? "+" : "") + fr(r[3], 2), (r[4] >= 0 ? "+" : "") + fr(r[4], 2), (r[5] >= 0 ? "+" : "") + fr(r[5], 1) + " %"])];
+  // 16 lignes × 0,31 = 4,96 sous un tableau posé à 1,50 : il finit à 6,46,
+  // ce qui laisse la note au-dessus de la ligne de source (7,02).
+  table(s, rows, M, 1.5, W - 2 * M, [0.4, 3.0, 2.6, 1.5, 0.95, 0.95, 2.73], { fontSize: 10, rowH: 0.31, alignRight: false });
+  para(s, M, 6.56, W - 2 * M, 0.4, rich(`**Le resserrement coûte du risque, et je l'assume** : volatilité ${fr(D.panier.panier.vol_3a, 2)} % contre ${fr(D.panier.trente.vol_3a, 2)} % à trente — chercher l'avenir coûte de la protection, parce que les défensives cotent souvent au-dessus de leur objectif.`), 11.5);
+  s.addNotes(`Voici le portefeuille d'actions européennes : ${D.entonnoir.final} lignes à parts égales, ${Object.keys(D.secteurs).length} secteurs et ${Object.keys(D.pays).length} pays. Deux colonnes de note, et c'est tout le propos : « Note » est le premier étage, ce que la société EST ; « Avenir » est le second, où elle VA. Un titre doit passer les deux. ASML est le cas le plus parlant : son bénéfice attendu a été relevé de 24 % en trois mois, le meilleur dossier des trente sur l'avenir — et elle a failli ne jamais entrer dans l'univers, parce que le plafond de volatilité était mesuré sur tout le marché au lieu de l'être sur son métier. SUR LE SURCROÎT DE RISQUE, et il faut le dire avant qu'on me le demande : passer de trente à quinze lignes fait monter la volatilité du panier d'environ 1,3 point. La cause est identifiée : le garde-fou du potentiel frappe les défensives, qui cotent souvent au-dessus de leur objectif quand elles sont chères. Chercher l'avenir coûte de la protection. L'échelle réelle, en revanche, est petite : la poche d'actions européennes vaut 12,2 % du portefeuille, donc l'écart pèse environ 0,16 point au niveau du patrimoine. La limite de moins 15 % n'est pas approchée.`);
 }
 
 {
   const P = D.panier;
-  const s = base(3, "Le panier résiste mieux que l'indice", { kicker: "Les 30 titres à parts égales, en euros, face au STOXX Europe 600" });
-  const items = [["Volatilité sur 3 ans", P.panier.vol_3a, P.indice.vol_3a], ["Pire baisse en 2020", P.panier.dd_2020, P.indice.dd_2020], ["Pire baisse en 2022", P.panier.dd_2022, P.indice.dd_2022]];
-  items.forEach(([l, a, b], i) => {
+  const s = base(3, "Le panier résiste mieux que l'indice", { kicker: `Les ${D.entonnoir.final} titres à parts égales, en euros, face aux ${D.entonnoir.sel} présélectionnés et au STOXX Europe 600` });
+  const items = [["Volatilité sur 3 ans", P.panier.vol_3a, P.trente.vol_3a, P.indice.vol_3a], ["Pire baisse en 2020", P.panier.dd_2020, P.trente.dd_2020, P.indice.dd_2020], ["Pire baisse en 2022", P.panier.dd_2022, P.trente.dd_2022, P.indice.dd_2022]];
+  items.forEach(([l, a, b, c], i) => {
     const x = M + i * 4.1;
-    card(s, x, 1.7, 3.85, 2.6);
-    s.addText(l, { x: x + 0.25, y: 1.85, w: 3.4, h: 0.4, fontFace: BF, fontSize: 14, color: MUTED, margin: 0, isTextBox: true });
-    s.addText(pct(a), { x: x + 0.25, y: 2.3, w: 3.4, h: 0.9, fontFace: HF, fontSize: 40, bold: true, color: INK, margin: 0, isTextBox: true });
-    s.addText("indice : " + pct(b), { x: x + 0.25, y: 3.3, w: 3.4, h: 0.4, fontFace: BF, fontSize: 15, color: TEXT, margin: 0, isTextBox: true });
+    card(s, x, 1.7, 3.85, 2.85);
+    s.addText(l, { x: x + 0.25, y: 1.82, w: 3.4, h: 0.4, fontFace: BF, fontSize: 14, color: MUTED, margin: 0, isTextBox: true });
+    s.addText(pct(a), { x: x + 0.25, y: 2.24, w: 3.4, h: 0.85, fontFace: HF, fontSize: 38, bold: true, color: INK, margin: 0, isTextBox: true });
+    s.addText(`les ${D.entonnoir.sel} : ` + pct(b), { x: x + 0.25, y: 3.14, w: 3.4, h: 0.38, fontFace: BF, fontSize: 13.5, color: TEXT, margin: 0, isTextBox: true });
+    s.addText("indice : " + pct(c), { x: x + 0.25, y: 3.52, w: 3.4, h: 0.38, fontFace: BF, fontSize: 13.5, color: MUTED, margin: 0, isTextBox: true });
   });
-  callout(s, M, 4.7, W - 2 * M, 1.7, "Moins agité au quotidien, nettement mieux tenu en 2022, à égalité en 2020. Mais en crise, il perd **bien plus que 15 %** : c'est le dosage avec les obligations et l'or, à l'étape 4, qui tiendra la limite.", INK, 15.5);
-  s.addNotes(`On vérifie que la sélection tient mieux en crise que l'indice. C'est le cas en 2022 : ${pct(P.panier.dd_2022)} contre ${pct(P.indice.dd_2022)}. En 2020, les deux ont baissé d'environ un tiers. Message important : un panier d'actions reste un panier d'actions. La limite de 15 % ne se tiendra pas par le choix des titres, mais par le dosage entre actions, obligations et or, à l'étape 4. Précaution d'honnêteté : les titres sont choisis avec les données d'aujourd'hui, donc leur performance passée est flatteuse par construction ; seul leur comportement en crise est informatif.`);
+  callout(s, M, 4.9, W - 2 * M, 1.6, "Moins agité que l'indice, nettement mieux tenu en 2022, un peu plus exposé en 2020 que les trente — le prix du resserrement. Mais en crise, un panier d'actions perd **bien plus que 15 %** : c'est le dosage avec les obligations et l'or, à l'étape 4, qui tiendra la limite.", INK, 14.5);
+  s.addNotes(`On vérifie que la sélection tient mieux en crise que l'indice. C'est le cas en 2022 : ${pct(P.panier.dd_2022)} contre ${pct(P.indice.dd_2022)}. En 2020, les deux ont baissé d'environ un tiers. La colonne du milieu est la mesure honnête du resserrement : passer de ${D.entonnoir.sel} à ${D.entonnoir.final} lignes coûte de la volatilité, ${pct(P.panier.vol_3a, 2)} contre ${pct(P.trente.vol_3a, 2)}, et un peu de 2020. Rapporté au patrimoine, où la poche vaut 12,2 %, cela pèse environ 0,16 point. Message important : un panier d'actions reste un panier d'actions. La limite de 15 % ne se tiendra pas par le choix des titres, mais par le dosage entre actions, obligations et or, à l'étape 4. Précaution d'honnêteté : les titres sont choisis avec les données d'aujourd'hui, donc leur performance passée est flatteuse par construction ; seul leur comportement en crise est informatif.`);
 }
 
 {
@@ -491,7 +548,7 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
   const pa = D.pertes.poche_actions["2008"];
   stat(s, 9.2, 1.6, 3.55, "≤ " + pct(15 / -pa * 100, 0), `d'actions au plus sans amortisseur (15 ÷ ${fr(-pa, 0)})`, INK, 34);
   para(s, 9.2, 3.2, 3.55, 3.6, bullets(["**Récession** (2008, 2011) : les États montent", "**Inflation** (2022) : tout baisse ensemble", "**L'or** tient dans les quatre crises", "Matières premières et bitcoin : **aucun amortisseur**"]), 13.5, { paraSpaceAfter: 9 });
-  s.addNotes(`Deuxième ingrédient : le comportement en crise. Les actions perdent jusqu'à ${pct(-pa, 0)} en 2008. Sans amortisseur, on ne pourrait donc pas en détenir plus de ${pct(15 / -pa * 100, 0)}. Pour aller au-delà, il faut des supports qui montent quand les actions baissent. En 2008, les emprunts d'État gagnent 14 % et l'or 39 % : ils amortissent. Mais en 2022, crise d'inflation, les obligations baissent avec les actions : plus d'amortisseur. C'est le régime décrit à l'étape 2. L'or est le seul qui tienne partout. Parce que ce lien change d'une crise à l'autre, le calcul ne s'appuie pas sur une corrélation moyenne : il fait traverser à chaque portefeuille les vingt années, jour après jour.`);
+  s.addNotes(`Deuxième ingrédient : le comportement en crise. Les actions perdent jusqu'à ${pct(-pa, 0)} en 2008. Sans amortisseur, on ne pourrait donc pas en détenir plus de ${pct(15 / -pa * 100, 0)}. Pour aller au-delà, il faut des supports qui montent quand les actions baissent. En 2008, sur la fenêtre de crise, les emprunts d'État gagnent ${pct(D.perf_crises.etats_longs['2008'])} et l'or ${pct(D.perf_crises.or['2008'])} : ils amortissent. Mais en 2022, crise d'inflation, les obligations baissent avec les actions : plus d'amortisseur. C'est le régime décrit à l'étape 2. L'or est le seul qui tienne partout. Parce que ce lien change d'une crise à l'autre, le calcul ne s'appuie pas sur une corrélation moyenne : il fait traverser à chaque portefeuille les vingt années, jour après jour.`);
 }
 
 {
@@ -584,7 +641,7 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
   // l'or a sa place : son plafond de 10 % n'est pas saturé, et la question
   // « pourquoi si peu d'or ? » se pose à chaque soutenance.
   para(s, 7.85, 5.68, 4.9, 1.25, rich(`Crédit et matières premières restent **à zéro** : le crédit rapporte moins que les États, les matières premières baissent avec les actions. **L'or s'arrête à ${pct(W4.or * 100, 1)}** alors que son plafond est à ${pct(D.plafonds.or, 0)} : personne ne l'a fixé à ce niveau, c'est tout ce que le calcul en veut.`), 11);
-  s.addNotes(`On reprend le calcul et on ajoute les règles une par une, en chiffrant ce que chacune coûte. Réserver les 10 millions en AAA ne coûte presque rien. Imposer la répartition des actions, Europe 40, États-Unis 35, Japon 10, émergents 15, est la règle la plus chère : ${fr(S.r2_cle.rdt - S.r1_aaa.rdt, 2)} point, c'est le prix du renoncement au pari sur le yen. Les plafonds évitent la concentration ; résultat intéressant, les actions remontent, parce que les États à 2-10 ans amortissaient mieux 2020 que les indexées. Enfin une marge : viser 14 % au lieu de 15, parce que certains remplaçants flattent 2008. Au total, les règles coûtent ${fr(LIB.rdt - R4.rdt, 2)} point de rendement espéré : c'est le prix d'un portefeuille robuste. SI ON ME DEMANDE POURQUOI SI PEU D'OR : parce que personne n'a choisi ce chiffre. Le plafond autorise ${pct(D.plafonds.or, 0)} et le calcul n'en prend que ${pct(W4.or * 100, 1)} — le plafond n'est pas la contrainte qui mord. L'or a le plus faible rendement espéré du modèle, ${pct(rdtCls.or, 2)}, à peine au-dessus des ${pct(rdtCls.etats_longs, 2)} des emprunts d'État à 2-10 ans. On ne le détient donc pas pour ce qu'il rapporte mais pour sa tenue en crise : plus 39 % en 2008, plus 19 % en 2011, plus 4 % en 2022, la seule ligne du portefeuille qui monte quand tout baisse. Le calcul en achète juste ce qu'il faut pour laisser la poche actions atteindre ${pct(partAct * 100, 1)} sous la limite ; au-delà, chaque euro d'or supplémentaire coûte du rendement sans acheter assez de protection. Vérifié le 24 septembre : le résultat est stable, huit tirages aléatoires différents donnent tous ${pct(W4.or * 100, 1)}.`);
+  s.addNotes(`On reprend le calcul et on ajoute les règles une par une, en chiffrant ce que chacune coûte. Réserver les 10 millions en AAA ne coûte presque rien. Imposer la répartition des actions, Europe 40, États-Unis 35, Japon 10, émergents 15, est la règle la plus chère : ${fr(S.r2_cle.rdt - S.r1_aaa.rdt, 2)} point, c'est le prix du renoncement au pari sur le yen. Les plafonds évitent la concentration ; résultat intéressant, les actions remontent, parce que les États à 2-10 ans amortissaient mieux 2020 que les indexées. Enfin une marge : viser 14 % au lieu de 15, parce que certains remplaçants flattent 2008. Au total, les règles coûtent ${fr(LIB.rdt - R4.rdt, 2)} point de rendement espéré : c'est le prix d'un portefeuille robuste. SI ON ME DEMANDE POURQUOI SI PEU D'OR : parce que personne n'a choisi ce chiffre. Le plafond autorise ${pct(D.plafonds.or, 0)} et le calcul n'en prend que ${pct(W4.or * 100, 1)} — le plafond n'est pas la contrainte qui mord. L'or a le plus faible rendement espéré du modèle, ${pct(rdtCls.or, 2)}, à peine au-dessus des ${pct(rdtCls.etats_longs, 2)} des emprunts d'État à 2-10 ans. On ne le détient donc pas pour ce qu'il rapporte mais pour sa tenue en crise. Les chiffres exacts, en euros et sur les fenêtres de crise du dossier : ${pct(D.perf_crises.or['2008'])} en 2008, ${pct(D.perf_crises.or['2011'])} en 2011, ${pct(D.perf_crises.or['2020'])} en 2020, ${pct(D.perf_crises.or['2022'])} en 2022 — c'est LE SEUL SUPPORT du portefeuille à finir positif sur les quatre, quand la poche d'actions perd ${pct(-D.perf_crises.poche_actions['2008'])} en 2008 et les emprunts d'État ${pct(-D.perf_crises.etats_longs['2022'])} en 2022. Si on me montre la table des pires baisses, où l'or affiche moins 25,7 % en 2008 : les deux sont vrais et ne mesurent pas la même chose — il a bien reculé de 25,7 % À L'INTÉRIEUR de la fenêtre avant de la finir en hausse. Le calcul en achète juste ce qu'il faut pour laisser la poche actions atteindre ${pct(partAct * 100, 1)} sous la limite ; au-delà, chaque euro d'or supplémentaire coûte du rendement sans acheter assez de protection. Et c'est stable : huit tirages aléatoires différents donnent tous ${pct(W4.or * 100, 1)}.`);
 }
 
 {
@@ -603,23 +660,23 @@ dark("Allocation", "Combien placer sur chaque support pour rapporter au moins 4 
 {
   const s = base(4, "Le portefeuille en millions d'euros", { kicker: "100 M€, support par support", source: `Frais des fonds : ${fr(D.frais_total / 1e3, 0)} k€ par an (${pct(D.frais_inst, 2)} du patrimoine) · frais de mandat ${pct(D.frais_mandat, 2)} · aucune ligne ne dépasse 1 % de son fonds` });
   const nm = { actions_europe: "Actions européennes", usa: "Actions américaines", japon: "Actions japonaises", emergents: "Actions émergentes", etats_courts: "Échelle AAA, 6 à 24 mois", etats_longs: "Échelle zone euro, 2 à 10 ans", indexees: "Obligations indexées", or: "Or" };
-  const sup = { actions_europe: "30 titres en direct", etats_courts: "4 obligations en direct", etats_longs: "5 obligations en direct" };
+  const sup = { actions_europe: `${D.entonnoir.final} titres en direct`, etats_courts: "4 obligations en direct", etats_longs: "5 obligations en direct" };
   const fc = { actions_europe: FAM.act, usa: FAM.act, japon: FAM.act, emergents: FAM.act, etats_courts: FAM.eta, etats_longs: FAM.eta, indexees: FAM.idx, or: FAM.or };
   const rows = [["Ligne", "Support", "Montant", "Poids", "Rendement espéré"]];
   D.retenu_lignes.forEach(([k, , s_, w, r]) => rows.push([{ text: [{ text: "■  ", options: { color: fc[k] } }, { text: nm[k], options: { color: TEXT } }] }, sup[k] || s_, me(w * 1e8), pct(w * 100), pct(r, 2)]));
   rows.push([{ text: "Total", options: { bold: true } }, "", { text: "100,0 M€", options: { bold: true } }, "100 %", { text: pct(R4.rdt, 2), options: { bold: true } }]);
   table(s, rows, M, 1.55, 8.3, [3.0, 2.2, 1.05, 0.8, 1.25], { fontSize: 13, rowH: 0.47, alignRight: true });
   // pastilles de couleur des familles
-  const par = W4.actions_europe * 1e8 / 30;
+  const par = W4.actions_europe * 1e8 / D.entonnoir.final;
   para(s, 9.25, 1.6, 3.5, 5.2, bullets([
-    `**30 actions européennes** à ${me(par, 2)} chacune`,
+    `**${D.entonnoir.final} actions européennes** à ${me(par, 2)} chacune`,
     `**Échelle AAA** : ${me(W4.etats_courts * 1e8)} investis, qui rendront les 10 M€ avec une petite réserve`,
     `**Échelle 2-10 ans** : 5 × ${me(W4.etats_longs * 1e8 / 5, 2)}`,
     "**Fonds** : XZMU, XZMJ, XZEM, IBCI, Xetra-Gold",
     `Réalisé 2006-2026 : **${pct(D.realise, 2)} par an** (dix ans de taux négatifs inclus)`,
     `Rendement espéré **net de frais : ${pct(D.net, 2)}**`,
   ]), 13, { paraSpaceAfter: 9 });
-  s.addNotes("Concrètement, en millions d'euros. Environ 12 millions sur les 30 actions européennes, à 400 000 euros chacune ; 10 millions sur l'échelle AAA, qui rendront un peu plus que les 10 millions à décaisser ; 41 millions sur l'échelle d'emprunts d'État de 2 à 10 ans ; 15 millions en obligations indexées ; le reste en fonds d'actions américaines, japonaises et émergentes, et 3 millions en or — la seule ligne détenue pour sa tenue en crise et non pour son rendement. Les frais des fonds représentent environ 47 000 euros par an. Sur 2006-2026, ce portefeuille aurait rapporté 4,5 % par an ; ce n'est pas comparable au rendement espéré, parce que le passé comptait dix ans de taux négatifs alors que l'avenir part de taux autour de 3 %.");
+  s.addNotes(`Concrètement, en millions d'euros. Environ 12 millions sur les ${D.entonnoir.final} actions européennes, à ${me(par, 0)} chacune ; 10 millions sur l'échelle AAA, qui rendront un peu plus que les 10 millions à décaisser ; 41 millions sur l'échelle d'emprunts d'État de 2 à 10 ans ; 15 millions en obligations indexées ; le reste en fonds d'actions américaines, japonaises et émergentes, et 3 millions en or — la seule ligne détenue pour sa tenue en crise et non pour son rendement. Les frais des fonds représentent environ 47 000 euros par an. Sur 2006-2026, ce portefeuille aurait rapporté 4,5 % par an ; ce n'est pas comparable au rendement espéré, parce que le passé comptait dix ans de taux négatifs alors que l'avenir part de taux autour de 3 %.`);
 }
 
 // ================================================================ SECTION 5
@@ -669,7 +726,7 @@ dark("Backtests", "Le portefeuille rejoué de 2006 à aujourd'hui : combien de t
 // ================================================================ Clôture
 {
   const s = dark("Notre proposition", null);
-  const items = [[pct(D.net, 2), "de rendement espéré net de frais"], [pct(R4.pire), "de pire baisse sur vingt ans"], [pct(partAct * 100, 0), "d'actions, dont 30 titres en direct"], ["10 M€", "sécurisés en AAA, à taux garantis"]];
+  const items = [[pct(D.net, 2), "de rendement espéré net de frais"], [pct(R4.pire), "de pire baisse sur vingt ans"], [pct(partAct * 100, 0), `d'actions, dont ${D.entonnoir.final} titres en direct`], ["10 M€", "sécurisés en AAA, à taux garantis"]];
   items.forEach(([v, l], i) => {
     const x = M + i * 3.1;
     s.addText(v, { x, y: 3.5, w: 2.95, h: 0.9, fontFace: HF, fontSize: 40, bold: true, color: "F5C969", margin: 0, isTextBox: true });
@@ -734,7 +791,7 @@ dark("Backtests", "Le portefeuille rejoué de 2006 à aujourd'hui : combien de t
   // Annexe C — la notation des actions, racontée avant d'être formulée.
   // Reprise de docs/modeles/04 : on dit ce que le chiffre VEUT DIRE, et on
   // ne pose une formule que là où elle apprend quelque chose (1/PER).
-  const s = base(0, "Annexe C — Comment 600 actions deviennent 30", { kicker: "Pour les questions techniques" });
+  const s = base(0, `Annexe C — Comment 600 actions deviennent ${D.entonnoir.final}`, { kicker: "Pour les questions techniques" });
   callout(s, M, 1.5, W - 2 * M, 0.95, "Le problème : on veut mélanger un PER, une marge, une volatilité et une croissance. **Trois obstacles — les unités diffèrent, les sens s'opposent, et le niveau « normal » dépend du secteur.**", INK, 14.5);
 
   const E = [

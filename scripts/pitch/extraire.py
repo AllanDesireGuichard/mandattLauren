@@ -3,8 +3,10 @@ Chiffres du pitch oral -> scripts/pitch/data.json
 
 Lancer :  PYTHONPATH=. python3 scripts/pitch/extraire.py
 Puis   :  cd scripts/pitch && npm install && npm run build
-          -> outputs/Mandat_Lauren_pitch_genere.pptx (jamais sur la version
-             retouchée à la main, outputs/Mandat_Lauren_pitch.pptx)
+          -> outputs/Mandat_Lauren_pitch_genere.pptx
+Enfin  :  python3 scripts/pitch/controle.py        (géométrie du rendu)
+          puis recopier sur outputs/Mandat_Lauren_pitch.pptx, qui est le
+          deck de référence depuis la bascule validée le 2026-09-21.
 
 POURQUOI. Le deck ne recalcule rien : il lit les mêmes modules que l'app
 (core/*), si bien que ses chiffres sont ceux affichés dans les onglets. Après
@@ -20,7 +22,8 @@ from pathlib import Path
 import pandas as pd
 
 from core import (actions, allocation, backtests, credit, fonds, ips, macro,
-                  marches, obligations, rendements, taux)
+                  marches, obligations, outlook, rendements, scoring, taux,
+                  vue_secteurs)
 
 RACINE = Path(__file__).resolve().parents[2]
 SORTIE = Path(__file__).resolve().parent / "data.json"
@@ -105,20 +108,71 @@ def main() -> None:
     d = actions.univers()
     sel = actions.selection(d)
     excl = d[d["exclusion"].notna()]
+    notes = d[d["note"].notna()]
+    # Le second étage (core/outlook) et la vue sectorielle (core/vue_secteurs)
+    # n'étaient pas extraits : le deck a parlé de trente titres pendant que
+    # l'application en affichait quinze.
+    j = outlook.juger(sel, outlook.indicateurs())
+    fin = outlook.selectionner(j)
+    cv = vue_secteurs.cout(d)
     out["entonnoir"] = {
         "n": len(d), "excl": len(excl), "inv": int(d["societe_invest"].sum()),
         "petites": int((d["trop_petite"] & d["exclusion"].isna()
                         & ~d["societe_invest"]).sum()),
-        "notees": int(d["note"].notna().sum()), "sel": len(sel),
+        "notees": int(notes["note"].notna().sum()),
+        "vue": cv["titres_notes"], "sel": len(sel), "final": len(fin),
         "excl_motifs": excl.groupby("exclusion").size().to_dict(),
+    }
+    out["vue"] = {
+        "industries": [(i, v[1], v[2]) for i, v in vue_secteurs.VUE.items()],
+        "depuis": next(iter(vue_secteurs.VUE.values()))[0],
+        "titres": cv["titres_notes"],
+        "meilleur": cv["meilleur_titre"],
+        "meilleure_note": round(cv["meilleure_note"], 3),
+        "trentieme": round(float(sel["note"].min()), 3),
     }
     out["trente"] = [(r.longName, r.secteur, r.pays, round(r.note, 2))
                      for r in sel.itertuples()]
-    out["secteurs"] = sel["secteur"].value_counts().to_dict()
-    out["pays"] = sel["pays"].value_counts().to_dict()
-    pa = actions.panier_face_indice(sel)
+    out["quinze"] = [(r.longName, r.secteur, r.pays, round(r.note, 2),
+                      round(r.note_avenir, 2), round(r.revision, 1),
+                      round(r.solde, 0), round(r.potentiel, 1))
+                     for r in fin.itertuples()]
+    out["ecartes"] = [(r.longName, r.secteur, r.motif)
+                      for r in j[j["motif"].notna()].itertuples()]
+    out["avenir"] = {
+        "releve": outlook.releve(),
+        "plafond_dispersion": round(outlook.plafond_dispersion(
+            outlook.indicateurs()), 1),
+        "revision_min": outlook.REVISION_MIN,
+        "revisions_min": outlook.REVISIONS_MIN,
+        "max_secteur": outlook.MAX_SECTEUR, "max_pays": outlook.MAX_PAYS,
+    }
+    out["secteurs"] = fin["secteur"].value_counts().to_dict()
+    out["pays"] = fin["pays"].value_counts().to_dict()
+    out["secteurs30"] = sel["secteur"].value_counts().to_dict()
+    pa, p30 = actions.panier_face_indice(fin), actions.panier_face_indice(sel)
     out["panier"] = {k: {x: pa[k][x] for x in ("vol_3a", "dd_2020", "dd_2022")}
                      for k in ("panier", "indice")}
+    out["panier"]["trente"] = {x: p30["panier"][x]
+                               for x in ("vol_3a", "dd_2020", "dd_2022")}
+    # Le plafond de volatilité est devenu sectoriel le 2026-09-25 : la
+    # technologie sortait entièrement d'un plafond mesuré sur tout l'univers.
+    pv = scoring.plafonds_volatilite(notes)
+    out["vol_plafond"] = {"univers": round(scoring.plafond_volatilite(notes), 1),
+                          "max": round(float(pv.max()), 1),
+                          "secteur_max": str(pv.idxmax())}
+
+    # Performance SUR la fenêtre de crise, à ne pas confondre avec la pire
+    # baisse DANS la fenêtre : le deck affirmait « l'or +39 % en 2008 », un
+    # chiffre qui ne sort d'aucune de nos séries. Mesuré ici, en euros.
+    sr = allocation.series_risque()
+    out["perf_crises"] = {
+        k: {nom: round((x.iloc[-1] / x.iloc[0] - 1) * 100, 1)
+            for nom, (a, b, _l) in allocation.CRISES.items()
+            if len(x := sr[k][a:b].dropna()) > 1}
+        for k in ("poche_actions", "etats_longs", "indexees", "or", "matieres")
+        if k in sr.columns
+    }
 
     sv = ph["svensson"]
     ech = obligations.echelle(allocation.TRANCHES, sv["aaa"])
