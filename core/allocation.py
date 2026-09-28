@@ -284,7 +284,18 @@ def resultats() -> dict:
 
 
 def avec_poche_actions(s: pd.DataFrame) -> pd.DataFrame:
-    """Les quatre zones d'actions remplacées par la poche 40/35/10/15."""
+    """
+    Les quatre zones d'actions remplacées par la poche 40/35/10/15.
+
+    Le `dropna` final aligne toutes les colonnes sur la plus courte : c'est
+    voulu, l'optimiseur a besoin d'une matrice pleine. Mais il rend la
+    fonction SENSIBLE À CE QU'ON LUI DONNE — passer `series()` brute coupe la
+    fenêtre à 2014, date du premier cours de bitcoin, et le rendement réalisé
+    du portefeuille tombe de 4,47 % à 4,03 % sans que rien ne le signale
+    (constaté le 2026-09-28 en écrivant scripts/export_risque.py). Les
+    colonnes hors calcul sont donc retirées ici, et non chez l'appelant.
+    """
+    s = s.drop(columns=[k for k in HORS_CALCUL if k in s.columns])
     autres = [k for k in s if k not in MIX_ACTIONS]
     out = pd.concat([portefeuille(s, MIX_ACTIONS).rename("poche_actions"),
                      s[autres]], axis=1).dropna()
