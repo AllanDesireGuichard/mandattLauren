@@ -1,0 +1,169 @@
+{
+ "asof": "2026-10-29",
+ "window": [
+  "2026-01-02",
+  "2026-10-29"
+ ],
+ "days": 300,
+ "port_ytd": 6.0,
+ "infl": 3.3,
+ "ecart": 2.7,
+ "maxdd": -3.6,
+ "maxdd_date": "2026-03-27",
+ "floor_margin": 11.4,
+ "poches": {
+  "actions": {
+   "w": 30.4,
+   "perf": 22.6,
+   "contrib": 6.86
+  },
+  "oblig": {
+   "w": 66.3,
+   "perf": -1.2,
+   "contrib": -0.78
+  },
+  "or": {
+   "w": 3.3,
+   "perf": -1.6,
+   "contrib": -0.05
+  }
+ },
+ "geo": {
+  "us": 17.3,
+  "jp": 23.7,
+  "em": 4.4,
+  "us_c": 1.84,
+  "jp_c": 0.72,
+  "em_c": 0.2
+ },
+ "bonds": {
+  "govt_ytd": -2.1,
+  "govt_contrib": -0.88,
+  "aaa_ytd": 0.3,
+  "link_ytd": 0.5
+ },
+ "sectors": {
+  "tech": {
+   "contrib": 0.42,
+   "perf": 51.3
+  },
+  "ind": {
+   "contrib": 0.51,
+   "perf": 31.4
+  },
+  "comm": {
+   "contrib": -0.03,
+   "perf": -1.6
+  },
+  "sante": {
+   "contrib": 0.57,
+   "perf": 35.0
+  },
+  "ener": {
+   "contrib": 0.95,
+   "perf": 117.1
+  },
+  "fin": {
+   "contrib": 0.48,
+   "perf": 29.6
+  },
+  "util": {
+   "contrib": 0.55,
+   "perf": 33.9
+  },
+  "cycl": {
+   "contrib": 0.37,
+   "perf": 22.9
+  },
+  "def": {
+   "contrib": 0.28,
+   "perf": 34.4
+  }
+ },
+ "stocks": {
+  "ASML": {
+   "ytd": 51.3,
+   "contrib": 0.42,
+   "sector": "tech"
+  },
+  "Unipol": {
+   "ytd": 28.5,
+   "contrib": 0.23,
+   "sector": "fin"
+  },
+  "Diploma": {
+   "ytd": 43.2,
+   "contrib": 0.35,
+   "sector": "ind"
+  },
+  "Endesa": {
+   "ytd": 46.4,
+   "contrib": 0.38,
+   "sector": "util"
+  },
+  "BAWAG": {
+   "ytd": 30.6,
+   "contrib": 0.25,
+   "sector": "fin"
+  },
+  "Naturgy": {
+   "ytd": 21.3,
+   "contrib": 0.17,
+   "sector": "util"
+  },
+  "Argenx": {
+   "ytd": 11.2,
+   "contrib": 0.09,
+   "sector": "sante"
+  },
+  "Next": {
+   "ytd": 17.9,
+   "contrib": 0.15,
+   "sector": "cycl"
+  },
+  "Vår Energi": {
+   "ytd": 117.1,
+   "contrib": 0.95,
+   "sector": "ener"
+  },
+  "InterContinental": {
+   "ytd": 27.9,
+   "contrib": 0.23,
+   "sector": "cycl"
+  },
+  "Publicis": {
+   "ytd": 18.3,
+   "contrib": 0.15,
+   "sector": "comm"
+  },
+  "AB InBev": {
+   "ytd": 34.4,
+   "contrib": 0.28,
+   "sector": "def"
+  },
+  "Orion": {
+   "ytd": 58.8,
+   "contrib": 0.48,
+   "sector": "sante"
+  },
+  "Airtel Africa": {
+   "ytd": -21.5,
+   "contrib": -0.17,
+   "sector": "comm"
+  },
+  "Aena": {
+   "ytd": 19.6,
+   "contrib": 0.16,
+   "sector": "ind"
+  }
+ },
+ "macro": {
+  "brent_ytd": 81.0,
+  "brent_peak": 95.0,
+  "brent_peak_date": "2026-03-31",
+  "gold_usd_ytd": -6.6,
+  "gold_usd_peak": 23.0,
+  "gold_eur_ytd": -1.6,
+  "eurusd_ytd": -5.1
+ }
+}
